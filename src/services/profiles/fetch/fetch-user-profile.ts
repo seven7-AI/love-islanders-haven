@@ -49,7 +49,7 @@ export const fetchUserProfile = async () => {
       const fallbackName = user.user_metadata?.name || user.email?.split('@')[0] || 'New User';
       const { data: createdProfile, error: createError } = await supabase
         .from('profiles')
-        .upsert({ id: userId, email: user.email, name: fallbackName, onboarding_completed: false }, { onConflict: 'id' })
+        .upsert({ id: userId, name: fallbackName, onboarding_completed: false }, { onConflict: 'id' })
         .select('*')
         .single();
 
@@ -79,6 +79,8 @@ export const fetchUserProfile = async () => {
     // Create a profile object with image data
     const profile = {
       ...transformProfileData(profileData),
+      // The email address is held by the auth provider, not the profiles table.
+      email: user.email || undefined,
       images: imageData 
         ? imageData
             .filter(img => img.is_visible)
@@ -113,7 +115,6 @@ function transformProfileData(rawData: any): SupabaseProfile {
   return {
     id: rawData.id,
     name: rawData.name || '',
-    email: rawData.email || undefined,
     displayName: rawData.display_name || rawData.name || '',
     display_name: rawData.display_name || undefined,
     age: rawData.age || 0,

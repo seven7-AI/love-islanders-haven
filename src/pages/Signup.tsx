@@ -37,16 +37,7 @@ const Signup = () => {
       }
 
       if (data.user) {
-        // Create profile + onboarding rows (ignore conflicts in case trigger already created them)
-        await supabase.from('profiles').upsert(
-          { id: data.user.id, email, name, display_name: name, email_verified: !!data.session, onboarding_completed: false },
-          { onConflict: 'id' }
-        );
-        await supabase.from('profile_onboarding').upsert(
-          { profile_id: data.user.id, completed: false, current_step: 'basics' },
-          { onConflict: 'profile_id' }
-        );
-
+        // Profile and onboarding rows are created by the database when the auth user is created.
         if (data.session) {
           localStorage.setItem('isAuthenticated', 'true');
           toast.success('Account created! Let\'s set up your profile.');

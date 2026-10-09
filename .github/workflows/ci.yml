@@ -43,3 +43,11 @@ jobs:
           node-version: 22
       # Report-only until existing advisories are triaged (#23 makes this blocking).
       - run: npm audit --audit-level=high || echo "::warning::npm audit reported high-severity advisories"
+
+  database:
+    name: Database (migrations + policy tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply migrations to a fresh Postgres and run policy tests
+        run: supabase/test/run.sh

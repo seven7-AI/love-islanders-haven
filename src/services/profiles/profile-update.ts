@@ -3,9 +3,10 @@ import { SupabaseProfile } from "./types";
 import { toast } from "sonner";
 
 const PROFILE_DB_FIELDS = new Set([
-  'name', 'email', 'age', 'dob', 'show_age', 'gender', 'gender_preference', 'height_cm',
-  'occupation', 'education', 'location', 'bio', 'avatar_url', 'interests', 'verified',
-  'relationship_goal', 'email_verified', 'streak_count', 'drinking_habit', 'smoking_habit',
+  // verified, email_verified and streak_count are managed by the database
+  'name', 'age', 'dob', 'show_age', 'gender', 'gender_preference', 'height_cm',
+  'occupation', 'education', 'location', 'bio', 'avatar_url', 'interests',
+  'relationship_goal', 'drinking_habit', 'smoking_habit',
   'communication_style', 'love_language', 'zodiac_sign', 'hometown', 'pronouns', 'city',
   'country', 'display_name', 'age_range_min', 'age_range_max', 'distance_preference',
   'show_me_verified_only', 'onboarding_completed', 'updated_at'

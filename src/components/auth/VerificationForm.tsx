@@ -52,23 +52,12 @@ const VerificationForm = ({
             const { error } = await supabase
               .from('profiles')
               .update({
-                name: email.split('@')[0], // Default name from email
-                email: email,
                 email_verified: true
               })
               .eq('id', user.id);
 
             if (error) {
               console.error("Error updating profile:", error);
-              // Try admin function approach if direct update fails
-              await supabase.functions.invoke('create-user-profile', {
-                body: { 
-                  userId: user.id,
-                  name: email.split('@')[0], 
-                  email: email,
-                  emailVerified: true
-                }
-              });
             }
             
             console.log("Profile created/updated with verified status");
