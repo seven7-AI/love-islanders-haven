@@ -1,140 +1,76 @@
-
-import { useState, useEffect } from 'react';
-import { User } from 'lucide-react';
+import { useState } from 'react';
+import { Loader2, User } from 'lucide-react';
 import SettingsSection from './SettingsSection';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useSettings } from '@/context/SettingsContext';
-import { AccountSettings as AccountSettingsType } from '@/services/settings';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const AccountSettings = () => {
-  const { settings, updateSettings } = useSettings();
   const { user } = useAuth();
-  const [localSettings, setLocalSettings] = useState<AccountSettingsType>(
-    settings.account_settings
-  );
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const currentEmail = user?.email ?? '';
+  const [newEmail, setNewEmail] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLocalSettings(settings.account_settings);
-    loadUserEmail();
-  }, [settings.account_settings, user]);
+  const trimmed = newEmail.trim();
+  const canSubmit = trimmed.length > 0 && trimmed.toLowerCase() !== currentEmail.toLowerCase() && !isSaving;
 
-  const loadUserEmail = async () => {
-    // Try different sources for the email
-    let userEmail = '';
-    
-    // 1. Try from user object
-    if (user?.email) {
-      userEmail = user.email;
-      console.log("User email set from auth context:", userEmail);
-    }
-
-    // 2. Try from Supabase directly
-    if (!userEmail) {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user?.email) {
-          userEmail = user.email;
-          console.log("User email set from Supabase auth:", userEmail);
-        }
-      } catch (error) {
-        console.error("Error fetching user from Supabase:", error);
-      }
-    }
-    
-    // 3. If we found an email, update state and settings
-    if (userEmail) {
-      setEmail(userEmail);
-      
-      // Update settings if the email changed
-      if (localSettings.email !== userEmail) {
-        const newSettings = { ...localSettings, email: userEmail };
-        setLocalSettings(newSettings);
-        updateSettings('account_settings', newSettings).catch(error => {
-          console.error('Error updating email in settings:', error);
-        });
-      }
-    }
-    
-    // Try to fetch user profile from Supabase
+  const handleChangeEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+    setIsSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (error) {
-          console.error("Error fetching profile:", error);
-        } else if (profile) {
-          console.log("Retrieved profile:", profile);
-        }
+      const { error } = await supabase.auth.updateUser({ email: trimmed });
+      if (error) {
+        toast.error(error.message || 'Could not change your email address');
+        return;
       }
-    } catch (error) {
-      console.error("Error getting user profile:", error);
-    }
-  };
-
-  const handleEmailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newEmail = e.target.value;
-    setEmail(newEmail);
-    
-    // Only update if this is not a Supabase authenticated email
-    if (!user?.email) {
-      setIsLoading(true);
-      try {
-        // Update local settings
-        const newSettings = { ...localSettings, email: newEmail };
-        setLocalSettings(newSettings);
-        
-        // Update settings in context/database
-        await updateSettings('account_settings', newSettings);
- 
-
-        toast.success("Email updated successfully");
-      } catch (error) {
-        console.error('Error updating email:', error);
-        toast.error("Failed to update email");
-      } finally {
-        setIsLoading(false);
-      }
+      setPendingEmail(trimmed);
+      setNewEmail('');
+      toast.success(`Check ${trimmed} and open the confirmation link to finish changing your email.`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   return (
     <SettingsSection title="Account Settings" icon={<User size={20} />}>
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium text-love">Email Address</h4>
-          <div>
-            <Label htmlFor="email" className="sr-only">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={handleEmailChange}
-              className="bg-island-light/20 border-island-light"
-              disabled={user?.email !== undefined || isLoading} // Disable if it's from Supabase auth or loading
-            />
-            {user?.email && (
-              <p className="text-xs text-muted-foreground mt-1">
-                This email is verified and cannot be changed.
-              </p>
-            )}
-            {!user?.email && (
-              <p className="text-xs text-muted-foreground mt-1">
-                You can update your email address here.
-              </p>
-            )}
-          </div>
+      <div className="space-y-4">
+        <h4 className="text-sm font-medium text-love">Email Address</h4>
+        <div>
+          <Label htmlFor="current-email" className="text-xs text-muted-foreground">Current email</Label>
+          <Input
+            id="current-email"
+            type="email"
+            value={currentEmail}
+            readOnly
+            className="bg-island-light/20 border-island-light"
+          />
         </div>
+        <form onSubmit={handleChangeEmail} className="space-y-2">
+          <Label htmlFor="new-email" className="text-xs text-muted-foreground">New email</Label>
+          <Input
+            id="new-email"
+            type="email"
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="bg-island-light/20 border-island-light"
+            disabled={isSaving}
+          />
+          <Button type="submit" variant="outline" className="w-full" disabled={!canSubmit}>
+            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Change email
+          </Button>
+          {pendingEmail && (
+            <p className="text-xs text-muted-foreground" role="status">
+              We sent a confirmation link to {pendingEmail}. Your email changes once you open it.
+            </p>
+          )}
+        </form>
       </div>
     </SettingsSection>
   );

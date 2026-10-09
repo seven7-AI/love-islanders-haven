@@ -1,80 +1,40 @@
+import type {
+  AccessibilityPreferences,
+  AICompanionPreferences,
+  AppCustomizationPreferences,
+  MatchDisplayPreferences,
+  ThemePreference,
+} from '@/lib/api/settings';
 
-import { Json } from "@/integrations/supabase/types";
-
-// Types for all settings categories
-export interface AccountSettings {
-  email?: string;
-  theme?: 'light' | 'dark' | 'system';
-}
+// UI shape of the user's settings. Persisted through GET/PATCH /v1/me/settings (see ./mapping.ts).
 
 export interface PrivacySettings {
-  profileVisibility?: 'everyone' | 'matches' | 'none';
-  shareLocation?: boolean;
-  showDistance?: boolean;
-  locationPrecision?: 'exact' | 'approximate' | 'city';
-  shareActivityStatus?: boolean;
-  lastActiveVisibility?: boolean;
   show_online_status?: boolean;
   location_sharing?: boolean;
 }
 
-export interface MatchPreferences {
-  ageRange?: [number, number];
-  interestedAge?: [number, number]; // Add the new field
-  distance?: number;
-  distanceUnit?: 'km' | 'mi';
-  dealBreakers?: {
-    smoking?: boolean;
-    children?: boolean;
-    pets?: boolean;
-  };
-}
+/**
+ * Display preferences only. Age range and distance are profile fields (see services/profiles/profile-preferences).
+ */
+export type MatchPreferences = MatchDisplayPreferences;
 
 export interface CommunicationSettings {
-  readReceipts?: boolean;
-  typingIndicators?: boolean;
-  filterOffensive?: boolean;
-  filterSpam?: boolean;
   notifications_enabled?: boolean;
 }
 
-export interface AICompanionSettings {
-  conversationStyle?: 'playful' | 'caring' | 'thoughtful' | 'flirty';
-  voiceTone?: 'warm' | 'soft' | 'confident' | 'soothing';
-  allowProactiveMessages?: boolean;
-  messageFrequency?: number;
-}
+export type AICompanionSettings = AICompanionPreferences;
 
-export interface AccessibilitySettings {
-  textSize?: number;
-  highContrast?: boolean;
-  colorBlindness?: 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia';
-  screenReader?: boolean;
-  voiceCommands?: boolean;
-}
+export type AccessibilitySettings = AccessibilityPreferences;
 
-export interface SecuritySettings {
-  twoFactor?: boolean;
-  biometric?: boolean;
-  loginNotification?: boolean;
-}
-
-export interface AppCustomization {
-  theme?: 'light' | 'dark' | 'system';
-  autoTheme?: boolean;
-  language?: string;
-  soundEffects?: boolean;
-  hapticFeedback?: boolean;
-  animations?: boolean;
+export interface AppCustomization extends AppCustomizationPreferences {
+  theme?: ThemePreference;
 }
 
 export interface UserSettings {
-  account_settings: AccountSettings;
   privacy_settings: PrivacySettings;
   match_preferences: MatchPreferences;
   communication_settings: CommunicationSettings;
   ai_companion_settings: AICompanionSettings;
   accessibility_settings: AccessibilitySettings;
-  security_settings: SecuritySettings;
   app_customization: AppCustomization;
 }

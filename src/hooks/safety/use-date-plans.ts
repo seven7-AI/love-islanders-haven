@@ -1,105 +1,90 @@
-
-import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import {
+  DatePlan,
+  DatePlanInput,
+  DatePlanStatus,
+  DatePlanUpdate,
+  createDatePlan,
+  deleteDatePlan,
+  fetchDatePlans as fetchDatePlansApi,
+  updateDatePlan as updateDatePlanApi,
+} from '@/lib/api/safety';
 
-export interface DatePlan {
-  id: string;
-  user_id: string;
-  location: string;
-  date_time: string;
-  notes?: string;
-  contact_id?: string;
-  location_sharing_enabled: boolean;
-  created_at: string;
-}
+export type { DatePlan, DatePlanInput, DatePlanStatus, DatePlanUpdate };
 
-export function useDatePlans() {
+const message = (err: unknown, fallback: string) => (err instanceof Error && err.message ? err.message : fallback);
+
+/** The signed-in user's date plans. Mutations report API errors to the user and resolve to null/false. */
+export function useDatePlans({ autoLoad = true }: { autoLoad?: boolean } = {}) {
   const [datePlans, setDatePlans] = useState<DatePlan[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(autoLoad);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Add a date plan
-  const addDatePlan = async (plan: Omit<DatePlan, 'id' | 'user_id' | 'created_at'>) => {
+  /** Loads the plans; rejects with the API error so callers can show it. */
+  const fetchDatePlans = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('Not authenticated');
-      }
+      const plans = await fetchDatePlansApi();
+      setDatePlans(plans);
+      setError(null);
+      return plans;
+    } catch (err) {
+      setError(message(err, 'Could not load your date plans'));
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-      const { data, error } = await supabase
-        .from('date_plans')
-        .insert([
-          {
-            user_id: user.id,
-            location: plan.location,
-            date_time: plan.date_time,
-            title: plan.location, // Use location as title for compatibility
-            notes: plan.notes,
-            location_sharing_enabled: plan.location_sharing_enabled
-          } as any
-        ])
-        .select();
-      
-      if (error) throw error;
-      
-      const newPlan = {
-        ...data![0],
-        location_sharing_enabled: (data![0] as any).location_sharing_enabled ?? false
-      } as DatePlan;
-      setDatePlans(prev => [newPlan, ...prev]);
-      
-      toast.success(`Date plan for ${new Date(plan.date_time).toLocaleDateString()} has been scheduled`);
-      
-      return newPlan;
-    } catch (error) {
-      console.error('Error adding date plan:', error);
-      toast.error('Failed to add date plan');
+  useEffect(() => {
+    if (autoLoad) fetchDatePlans().catch(() => undefined);
+  }, [autoLoad, fetchDatePlans]);
+
+  const addDatePlan = async (plan: DatePlanInput): Promise<DatePlan | null> => {
+    setIsSaving(true);
+    try {
+      const created = await createDatePlan(plan);
+      setDatePlans((prev) => [created, ...prev]);
+      toast.success(`"${created.title}" has been added to your date plans`);
+      return created;
+    } catch (err) {
+      toast.error(message(err, 'Could not save the date plan'));
       return null;
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
-  // Get date plans
-  const fetchDatePlans = async () => {
-    setIsLoading(true);
+  const updateDatePlan = async (id: string, changes: DatePlanUpdate): Promise<DatePlan | null> => {
+    setIsSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('Not authenticated');
-      }
-
-      const { data, error } = await supabase
-        .from('date_plans')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date_time', { ascending: true });
-      
-      if (error) throw error;
-      
-      const plans = (data || []).map(item => ({
-        ...item,
-        location_sharing_enabled: (item as any).location_sharing_enabled ?? false
-      })) as DatePlan[];
-      
-      setDatePlans(plans);
-      return plans;
-    } catch (error) {
-      console.error('Error fetching date plans:', error);
-      toast.error('Failed to load date plans');
-      return [];
+      const updated = await updateDatePlanApi(id, changes);
+      setDatePlans((prev) => prev.map((p) => (p.id === id ? updated : p)));
+      return updated;
+    } catch (err) {
+      toast.error(message(err, 'Could not update the date plan'));
+      return null;
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
-  return {
-    datePlans,
-    isLoading,
-    addDatePlan,
-    fetchDatePlans
+  const removeDatePlan = async (id: string): Promise<boolean> => {
+    setIsSaving(true);
+    try {
+      await deleteDatePlan(id);
+      setDatePlans((prev) => prev.filter((p) => p.id !== id));
+      toast.success('Date plan deleted');
+      return true;
+    } catch (err) {
+      toast.error(message(err, 'Could not delete the date plan'));
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  return { datePlans, isLoading, isSaving, error, fetchDatePlans, addDatePlan, updateDatePlan, removeDatePlan };
 }

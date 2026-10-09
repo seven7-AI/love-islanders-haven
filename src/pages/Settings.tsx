@@ -15,16 +15,16 @@ import AppCustomization from '@/components/settings/AppCustomization';
 import FeedbackSupport from '@/components/settings/FeedbackSupport';
 import { useSettings } from '@/context/SettingsContext';
 import { useAuth } from '@/context/auth';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Settings = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState('account');
-  const { settings, isLoading, saveAllSettings, error } = useSettings();
+  const { isLoading, saveAllSettings, error } = useSettings();
   const [isSaving, setIsSaving] = useState(false);
 
   // Redirect to login if not authenticated
@@ -47,15 +47,10 @@ const Settings = () => {
     
     setIsSaving(true);
     try {
-      const success = await saveAllSettings();
-      if (success) {
-        toast.success('All settings saved successfully');
-      } else {
-        toast.error('Failed to save settings. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      toast.error('Failed to save settings. Please try again.');
+      await saveAllSettings();
+      toast.success('Settings saved');
+    } catch (err) {
+      toast.error(err instanceof Error && err.message ? err.message : 'Failed to save settings. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -104,6 +99,10 @@ const Settings = () => {
               <AccountSettings />
               <PrivacySettings />
               <SecuritySettings />
+              <Button variant="outline" className="w-full gap-2" onClick={() => navigate('/safety')}>
+                <Shield className="h-4 w-4" />
+                Safety centre: contacts, date plans and emergency help
+              </Button>
             </TabsContent>
 
             {/* Preferences Tab Group */}
