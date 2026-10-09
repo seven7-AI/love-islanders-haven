@@ -31,31 +31,45 @@ psql_run() { psql -v ON_ERROR_STOP=1 -q -X "$@"; }
 echo "Bootstrapping Supabase stubs"
 psql_run -f "$here/bootstrap.sql"
 
-for f in "$migrations"/*.sql; do
+# Migrations whose effect is tested separately: SQL tests in tests/ run before them, tests in tests/lockdown/ after.
+LATE_MIGRATIONS_GLOB="*_lock_down_client_access.sql"
+
+apply_migration() {
+  local f="$1"
   echo "Applying $(basename "$f")"
   if ! out="$(psql_run -f "$f" 2>&1)"; then
     echo "$out"
     echo "Migration failed: $f"
     exit 1
   fi
-  # Publications warn when wal_level is not logical; irrelevant for these tests.
   echo "$out" | grep -v -e 'wal_level' -e '^$' || true
+}
+
+for f in "$migrations"/*.sql; do
+  # shellcheck disable=SC2053
+  [[ "$(basename "$f")" == $LATE_MIGRATIONS_GLOB ]] && continue
+  apply_migration "$f"
 done
 
 psql_run -f "$here/helpers.sql"
 
 failed=0
-for t in "$here"/tests/*.sql; do
-  name="$(basename "$t")"
-  # Each test file runs in one transaction that is rolled back, so tests are independent.
-  if out="$( { echo 'BEGIN;'; cat "$t"; echo 'ROLLBACK;'; } | psql -v ON_ERROR_STOP=1 -q -X 2>&1)"; then
-    echo "PASS $name"
-  else
-    echo "FAIL $name"
-    echo "$out" | sed 's/^/    /'
-    failed=1
-  fi
-done
+run_sql_tests() {
+  local t name out
+  for t in "$@"; do
+    name="${t#"$here"/tests/}"
+    # Each test file runs in one transaction that is rolled back, so tests are independent.
+    if out="$( { echo 'BEGIN;'; cat "$t"; echo 'ROLLBACK;'; } | psql -v ON_ERROR_STOP=1 -q -X 2>&1)"; then
+      echo "PASS $name"
+    else
+      echo "FAIL $name"
+      echo "$out" | sed 's/^/    /'
+      failed=1
+    fi
+  done
+}
+
+run_sql_tests "$here"/tests/*.sql
 
 for t in "$here"/concurrency/*.sh; do
   name="concurrency/$(basename "$t")"
@@ -67,5 +81,10 @@ for t in "$here"/concurrency/*.sh; do
     failed=1
   fi
 done
+
+for f in "$migrations"/$LATE_MIGRATIONS_GLOB; do
+  [[ -e "$f" ]] && apply_migration "$f"
+done
+run_sql_tests "$here"/tests/lockdown/*.sql
 
 exit "$failed"

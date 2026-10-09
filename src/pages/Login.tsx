@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { getMyProfile } from '@/lib/api/profile';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -34,11 +35,7 @@ const Login = () => {
       if (data.session) {
         toast.success('Welcome back!');
         // Decide destination based on onboarding status
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('onboarding_completed')
-          .eq('id', data.session.user.id)
-          .maybeSingle();
+        const profile = await getMyProfile().catch(() => null);
         navigate(profile?.onboarding_completed ? '/discover' : '/onboarding', { replace: true });
       }
     } catch (err: any) {

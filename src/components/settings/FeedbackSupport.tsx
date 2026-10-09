@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useAuth } from '@/context/auth';
-import { supabase } from '@/integrations/supabase/client';
+import { sendFeedback } from '@/lib/api/insights';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const FeedbackSupport = () => {
@@ -30,16 +30,8 @@ const FeedbackSupport = () => {
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
-        .from('user_feedback')
-        .insert({
-          user_id: user.id,
-          feedback_content: feedback.trim(),
-          feedback_type: category
-        } as any);
-        
-      if (error) throw error;
-      
+      await sendFeedback(category, feedback.trim());
+
       toast.success('Thank you for your feedback!');
       setFeedback('');
     } catch (error) {

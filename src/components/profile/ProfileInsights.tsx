@@ -47,7 +47,7 @@ const ProfileInsights = () => {
       .catch(error => console.error('Error fetching profile stats:', error))
       .finally(() => setIsLoading(false));
     
-    fetchDemographics()
+    fetchDemographics(timeRange)
       .then(data => {
         setAgeDistribution(data.age);
         setLocationDistribution(data.location);
@@ -143,7 +143,7 @@ const ProfileInsights = () => {
                 <CardContent className="p-4 flex flex-col items-center">
                   <Clock className="mb-2 text-love h-5 w-5" />
                   <p className="text-sm text-muted-foreground">Avg. Response</p>
-                  <h3 className="text-2xl font-bold">{stats?.averageResponseTime || 0}m</h3>
+                  <h3 className="text-2xl font-bold">{stats?.averageResponseTime != null ? `${Math.round(stats.averageResponseTime)}m` : '—'}</h3>
                 </CardContent>
               </Card>
             </div>
@@ -152,7 +152,7 @@ const ProfileInsights = () => {
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Conversion Rate</CardTitle>
                 <CardDescription>
-                  {stats?.conversionRate ? stats.conversionRate.toFixed(1) : 0}% of likes lead to matches
+                  {stats?.conversionRate != null ? `${stats.conversionRate.toFixed(1)}% of likes lead to matches` : 'Not enough likes yet'}
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-2">
@@ -258,7 +258,7 @@ const ProfileInsights = () => {
               <CardContent className="flex justify-center items-center p-6">
                 <div className="relative w-32 h-32">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="text-2xl font-bold">{stats?.responseRate || 0}%</p>
+                    <p className="text-2xl font-bold">{stats?.responseRate != null ? `${stats.responseRate}%` : '—'}</p>
                   </div>
                   <svg className="w-32 h-32" viewBox="0 0 36 36">
                     <path
@@ -276,7 +276,7 @@ const ProfileInsights = () => {
                       fill="none"
                       stroke="#FF6B8B"
                       strokeWidth="3"
-                      strokeDasharray={`${stats?.responseRate || 0}, 100`}
+                      strokeDasharray={`${stats?.responseRate ?? 0}, 100`}
                     />
                   </svg>
                 </div>
