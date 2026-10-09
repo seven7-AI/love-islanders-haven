@@ -51,31 +51,21 @@ export const fetchUserProfile = async () => {
     console.log('fetchUserProfile: User authenticated, id:', userId);
 
     // Fetch the user's profile data with a timeout for mobile networks
-    const profilePromise = new Promise<SupabaseProfile | null>(async (resolve, reject) => {
-      try {
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .maybeSingle();
-  
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
-          reject(profileError);
-          return;
-        }
-        
-        // If we have profile data, transform it to match our SupabaseProfile type
-        if (profileData) {
-          // First cast to unknown to avoid type issues, then cast to SupabaseProfile
-          resolve(transformProfileData(profileData));
-        } else {
-          resolve(null);
-        }
-      } catch (err) {
-        reject(err);
+    const profilePromise = (async (): Promise<SupabaseProfile | null> => {
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw profileError;
       }
-    });
+
+      // If we have profile data, transform it to match our SupabaseProfile type
+      return profileData ? transformProfileData(profileData) : null;
+    })();
     
     // Set a timeout to handle slow connections on mobile
     const timeoutPromise = new Promise<never>((_, reject) => {
