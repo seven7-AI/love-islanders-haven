@@ -268,3 +268,26 @@ async def delete_image(
         update(Profile).where(Profile.id == user_id).values(avatar_url=remaining[0].url if remaining else None)
     )
     await session.commit()
+
+
+LOCATION_DECIMALS = 2  # about 1 km; exact positions are never stored
+
+
+async def set_location(session: AsyncSession, user_id: uuid.UUID, latitude: float, longitude: float) -> None:
+    await session.execute(
+        update(Profile)
+        .where(Profile.id == user_id)
+        .values(
+            latitude=round(latitude, LOCATION_DECIMALS),
+            longitude=round(longitude, LOCATION_DECIMALS),
+            location_updated_at=func.now(),
+        )
+    )
+    await session.commit()
+
+
+async def clear_location(session: AsyncSession, user_id: uuid.UUID) -> None:
+    await session.execute(
+        update(Profile).where(Profile.id == user_id).values(latitude=None, longitude=None, location_updated_at=None)
+    )
+    await session.commit()

@@ -22,13 +22,13 @@ SELECT tests.ok(NOT EXISTS (SELECT 1 FROM information_schema.columns
 -- Anonymous visitors cannot read profiles.
 SET ROLE anon;
 SELECT set_config('request.jwt.claims', '{"role":"anon"}', true);
-SELECT tests.ok(tests.row_count('SELECT * FROM public.profiles') = 0, 'anon sees no profiles');
+SELECT tests.throws('SELECT id FROM public.profiles', 'permission denied', 'anon cannot read profiles');
 RESET ROLE;
 
 -- Signed-in users can read other profiles.
 SET ROLE authenticated;
 SELECT set_config('request.jwt.claims', json_build_object('sub', :'alice', 'role', 'authenticated')::text, true);
-SELECT tests.ok(tests.row_count(format('SELECT * FROM public.profiles WHERE id = %L', :'bob')) = 1, 'authenticated user sees other profiles');
+SELECT tests.ok(tests.row_count(format('SELECT id, name FROM public.profiles WHERE id = %L', :'bob')) = 1, 'authenticated user sees other profiles');
 
 -- Users can edit ordinary fields of their own profile...
 UPDATE public.profiles SET bio = 'hello' WHERE id = :'alice';

@@ -1,5 +1,5 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { apiFetch } from "@/lib/api/client";
 import { toast } from "sonner";
 
 export interface UserLocation {
@@ -8,37 +8,23 @@ export interface UserLocation {
 }
 
 /**
- * Updates the user's current location in their profile using the edge function
+ * Saves the user's approximate location (the API keeps it at about 1 km precision and only shows rounded distances).
  */
 export const updateUserLocation = async (location: UserLocation): Promise<boolean> => {
   try {
-    console.log('Updating location for user:', location);
-    
-    // Call the location-services edge function
-    const { data, error } = await supabase.functions.invoke("location-services", {
-      body: {
-        action: "update",
-        location
-      }
+    await apiFetch<void>('/v1/me/location', {
+      method: 'PUT',
+      body: { latitude: location.latitude, longitude: location.longitude },
     });
-
-    if (error) {
-      console.error('Error calling location-services function:', error);
-      return false;
-    }
-
-    if (!data.success) {
-      console.error('Error from location-services function:', data.error);
-      return false;
-    }
-
-    console.log('Location updated successfully via edge function');
     return true;
   } catch (error) {
     console.error('Error updating location:', error);
     return false;
   }
 };
+
+/** Removes the stored location (used when location sharing is turned off). */
+export const clearUserLocation = () => apiFetch<void>('/v1/me/location', { method: 'DELETE' });
 
 /**
  * Gets the user's current location using the browser's geolocation API
@@ -82,9 +68,6 @@ export const requestAndUpdateLocation = async (): Promise<boolean> => {
     console.log('Requesting user location...');
     // Get current location
     const location = await getCurrentLocation();
-    console.log('Got location, updating via edge function:', location);
-    
-    // Update location using edge function
     const success = await updateUserLocation(location);
     
     if (success) {

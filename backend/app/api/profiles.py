@@ -10,6 +10,7 @@ from app.schemas.profile import (
     ImageOut,
     ImageRegister,
     ImageUpdate,
+    LocationUpdate,
     OnboardingStepUpdate,
     OwnProfile,
     ProfileUpdate,
@@ -85,4 +86,16 @@ async def delete_image(
     image_id: uuid.UUID, user: CurrentUser, session: SessionDep, storage: StorageDep, bucket: BucketDep
 ) -> Response:
     await profiles.delete_image(storage, bucket, session, user.id, image_id)
+    return Response(status_code=204)
+
+
+@router.put("/me/location", status_code=204)
+async def update_location(body: LocationUpdate, user: CurrentUser, session: SessionDep) -> Response:
+    await profiles.set_location(session, user.id, body.latitude, body.longitude)
+    return Response(status_code=204)
+
+
+@router.delete("/me/location", status_code=204)
+async def clear_location(user: CurrentUser, session: SessionDep) -> Response:
+    await profiles.clear_location(session, user.id)
     return Response(status_code=204)

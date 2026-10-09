@@ -18,11 +18,20 @@ LIKES = ("right", "super")
 # Candidates for :me — onboarded, not already swiped/matched/blocked (either way), and compatible under BOTH users'
 # saved preferences (gender and age range), plus "verified only" if :me asked for it.
 _FEED_SQL = """
-WITH me AS (SELECT * FROM profiles WHERE id = :me)
-SELECT p.*, coalesce(date_part('year', age(current_date, p.dob))::int, p.age) AS current_age
-FROM profiles p, me
-WHERE p.id <> me.id
-  AND p.onboarding_completed
+WITH me AS (SELECT * FROM profiles WHERE id = :me),
+candidates AS (
+  SELECT p.*, coalesce(date_part('year', age(current_date, p.dob))::int, p.age) AS current_age,
+         CASE WHEN p.latitude IS NOT NULL AND me.latitude IS NOT NULL THEN
+           6371 * 2 * asin(sqrt(power(sin(radians(p.latitude - me.latitude) / 2), 2)
+             + cos(radians(me.latitude)) * cos(radians(p.latitude))
+               * power(sin(radians(p.longitude - me.longitude) / 2), 2)))
+         END AS distance_km
+  FROM profiles p, me
+  WHERE p.id <> me.id
+)
+SELECT p.*
+FROM candidates p, me
+WHERE p.onboarding_completed
   AND NOT EXISTS (SELECT 1 FROM swipes s WHERE s.user_id = me.id AND s.swiped_user_id = p.id)
   AND NOT EXISTS (SELECT 1 FROM matches m WHERE least(m.user_id, m.matched_user_id) = least(me.id, p.id)
                                             AND greatest(m.user_id, m.matched_user_id) = greatest(me.id, p.id))
@@ -36,6 +45,8 @@ WHERE p.id <> me.id
   AND coalesce(date_part('year', age(current_date, me.dob))::int, me.age, 18)
       BETWEEN coalesce(p.age_range_min, 18) AND coalesce(p.age_range_max, 100)
   AND (NOT coalesce(me.show_me_verified_only, false) OR coalesce(p.verified, false))
+  -- People who have not shared a location are not excluded by distance.
+  AND (p.distance_km IS NULL OR me.distance_preference IS NULL OR p.distance_km <= me.distance_preference)
   AND (CAST(:after_ts AS timestamptz) IS NULL
        OR (p.created_at, p.id) < (CAST(:after_ts AS timestamptz), CAST(:after_id AS uuid)))
 ORDER BY p.created_at DESC, p.id DESC
@@ -76,6 +87,7 @@ def _public(row: Any, images: list[str]) -> PublicProfile:
         interests=row.interests or [],
         verified=bool(row.verified),
         images=images,
+        distance_km=max(1, round(row.distance_km)) if row.distance_km is not None else None,
     )
 
 

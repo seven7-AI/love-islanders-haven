@@ -3,7 +3,8 @@ import PrivacyControlsSection from './PrivacyControlsSection';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useState } from 'react';
-import { requestAndUpdateLocation } from '@/services/profiles/location';
+import { toast } from 'sonner';
+import { clearUserLocation, requestAndUpdateLocation } from '@/services/profiles/location';
 import { useSettings } from '@/context/SettingsContext';
 
 const LocationSharingSection = () => {
@@ -37,6 +38,13 @@ const LocationSharingSection = () => {
         // Only switch sharing on once the location was actually updated.
         await handleUpdateLocation();
       } else {
+        // Turning sharing off deletes the stored location as well.
+        try {
+          await clearUserLocation();
+        } catch (error) {
+          toast.error(`Could not remove your location: ${error instanceof Error ? error.message : 'please try again'}`);
+          return;
+        }
         await setSharing(false);
       }
     } finally {
