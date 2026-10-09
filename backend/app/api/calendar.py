@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, Response
 
 from app.api.deps import CurrentUser, SessionDep
+from app.core.rate_limit import limited
 from app.schemas.calendar import (
     AuthorizeRequest,
     AuthorizeResponse,
@@ -26,7 +27,7 @@ async def read_status(request: Request, user: CurrentUser, session: SessionDep) 
     return CalendarStatus(available=available, connected=connected)
 
 
-@router.post("/authorize")
+@router.post("/authorize", dependencies=limited("oauth", 10))
 async def authorize(body: AuthorizeRequest, request: Request, user: CurrentUser) -> AuthorizeResponse:
     config = calendar.require(_config(request))
     return AuthorizeResponse(authorization_url=calendar.authorization_url(config, user.id, body.return_to))

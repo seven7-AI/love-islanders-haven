@@ -5,6 +5,7 @@ from fastapi import APIRouter, Query
 
 from app.api.deps import CurrentUser, SessionDep
 from app.api.profiles import BucketDep, StorageDep
+from app.core.rate_limit import limited
 from app.schemas.profile import UploadRequest, UploadTicket
 from app.schemas.streaks import LeaderboardEntry, LikeState, StreakCreate, StreakFeed, StreakPost, StreakStatus
 from app.services import streaks
@@ -19,7 +20,7 @@ async def feed(
     return await streaks.feed(session, user.id, limit, cursor)
 
 
-@router.post("/uploads", status_code=201)
+@router.post("/uploads", status_code=201, dependencies=limited("uploads", 30))
 async def request_upload(
     body: UploadRequest, user: CurrentUser, storage: StorageDep, bucket: BucketDep
 ) -> UploadTicket:
@@ -27,7 +28,7 @@ async def request_upload(
     return UploadTicket(bucket=signed.bucket, path=signed.path, token=signed.token, upload_url=signed.url)
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, dependencies=limited("streak_posts", 10))
 async def create(
     body: StreakCreate, user: CurrentUser, session: SessionDep, storage: StorageDep, bucket: BucketDep
 ) -> StreakPost:
@@ -46,7 +47,7 @@ async def leaderboard(
     return await streaks.leaderboard(session, user.id, limit)
 
 
-@router.put("/{post_id}/like")
+@router.put("/{post_id}/like", dependencies=limited("likes", 120))
 async def like(post_id: uuid.UUID, user: CurrentUser, session: SessionDep) -> LikeState:
     return await streaks.set_like(session, user.id, post_id, liked=True)
 

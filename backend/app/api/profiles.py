@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Request, Response
 
 from app.api.deps import CurrentUser, SessionDep
+from app.core.rate_limit import limited
 from app.integrations.storage import StorageProvider
 from app.schemas.profile import (
     ImageOrder,
@@ -56,7 +57,7 @@ async def read_profile(profile_id: uuid.UUID, user: CurrentUser, session: Sessio
     return await profiles.get_public_profile(session, user.id, profile_id)
 
 
-@router.post("/me/images/uploads", status_code=201)
+@router.post("/me/images/uploads", status_code=201, dependencies=limited("uploads", 30))
 async def request_image_upload(
     body: UploadRequest, user: CurrentUser, session: SessionDep, storage: StorageDep, bucket: BucketDep
 ) -> UploadTicket:
@@ -89,7 +90,7 @@ async def delete_image(
     return Response(status_code=204)
 
 
-@router.put("/me/location", status_code=204)
+@router.put("/me/location", status_code=204, dependencies=limited("location", 20))
 async def update_location(body: LocationUpdate, user: CurrentUser, session: SessionDep) -> Response:
     await profiles.set_location(session, user.id, body.latitude, body.longitude)
     return Response(status_code=204)

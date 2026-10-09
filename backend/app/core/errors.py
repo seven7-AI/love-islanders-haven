@@ -17,11 +17,12 @@ PROBLEM_JSON = "application/problem+json"
 class AppError(Exception):
     """An expected failure with a client-safe message."""
 
-    def __init__(self, status: int, detail: str, *, code: str | None = None) -> None:
+    def __init__(self, status: int, detail: str, *, code: str | None = None, retry_after: float | None = None) -> None:
         super().__init__(detail)
         self.status = status
         self.detail = detail
         self.code = code
+        self.retry_after = retry_after
 
 
 def problem(status: int, detail: str | None = None, **extra: Any) -> JSONResponse:
@@ -38,6 +39,8 @@ def register_error_handlers(app: FastAPI) -> None:
         response = problem(exc.status, exc.detail, code=exc.code)
         if exc.status == 401:
             response.headers["WWW-Authenticate"] = "Bearer"
+        if exc.retry_after is not None:
+            response.headers["Retry-After"] = str(max(1, round(exc.retry_after)))
         return response
 
     @app.exception_handler(StarletteHTTPException)

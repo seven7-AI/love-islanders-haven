@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Query, Request
 
 from app.api.deps import CurrentUser, SessionDep
 from app.api.profiles import StorageDep
+from app.core.rate_limit import limited
 from app.schemas.messages import MediaUploadRequest, MessageCreate, MessageOut, MessagePage, ReadReceipt
 from app.schemas.profile import UploadTicket
 from app.services import messaging
@@ -36,7 +37,7 @@ async def list_messages(
     )
 
 
-@router.post("/messages", status_code=201)
+@router.post("/messages", status_code=201, dependencies=limited("messages", 60))
 async def send_message(
     match_id: uuid.UUID,
     body: MessageCreate,
@@ -48,7 +49,7 @@ async def send_message(
     return await messaging.send_message(session, storage, bucket, user.id, match_id, body)
 
 
-@router.post("/media/uploads", status_code=201)
+@router.post("/media/uploads", status_code=201, dependencies=limited("uploads", 30))
 async def request_media_upload(
     match_id: uuid.UUID,
     body: MediaUploadRequest,

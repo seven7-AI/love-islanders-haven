@@ -20,7 +20,8 @@ from app.api import (
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
-from app.core.middleware import RequestContextMiddleware
+from app.core.middleware import BodySizeLimitMiddleware, RequestContextMiddleware, SecurityHeadersMiddleware
+from app.core.rate_limit import SlidingWindowLimiter
 from app.db.session import Database, create_engine
 from app.integrations.alerts import AlertSender, UnconfiguredAlertSender
 from app.integrations.auth import SupabaseTokenVerifier, TokenVerifier
@@ -74,7 +75,10 @@ def create_app(
         allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
         expose_headers=["X-Request-ID"],
     )
+    app.add_middleware(SecurityHeadersMiddleware, hsts=settings.environment == "production")
+    app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_bytes)
     app.add_middleware(RequestContextMiddleware)
+    app.state.rate_limiter = SlidingWindowLimiter()
     register_error_handlers(app)
     app.include_router(health.router)
     app.include_router(me.router)

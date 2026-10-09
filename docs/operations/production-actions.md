@@ -22,6 +22,7 @@ Changes merged to the repository that only take effect once someone with access 
 | #20 | Create a Google OAuth client (Calendar read-only scope, redirect `https://<app>/calendar/callback`); set `GOOGLE_*` and `TOKEN_ENCRYPTION_KEY` on the API; apply migration `20261009170000_google_calendar_connections.sql`; delete the five old Google edge functions | Google Cloud console; `supabase db push`; `supabase functions delete <name>` | Blocked (OAuth client) |
 | #21 | Apply migration `20261009180000_profile_location.sql` (also replaces table grants on `profiles` with column grants); delete the `location-services` edge function | `supabase db push`; `supabase functions delete location-services` | Pending |
 | #22 | Apply migration `20261009190000_lock_down_client_access.sql` **only after** the web app build that uses the API everywhere is live (older builds query tables directly and would break) | `supabase db push` | Pending |
+| #23 | **Rotate the Spotify client secret** committed in old commit `370a20d` (public history); set `ENVIRONMENT=production` and explicit https `CORS_ORIGINS` on the API | Spotify developer dashboard | **Urgent** |
 
 ## Known residual risks
 Resolved once the #22 lockdown migration is applied: other users' `dob` readable through the Supabase API, forged
