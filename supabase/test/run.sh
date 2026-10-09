@@ -57,4 +57,15 @@ for t in "$here"/tests/*.sql; do
   fi
 done
 
+for t in "$here"/concurrency/*.sh; do
+  name="concurrency/$(basename "$t")"
+  if out="$("$t" 2>&1)"; then
+    echo "PASS $name"
+  else
+    echo "FAIL $name"
+    echo "$out" | sed 's/^/    /'
+    failed=1
+  fi
+done
+
 exit "$failed"

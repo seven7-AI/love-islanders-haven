@@ -12,7 +12,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 4 | 2 Security | Harden the password reset flow | ✅ (production action pending, see docs/operations/production-actions.md) |
 | 5 | 2 Security | Harden profile write paths and read policies | ✅ (production action pending) |
 | 6 | 2 Security | Move verification and auth state checks server-side | ✅ (production action pending) |
-| 7 | 2 Security | Enforce matching, blocking, read-receipt rules in the database | ⏳ |
+| 7 | 2 Security | Enforce matching, blocking, read-receipt rules in the database | ✅ (production action pending) |
 | 8 | 3 Database | Reconcile live Supabase schema with migrations | ⛔ needs Supabase project access |
 | 9 | 3 Database | Scaffold FastAPI backend, config, logging, health, local Postgres | ⏳ |
 | 10 | 3 Database | Alembic baseline migration with indexes | ⏳ |

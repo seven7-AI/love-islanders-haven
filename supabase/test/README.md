@@ -17,5 +17,8 @@ so row-level security and triggers behave as they do for real API requests. Help
 - `tests.throws(sql, expected_error_substring, message)` – fails unless the statement errors with that message
 - `tests.row_count(sql)` – rows visible to the current role
 
+Scripts in `concurrency/` run after the SQL tests and exercise behaviour that needs several simultaneous sessions
+(for example two users liking each other at the same moment).
+
 The stubs are a test substitute for the Supabase platform, not the platform itself: Supabase Auth, Storage and Realtime
 behaviour beyond what the migrations reference is not covered here.

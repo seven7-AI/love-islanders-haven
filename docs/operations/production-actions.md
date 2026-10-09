@@ -11,7 +11,9 @@ Changes merged to the repository that only take effect once someone with access 
 | #5 | Delete the `create-user-profile` edge function | `supabase functions delete create-user-profile --project-ref <project-ref>` | Pending |
 | #6 | Delete the `send-verification-email` and `ai-companion-proactive` edge functions | `supabase functions delete send-verification-email --project-ref <project-ref>` and the same for `ai-companion-proactive` | Pending |
 | #6 | Require email confirmation and allow the callback URL | Supabase dashboard → Authentication → Providers → Email: enable "Confirm email"; URL Configuration → Redirect URLs: add `https://<app-domain>/auth/callback` | Pending |
+| #7 | Apply migration `20261009130000_enforce_matching_rules.sql` (merges any duplicate reversed matches, keeping messages) | `supabase db push` | Pending |
 
 ## Known residual risks
 - Signed-in users can read other users' `dob` (and other profile columns) through the `profiles` table until profile reads move behind the API (#13).
+- Unblocking someone leaves the match closed (status `blocked`); they need to match again, which the unique pair index currently prevents. Revisit in #17.
 - Profile images are stored in a public bucket, so an image URL remains viewable by anyone who has it, even if the image is hidden.
