@@ -24,7 +24,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 15 | 4 Features | Messaging via API | ✅ (production action pending) |
 | 16 | 4 Features | Streaks via API | ✅ (job scheduling pending) |
 | 17 | 4 Features | Settings, privacy, blocking, reports, safety | ✅ (alert provider ⛔) |
-| 18 | 4 Features | Notifications | ⏳ |
+| 18 | 4 Features | Notifications | ✅ |
 | 19 | 4 Features | AI companion on LLM provider interface | ⏳ (live check ⛔ OpenAI key) |
 | 20 | 4 Features | Google Calendar integration | ⏳ (live check ⛔ Google OAuth client) |
 | 21 | 4 Features | Location and distance filtering | ⏳ |

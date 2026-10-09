@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import discovery, health, me, messages, profiles, safety, streaks
+from app.api import discovery, health, me, messages, notifications, profiles, safety, streaks
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
@@ -64,6 +64,7 @@ def create_app(
     app.include_router(messages.router)
     app.include_router(streaks.router)
     app.include_router(safety.router)
+    app.include_router(notifications.router)
     return app
 
 

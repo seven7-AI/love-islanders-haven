@@ -10,6 +10,7 @@ from app.core.errors import AppError
 from app.core.pagination import decode_cursor, encode_cursor
 from app.schemas.discovery import DiscoverPage, LastMessage, MatchPage, MatchPartner, MatchSummary, SwipeResult
 from app.schemas.profile import PublicProfile
+from app.services.notifications import notify_match
 from app.services.profiles import NotFound
 
 LIKES = ("right", "super")
@@ -137,10 +138,11 @@ async def swipe(session: AsyncSession, me: uuid.UUID, target: uuid.UUID, directi
             {"me": me, "t": target},
         )
         if liked_back:
-            await session.execute(
+            created = await session.scalar(
                 text(
                     "INSERT INTO matches (user_id, matched_user_id, status) VALUES (:me, :t, 'active') "
-                    "ON CONFLICT ((least(user_id, matched_user_id)), (greatest(user_id, matched_user_id))) DO NOTHING"
+                    "ON CONFLICT ((least(user_id, matched_user_id)), (greatest(user_id, matched_user_id))) DO NOTHING "
+                    "RETURNING id"
                 ),
                 {"me": me, "t": target},
             )
@@ -151,6 +153,9 @@ async def swipe(session: AsyncSession, me: uuid.UUID, target: uuid.UUID, directi
                 ),
                 {"lo": lo, "hi": hi},
             )
+            # On Supabase Postgres the swipe trigger may have created the match already; notify either way once.
+            if match_id is not None and (created is not None or not await _has_match_notifications(session, match_id)):
+                await notify_match(session, match_id, me, target)
     await session.commit()
     return SwipeResult(matched=match_id is not None, match_id=match_id)
 
@@ -213,3 +218,11 @@ async def unmatch(session: AsyncSession, me: uuid.UUID, match_id: uuid.UUID) -> 
     if updated is None:
         raise NotFound("Match")
     await session.commit()
+
+
+async def _has_match_notifications(session: AsyncSession, match_id: uuid.UUID) -> bool:
+    return bool(
+        await session.scalar(
+            text("SELECT EXISTS (SELECT 1 FROM notifications WHERE match_id = :m AND type = 'match')"), {"m": match_id}
+        )
+    )

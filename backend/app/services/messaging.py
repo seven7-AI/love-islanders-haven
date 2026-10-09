@@ -11,6 +11,7 @@ from app.core.errors import AppError
 from app.core.pagination import decode_cursor, encode_cursor
 from app.integrations.storage import SignedUpload, StorageError, StorageProvider
 from app.schemas.messages import MessageCreate, MessageOut, MessagePage
+from app.services.notifications import notify_message
 from app.services.profiles import NotFound, _storage_unavailable
 
 MEDIA_URL_TTL_SECONDS = 3600
@@ -142,6 +143,11 @@ async def send_message(
             {"m": match_id, "me": me, "c": body.content.strip(), "t": body.content_type, "media": body.media_path},
         )
     ).one()
+    recipient = await session.scalar(
+        text("SELECT CASE WHEN user_id = :me THEN matched_user_id ELSE user_id END FROM matches WHERE id = :m"),
+        {"me": me, "m": match_id},
+    )
+    await notify_message(session, match_id, me, recipient)
     await session.commit()
     return await _to_out(row, storage, bucket)
 

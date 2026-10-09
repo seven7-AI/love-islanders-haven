@@ -17,6 +17,7 @@ Changes merged to the repository that only take effect once someone with access 
 | #16 | Schedule `python -m app.jobs.expire_streaks` hourly with the API's environment | hosting platform scheduler / cron | Pending |
 | #17 | Apply migration `20261009150000_settings_preferences_and_reports.sql`; decide who reviews `reports` (service-role access, e.g. Supabase dashboard) | `supabase db push` | Pending |
 | #17 | Choose and configure an emergency-alert delivery provider (SMS/email); until then the API answers 503 `alerts_not_configured` and the app tells users to call emergency services | implement `AlertSender` in `backend/app/integrations/alerts` | Blocked (provider) |
+| #18 | Apply migration `20261009160000_notifications.sql` | `supabase db push` | Pending |
 
 ## Known residual risks
 - Signed-in users can read other users' `dob` (and other profile columns) through the `profiles` table until profile reads move behind the API (#13).
