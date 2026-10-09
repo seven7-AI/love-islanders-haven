@@ -1,0 +1,13 @@
+node_modules
+dist
+backend
+supabase
+e2e
+test-results
+playwright-report
+.git
+.env
+.env.*
+!.env.example
+.codegraph
+.security

@@ -33,6 +33,14 @@ jobs:
           # Placeholders: the build only embeds these; no network calls are made.
           VITE_SUPABASE_URL: https://example.supabase.co
           VITE_SUPABASE_PUBLISHABLE_KEY: ci-placeholder
+      - name: Web deployment image builds
+        run: >-
+          docker build -f deploy/web/Dockerfile -t love-islander-web
+          --build-arg NODE_IMAGE=public.ecr.aws/docker/library/node:22-alpine
+          --build-arg NGINX_IMAGE=public.ecr.aws/docker/library/nginx:1.27-alpine
+          --build-arg VITE_SUPABASE_URL=https://example.supabase.co
+          --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=ci-placeholder
+          --build-arg VITE_API_URL=https://api.example.com .
 
   security:
     name: Security (dependencies, secrets)

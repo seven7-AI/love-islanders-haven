@@ -52,10 +52,9 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _production_cors(self) -> "Settings":
-        if self.environment == "production" and any(
-            "*" in o or not o.startswith("https://") for o in self.cors_origins
-        ):
-            raise ValueError("In production CORS_ORIGINS must list explicit https:// origins")
+        secure = ("https://", "capacitor://")  # capacitor:// is the native app's origin on iOS
+        if self.environment == "production" and any("*" in o or not o.startswith(secure) for o in self.cors_origins):
+            raise ValueError("In production CORS_ORIGINS must list explicit https:// (or capacitor://) origins")
         return self
 
     @model_validator(mode="after")
