@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
-import { supabase } from '@/integrations/supabase/client';
+import { getMyProfile } from '@/lib/api/profile';
 
 interface OnboardingGuardProps {
   children: React.ReactNode;
@@ -26,18 +26,8 @@ const OnboardingGuard = ({ children }: OnboardingGuardProps) => {
       }
 
       try {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('onboarding_completed')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (error) {
-          console.error('OnboardingGuard profile query error:', error);
-          return;
-        }
-
-        if (!cancelled && profile && profile.onboarding_completed === false) {
+        const profile = await getMyProfile();
+        if (!cancelled && profile.onboarding_completed === false) {
           navigate('/onboarding', { replace: true });
         }
       } catch (err) {

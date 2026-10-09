@@ -21,9 +21,12 @@ Changes merged to the repository that only take effect once someone with access 
 | #19 | Set `LLM_API_KEY` (and optionally `LLM_MODEL`/`LLM_BASE_URL`) on the API; schedule `python -m app.jobs.companion_checkins`; delete the `ai-companion` edge function | `supabase functions delete ai-companion --project-ref <project-ref>` | Blocked (API key) |
 | #20 | Create a Google OAuth client (Calendar read-only scope, redirect `https://<app>/calendar/callback`); set `GOOGLE_*` and `TOKEN_ENCRYPTION_KEY` on the API; apply migration `20261009170000_google_calendar_connections.sql`; delete the five old Google edge functions | Google Cloud console; `supabase db push`; `supabase functions delete <name>` | Blocked (OAuth client) |
 | #21 | Apply migration `20261009180000_profile_location.sql` (also replaces table grants on `profiles` with column grants); delete the `location-services` edge function | `supabase db push`; `supabase functions delete location-services` | Pending |
+| #22 | Apply migration `20261009190000_lock_down_client_access.sql` **only after** the web app build that uses the API everywhere is live (older builds query tables directly and would break) | `supabase db push` | Pending |
 
 ## Known residual risks
-- Signed-in users can read other users' `dob` (and other profile columns) through the `profiles` table until profile reads move behind the API (#13).
-- Unblocking someone leaves the match closed (status `blocked`); because a pair can only have one match row, they cannot match again. This is deliberate (an unblock should not silently reopen a conversation).
-- Until direct table access is revoked (#22), clients can still insert rows into `ai_chat_history` through the Supabase API (RLS only checks the user id), so a user could add fake assistant messages to their own history.
-- Profile images are stored in a public bucket, so an image URL remains viewable by anyone who has it, even if the image is hidden.
+Resolved once the #22 lockdown migration is applied: other users' `dob` readable through the Supabase API, forged
+companion messages in `ai_chat_history`, and direct table writes that bypass API validation. Until then they remain.
+- Profile photos are stored in a public bucket, so a photo URL stays viewable by anyone who has it, even if the photo is
+  hidden on the profile.
+- Unblocking someone leaves the match closed (status `blocked`); because a pair can only have one match row, they cannot
+  match again. This is deliberate (an unblock should not silently reopen a conversation).

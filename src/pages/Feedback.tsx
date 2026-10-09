@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth';
-import { supabase } from '@/integrations/supabase/client';
+import { fetchMyFeedback } from '@/lib/api/insights';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { 
   Table,
@@ -22,7 +22,6 @@ interface FeedbackItem {
   feedback: string;
   created_at: string;
   category: string;
-  status: string;
 }
 
 const getCategoryColor = (category: string) => {
@@ -38,20 +37,6 @@ const getCategoryColor = (category: string) => {
   }
 };
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'new':
-      return 'bg-yellow-500';
-    case 'in-progress':
-      return 'bg-blue-500';
-    case 'completed':
-      return 'bg-green-500';
-    case 'rejected':
-      return 'bg-red-500';
-    default:
-      return 'bg-gray-500';
-  }
-};
 
 const FeedbackPage = () => {
   const navigate = useNavigate();
@@ -69,27 +54,15 @@ const FeedbackPage = () => {
     const fetchFeedback = async () => {
       try {
         setIsLoading(true);
-        const { data, error } = await supabase
-          .from('user_feedback')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        
-        // Map database fields to our interface
-        if (data) {
-          const typedFeedback = data.map(item => ({
+        const items = await fetchMyFeedback();
+        setFeedbackItems(
+          items.map((item) => ({
             id: item.id,
-            feedback: item.feedback_content,
+            feedback: item.content,
             created_at: item.created_at,
-            category: item.feedback_type || 'general',
-            status: 'new' // Default status since we don't have it in DB
-          })) as FeedbackItem[];
-          
-          setFeedbackItems(typedFeedback);
-        } else {
-          setFeedbackItems([]);
-        }
+            category: item.category || 'general',
+          })),
+        )
       } catch (err) {
         console.error('Error fetching feedback:', err);
         setError('Failed to load feedback. Please try again.');
@@ -149,7 +122,6 @@ const FeedbackPage = () => {
                     <TableHead className="text-white">Date</TableHead>
                     <TableHead className="text-white">Category</TableHead>
                     <TableHead className="text-white">Feedback</TableHead>
-                    <TableHead className="text-white">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -165,11 +137,6 @@ const FeedbackPage = () => {
                       </TableCell>
                       <TableCell className="text-white">
                         {item.feedback}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={`${getStatusColor(item.status)}`}>
-                          {item.status}
-                        </Badge>
                       </TableCell>
                     </TableRow>
                   ))}
