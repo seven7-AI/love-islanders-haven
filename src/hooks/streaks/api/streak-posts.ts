@@ -104,7 +104,6 @@ export const fetchStreakPosts = async (): Promise<StreakData[]> => {
 export const createStreakPost = async ({
   userId,
   content,
-  streakCount,
   expiresAt,
   caption
 }: CreateStreakParams): Promise<StreakData | null> => {
@@ -118,34 +117,26 @@ export const createStreakPost = async ({
     const postId = uuidv4();
     const uploadedContent = await uploadStreakMedia(userId, postId, content);
     const contentString = JSON.stringify(uploadedContent);
-    const createdAt = new Date().toISOString();
-    
+
+    // streak_count, likes/comments counters and created_at are set by the database.
     const postData = {
       id: postId,
       user_id: userId,
       content: contentString,
       caption,
-      streak_count: streakCount,
       expires_at: expiresAt,
-      likes_count: 0, 
-      comments_count: 0,
-      created_at: createdAt
     };
-    
-    // Insert streak post
-    const { error } = await (supabase
+
+    // Insert streak post and read back the server-computed fields
+    const { data: created, error } = await (supabase
       .from('streaks' as any)
-      .insert(postData) as any);
-      
+      .insert(postData)
+      .select('*')
+      .single() as any);
+
     if (error) {
       throw new Error(`Streak save failed: ${error.message}`);
     }
-
-    // Get profile info
-    await supabase
-      .from('profiles')
-      .update({ streak_count: streakCount })
-      .eq('id', userId);
 
     const { data: profileData } = await supabase
       .from('profiles')
@@ -155,7 +146,7 @@ export const createStreakPost = async ({
 
     // Return the created post with user data
     return {
-      ...postData,
+      ...created,
       content: uploadedContent,
       user_name: profileData?.name || "You",
       user_profile_image: profileData?.avatar_url || undefined,

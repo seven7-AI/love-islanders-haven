@@ -11,7 +11,6 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{
     error?: Error;
   }>;
-  signUp: (email: string, password: string) => Promise<boolean>;
   signOut: () => Promise<void>;
   /** True after the user opened a password recovery link, until the password is updated. */
   passwordRecovery: boolean;
@@ -135,83 +134,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
-    try {
-      setLoading(true);
-      
-      // For passwordless auth or if using verification code system
-      let signUpResult;
-      if (!password) {
-        signUpResult = await supabase.auth.signInWithOtp({
-          email,
-          options: {
-            shouldCreateUser: true
-          }
-        });
-      } else {
-        signUpResult = await supabase.auth.signUp({
-          email,
-          password,
-        });
-      }
-      
-      const { data, error } = signUpResult;
-
-      if (error) {
-        console.error("Signup error:", error);
-        throw error;
-      }
-      
-      // Create a profile if user was created
-      if (data.user) {
-        try {
-          // Check if profile already exists
-          const { data: existingProfile } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('id', data.user.id)
-            .maybeSingle();
-            
-          if (!existingProfile) {
-            // Create profile
-            await supabase
-              .from('profiles')
-              .insert({
-                id: data.user.id,
-                email: email,
-                name: email.split('@')[0],
-                email_verified: true
-              });
-          }
-          
-          // Create onboarding entry
-          await supabase
-            .from('profile_onboarding')
-            .insert({
-              profile_id: data.user.id,
-              completed: false,
-              current_step: 'basics'
-            });
-            
-        } catch (profileError) {
-          console.error("Error creating profile:", profileError);
-        }
-      }
-      
-      // Set auth in localStorage
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('authMethod', 'email');
-      localStorage.setItem('authContact', email);
-      
-      return !!data.user;
-    } catch (error: any) {
-      console.error('Sign-up error:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
@@ -266,7 +188,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loading,
         networkError,
         signIn,
-        signUp,
         signOut,
         passwordRecovery,
         resetPassword,

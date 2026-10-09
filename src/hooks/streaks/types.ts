@@ -17,7 +17,6 @@ export interface StreakData {
 export interface CreateStreakParams {
   userId: string;
   content: string[];
-  streakCount: number;
   expiresAt: string;
   caption?: string;
 }

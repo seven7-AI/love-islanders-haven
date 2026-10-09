@@ -10,7 +10,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 2 | 1 Audit | Remove Lovable coupling, dead code, green tooling baseline | ✅ |
 | 3 | 1 Audit | CI workflow for the web app | ✅ |
 | 4 | 2 Security | Harden the password reset flow | ✅ (production action pending, see docs/operations/production-actions.md) |
-| 5 | 2 Security | Harden profile write paths and read policies | ⏳ |
+| 5 | 2 Security | Harden profile write paths and read policies | ✅ (production action pending) |
 | 6 | 2 Security | Move verification and auth state checks server-side | ⏳ |
 | 7 | 2 Security | Enforce matching, blocking, read-receipt rules in the database | ⏳ |
 | 8 | 3 Database | Reconcile live Supabase schema with migrations | ⛔ needs Supabase project access |

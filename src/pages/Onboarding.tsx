@@ -100,7 +100,7 @@ export const Onboarding = () => {
         'drinking_habit', 'smoking_habit', 'relationship_goal', 'communication_style',
         'love_language', 'zodiac_sign', 'age_range_min', 'age_range_max',
         'distance_preference', 'show_me_verified_only', 'show_age',
-        'verified', 'email_verified', 'onboarding_completed',
+        'onboarding_completed',
       ]);
       const profileUpdate: any = {};
       for (const key of Object.keys(stepData)) {

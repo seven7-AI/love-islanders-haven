@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { createStreakPost } from "./api/streak-posts";
 import { likeStreakPost } from "./api/streak-interactions";
 
@@ -37,16 +36,6 @@ export const useStreaksActions = (user: any, refreshPosts: () => void) => {
     try {
       setIsSubmitting(true);
       
-      // Get current streak count
-      const { data: userData } = await supabase
-        .from('profiles')
-        .select('streak_count')
-        .eq('id', user.id)
-        .maybeSingle();
-      
-      const currentStreakCount = userData?.streak_count || 0;
-      const newStreakCount = currentStreakCount + 1;
-      
       // Calculate expiration
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + (postData.duration || 24));
@@ -55,7 +44,6 @@ export const useStreaksActions = (user: any, refreshPosts: () => void) => {
       await createStreakPost({
         userId: user.id,
         content: postData.content,
-        streakCount: newStreakCount,
         expiresAt: expiresAt.toISOString(),
       });
       

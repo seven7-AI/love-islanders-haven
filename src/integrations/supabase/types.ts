@@ -321,7 +321,6 @@ export type Database = {
           dob: string | null
           drinking_habit: string | null
           education: string | null
-          email: string | null
           email_verified: boolean | null
           exercise: string | null
           gender: string | null
@@ -360,7 +359,6 @@ export type Database = {
           dob?: string | null
           drinking_habit?: string | null
           education?: string | null
-          email?: string | null
           email_verified?: boolean | null
           exercise?: string | null
           gender?: string | null
@@ -399,7 +397,6 @@ export type Database = {
           dob?: string | null
           drinking_habit?: string | null
           education?: string | null
-          email?: string | null
           email_verified?: boolean | null
           exercise?: string | null
           gender?: string | null
