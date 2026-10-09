@@ -34,9 +34,15 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 25 | 6 Testing | Playwright E2E | ✅ |
 | 26 | 6 Testing | Complete CI pipeline | ✅ |
 | 27 | 7 Docs | Documentation and deployment artifacts | ✅ |
-| 28 | 7 Docs | Clean-clone verification and upstream PR | ⏳ |
+| 28 | 7 Docs | Clean-clone verification and upstream PR | ✅ |
 
 ## External blockers
 - Supabase project access (schema dump, JWT verification key, function deployment/undeployment)
 - OpenAI API key, Resend API key + verified sender domain, Google OAuth client
 - Production hosting target, Android signing keystore, final Capacitor `appId` (currently the Lovable-generated id)
+
+## Clean-clone verification
+`scripts/clean-clone-check.sh` (2026-10-09, fork `main` at `e380da3`): fresh `git clone` → no Lovable tooling
+referenced → `npm ci`, `uv sync` → Postgres via compose, `alembic upgrade head` (0005) → `make check`: Prettier, ESLint
+(0 errors), typecheck, 23 test files / 88 web tests, build, ruff, mypy, 169 API tests → 12 database policy suites →
+3/3 end-to-end tests against a local Supabase (real Auth, Storage, Postgres), the API and the web app.

@@ -18,6 +18,10 @@ Some external services are replaced in tests; these tests check our code's handl
 - Language model, Google OAuth/Calendar, emergency-alert delivery: scripted fakes / mocked transports. No live test
   exists until credentials are provided (see docs/operations/production-actions.md).
 
+## From a fresh clone
+`scripts/clean-clone-check.sh [repo-url] [ref]` clones into a temporary directory and runs the documented setup and
+all suites there, proving nothing depends on a developer's machine state or on Lovable tooling.
+
 ## Everything at once
 `make ci` runs every CI job locally: format check, lint, typecheck, unit tests and build; ruff, mypy and API tests;
 the backup/restore and data-copy drills; npm audit, pip-audit and gitleaks; the database policy tests; and the
