@@ -1,17 +1,10 @@
-
-import { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Heart, Flame, User } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { StreakPost as StreakPostType } from "./types";
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
-} from "@/components/ui/carousel";
+import { useState } from 'react';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Heart, Flame, User } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { StreakPost as StreakPostType } from './types';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 interface StreakPostProps {
   post: StreakPostType;
@@ -35,11 +28,14 @@ const StreakPost = ({ post, onLike }: StreakPostProps) => {
   };
 
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
-  
+
   // Check if content is an array
-  const contentArray = Array.isArray(post.content) ? post.content : 
-                      (typeof post.content === 'string' ? [post.content] : []);
-  
+  const contentArray = Array.isArray(post.content)
+    ? post.content
+    : typeof post.content === 'string'
+      ? [post.content]
+      : [];
+
   const hasMultipleImages = contentArray.length > 1;
 
   return (
@@ -47,11 +43,7 @@ const StreakPost = ({ post, onLike }: StreakPostProps) => {
       <CardHeader className="py-3 px-4">
         <div className="flex items-center gap-3">
           {post.user_profile_image ? (
-            <img 
-              src={post.user_profile_image} 
-              alt={post.user_name} 
-              className="h-10 w-10 rounded-full object-cover"
-            />
+            <img src={post.user_profile_image} alt={post.user_name} className="h-10 w-10 rounded-full object-cover" />
           ) : (
             <div className="h-10 w-10 bg-muted rounded-full flex items-center justify-center">
               <User className="h-6 w-6 text-muted-foreground" />
@@ -77,11 +69,7 @@ const StreakPost = ({ post, onLike }: StreakPostProps) => {
               {contentArray.map((imageUrl, index) => (
                 <CarouselItem key={index}>
                   <div className="relative aspect-square">
-                    <img 
-                      src={imageUrl} 
-                      alt={`Streak post ${index + 1}`} 
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={imageUrl} alt={`Streak post ${index + 1}`} className="w-full h-full object-cover" />
                     {hasMultipleImages && (
                       <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded-full text-xs">
                         {index + 1}/{contentArray.length}
@@ -104,10 +92,8 @@ const StreakPost = ({ post, onLike }: StreakPostProps) => {
             <p className="text-muted-foreground">No image available</p>
           </div>
         )}
-        
-        <div className="p-4">
-          {post.caption && <p className="mb-2">{post.caption}</p>}
-        </div>
+
+        <div className="p-4">{post.caption && <p className="mb-2">{post.caption}</p>}</div>
       </CardContent>
       <CardFooter className="px-4 py-2 flex justify-between">
         <div className="flex gap-4">
@@ -125,7 +111,6 @@ const StreakPost = ({ post, onLike }: StreakPostProps) => {
           </Button>
         </div>
       </CardFooter>
-      
     </Card>
   );
 };

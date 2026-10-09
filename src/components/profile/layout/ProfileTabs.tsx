@@ -1,4 +1,3 @@
-
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { User, Info, Calendar } from 'lucide-react';
 import ProfileViewContent from './ProfileViewContent';
@@ -30,15 +29,15 @@ const ProfileTabs = ({ activeTab, setActiveTab, profile, onEdit }: ProfileTabsPr
           Calendar
         </TabsTrigger>
       </TabsList>
-      
+
       <TabsContent value="profile">
         <ProfileViewContent profile={profile} onEdit={onEdit} />
       </TabsContent>
-      
+
       <TabsContent value="insights">
         <ProfileInsightsContent />
       </TabsContent>
-      
+
       <TabsContent value="calendar">
         <ProfileCalendarContent />
       </TabsContent>

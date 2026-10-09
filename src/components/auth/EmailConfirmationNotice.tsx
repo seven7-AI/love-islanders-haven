@@ -37,10 +37,14 @@ const EmailConfirmationNotice = ({ email }: EmailConfirmationNoticeProps) => {
   return (
     <div className="space-y-4 text-center">
       <p className="text-white">
-        We sent a confirmation link to <span className="font-semibold">{email}</span>. Open it to confirm your email address.
+        We sent a confirmation link to <span className="font-semibold">{email}</span>. Open it to confirm your email
+        address.
       </p>
       {status && (
-        <p role={status.kind === 'error' ? 'alert' : 'status'} className={status.kind === 'error' ? 'text-red-400 text-sm' : 'text-green-400 text-sm'}>
+        <p
+          role={status.kind === 'error' ? 'alert' : 'status'}
+          className={status.kind === 'error' ? 'text-red-400 text-sm' : 'text-green-400 text-sm'}
+        >
           {status.message}
         </p>
       )}
@@ -50,7 +54,9 @@ const EmailConfirmationNotice = ({ email }: EmailConfirmationNoticeProps) => {
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Sending...
           </span>
-        ) : 'Resend confirmation email'}
+        ) : (
+          'Resend confirmation email'
+        )}
       </Button>
     </div>
   );

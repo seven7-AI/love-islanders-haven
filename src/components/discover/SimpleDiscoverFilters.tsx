@@ -27,7 +27,9 @@ interface Props {
 const SimpleDiscoverFilters: React.FC<Props> = ({ isOpen, onOpenChange, activeFilters, onApply }) => {
   const [draft, setDraft] = useState<SimpleFilters>(activeFilters);
 
-  useEffect(() => { if (isOpen) setDraft(activeFilters); }, [isOpen, activeFilters]);
+  useEffect(() => {
+    if (isOpen) setDraft(activeFilters);
+  }, [isOpen, activeFilters]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -54,10 +56,14 @@ const SimpleDiscoverFilters: React.FC<Props> = ({ isOpen, onOpenChange, activeFi
           <div>
             <div className="flex justify-between text-sm text-gray-300 mb-2">
               <Label>Age</Label>
-              <span>{draft.ageRange[0]} – {draft.ageRange[1]}</span>
+              <span>
+                {draft.ageRange[0]} – {draft.ageRange[1]}
+              </span>
             </div>
             <Slider
-              min={18} max={80} step={1}
+              min={18}
+              max={80}
+              step={1}
               value={draft.ageRange}
               onValueChange={(v) => setDraft({ ...draft, ageRange: [v[0], v[1]] as [number, number] })}
             />
@@ -69,7 +75,9 @@ const SimpleDiscoverFilters: React.FC<Props> = ({ isOpen, onOpenChange, activeFi
               <span>{draft.distance} km</span>
             </div>
             <Slider
-              min={1} max={200} step={1}
+              min={1}
+              max={200}
+              step={1}
               value={[draft.distance]}
               onValueChange={(v) => setDraft({ ...draft, distance: v[0] })}
             />
@@ -77,7 +85,13 @@ const SimpleDiscoverFilters: React.FC<Props> = ({ isOpen, onOpenChange, activeFi
         </div>
 
         <DialogFooter>
-          <Button onClick={() => { onApply(draft); onOpenChange(false); }} className="w-full bg-love hover:bg-love-dark">
+          <Button
+            onClick={() => {
+              onApply(draft);
+              onOpenChange(false);
+            }}
+            className="w-full bg-love hover:bg-love-dark"
+          >
             Apply
           </Button>
         </DialogFooter>

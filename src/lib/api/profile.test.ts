@@ -12,8 +12,9 @@ describe('toProfileUpdate', () => {
   });
 
   it('drops server-managed and unknown fields', () => {
-    expect(toProfileUpdate({ verified: true, email_verified: true, streak_count: 5, age: 30, id: 'x', images: [] }))
-      .toEqual({});
+    expect(
+      toProfileUpdate({ verified: true, email_verified: true, streak_count: 5, age: 30, id: 'x', images: [] }),
+    ).toEqual({});
   });
 
   it('prefers the snake_case value when both spellings are present', () => {

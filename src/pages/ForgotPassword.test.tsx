@@ -6,7 +6,12 @@ import ForgotPassword from './ForgotPassword';
 const resetPassword = vi.fn();
 vi.mock('@/context/auth', () => ({ useAuth: () => ({ resetPassword }) }));
 
-const renderPage = () => render(<MemoryRouter><ForgotPassword /></MemoryRouter>);
+const renderPage = () =>
+  render(
+    <MemoryRouter>
+      <ForgotPassword />
+    </MemoryRouter>,
+  );
 const submit = (email: string) => {
   fireEvent.change(screen.getByLabelText('Email'), { target: { value: email } });
   fireEvent.click(screen.getByRole('button', { name: 'Send reset link' }));

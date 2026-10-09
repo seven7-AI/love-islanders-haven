@@ -13,7 +13,7 @@ export function useProfileCalendar() {
     isAuthorized: isGoogleAuthorized,
     isAvailable: isGoogleAvailable,
     initiateGoogleAuth,
-    fetchGoogleEvents
+    fetchGoogleEvents,
   } = useGoogleCalendar();
 
   const loadDatePlans = useCallback(async () => {
@@ -70,6 +70,6 @@ export function useProfileCalendar() {
     },
     isGoogleAuthorized,
     isGoogleAvailable,
-    initiateGoogleAuth
+    initiateGoogleAuth,
   };
 }

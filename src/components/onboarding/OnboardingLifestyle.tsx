@@ -12,16 +12,16 @@ import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   height: z.string().optional(),
-  occupation: z.string().min(1, { message: "Please enter your occupation" }),
+  occupation: z.string().min(1, { message: 'Please enter your occupation' }),
   education: z.string().optional(),
-  exercise: z.enum(["active", "sometimes", "rarely", "never"], {
-    required_error: "Please select an option",
+  exercise: z.enum(['active', 'sometimes', 'rarely', 'never'], {
+    required_error: 'Please select an option',
   }),
-  drinking: z.enum(["never", "socially", "frequently"], {
-    required_error: "Please select an option",
+  drinking: z.enum(['never', 'socially', 'frequently'], {
+    required_error: 'Please select an option',
   }),
-  smoking: z.enum(["never", "socially", "regularly"], {
-    required_error: "Please select an option",
+  smoking: z.enum(['never', 'socially', 'regularly'], {
+    required_error: 'Please select an option',
   }),
 });
 
@@ -44,7 +44,7 @@ export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting 
       smoking: initialData?.smoking_habit || initialData?.smoking || undefined,
     },
   });
-  
+
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     onNext({
       ...data,
@@ -52,38 +52,36 @@ export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting 
       smoking_habit: data.smoking,
     });
   };
-  
+
   // Option button component for visual selection
-  const OptionButton = ({ 
-    value, 
-    label, 
-    selected, 
-    onClick 
-  }: { 
-    value: string; 
-    label: string; 
-    selected: boolean; 
+  const OptionButton = ({
+    value,
+    label,
+    selected,
+    onClick,
+  }: {
+    value: string;
+    label: string;
+    selected: boolean;
     onClick: () => void;
   }) => (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "px-4 py-2 rounded-full text-sm transition-all",
-        selected 
-          ? "bg-love text-white" 
-          : "bg-island-light/20 text-white/80 hover:bg-island-light/30"
+        'px-4 py-2 rounded-full text-sm transition-all',
+        selected ? 'bg-love text-white' : 'bg-island-light/20 text-white/80 hover:bg-island-light/30',
       )}
     >
       {label}
     </button>
   );
-  
+
   return (
     <div className="bg-island-dark/80 backdrop-blur-sm rounded-lg p-6 text-white animate-fade-in shadow-lg border border-island-light/30">
       <h1 className="text-2xl font-bold mb-2 text-gradient">Lifestyle</h1>
       <p className="text-gray-300 mb-6">Share a bit about how you live.</p>
-      
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           {/* Height */}
@@ -104,7 +102,7 @@ export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting 
               </FormItem>
             )}
           />
-          
+
           {/* Occupation */}
           <FormField
             control={form.control}
@@ -123,7 +121,7 @@ export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting 
               </FormItem>
             )}
           />
-          
+
           {/* Education */}
           <FormField
             control={form.control}
@@ -150,7 +148,7 @@ export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting 
               </FormItem>
             )}
           />
-          
+
           {/* Exercise */}
           <FormField
             control={form.control}
@@ -178,7 +176,7 @@ export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting 
               </FormItem>
             )}
           />
-          
+
           {/* Drinking */}
           <FormField
             control={form.control}
@@ -205,7 +203,7 @@ export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting 
               </FormItem>
             )}
           />
-          
+
           {/* Smoking */}
           <FormField
             control={form.control}
@@ -232,29 +230,21 @@ export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting 
               </FormItem>
             )}
           />
-          
+
           <div className="flex space-x-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={onBack}
-              className="flex-1"
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={onBack} className="flex-1" disabled={isSubmitting}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
-            <Button 
-              type="submit" 
-              className="flex-1 bg-love hover:bg-love-dark"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" className="flex-1 bg-love hover:bg-love-dark" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
-              ) : "Continue"}
+              ) : (
+                'Continue'
+              )}
             </Button>
           </div>
         </form>

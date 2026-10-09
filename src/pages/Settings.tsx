@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -44,7 +43,7 @@ const Settings = () => {
       toast.error('You must be logged in to save settings');
       return;
     }
-    
+
     setIsSaving(true);
     try {
       await saveAllSettings();
@@ -128,11 +127,7 @@ const Settings = () => {
           </Tabs>
 
           <div className="sticky bottom-[120px] left-0 right-0 p-4 bg-gradient-to-t from-island-dark to-transparent">
-            <Button 
-              onClick={handleSaveAll}
-              className="w-full bg-love hover:bg-love/90"
-              disabled={isSaving}
-            >
+            <Button onClick={handleSaveAll} className="w-full bg-love hover:bg-love/90" disabled={isSaving}>
               {isSaving ? (
                 <span className="flex items-center">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

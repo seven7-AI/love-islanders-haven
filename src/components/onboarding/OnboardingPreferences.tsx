@@ -21,23 +21,13 @@ interface OnboardingPreferencesProps {
   isSubmitting: boolean;
 }
 
-const OptionButton = ({ 
-  label, 
-  selected, 
-  onClick,
-}: { 
-  label: string; 
-  selected: boolean; 
-  onClick: () => void;
-}) => (
+const OptionButton = ({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) => (
   <button
     type="button"
     onClick={onClick}
     className={cn(
-      "px-4 py-2 rounded-full text-sm transition-all",
-      selected 
-        ? "bg-love text-white" 
-        : "bg-island-light/20 text-white/80 hover:bg-island-light/30"
+      'px-4 py-2 rounded-full text-sm transition-all',
+      selected ? 'bg-love text-white' : 'bg-island-light/20 text-white/80 hover:bg-island-light/30',
     )}
   >
     {label}
@@ -54,29 +44,31 @@ export const OnboardingPreferences = ({ initialData, onNext, onBack, isSubmittin
       show_me_verified_only: initialData?.show_me_verified_only || false,
     },
   });
-  
+
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     onNext(data);
   };
-  
+
   const ageMin = form.watch('age_range_min');
   const ageMax = form.watch('age_range_max');
   const distance = form.watch('distance_preference');
-  
+
   return (
     <div className="bg-island-dark/80 backdrop-blur-sm rounded-lg p-6 text-white animate-fade-in shadow-lg border border-island-light/30">
       <h1 className="text-2xl font-bold mb-2 text-gradient">Your Preferences</h1>
       <p className="text-gray-300 mb-6">Let us know who you'd like to meet.</p>
-      
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {/* Age Range */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <FormLabel>Age Range</FormLabel>
-              <span className="text-love font-medium">{ageMin} - {ageMax}</span>
+              <span className="text-love font-medium">
+                {ageMin} - {ageMax}
+              </span>
             </div>
-            
+
             <div className="px-2">
               <Slider
                 min={18}
@@ -90,20 +82,20 @@ export const OnboardingPreferences = ({ initialData, onNext, onBack, isSubmittin
                 className="[&_[role=slider]]:bg-love"
               />
             </div>
-            
+
             <div className="flex justify-between text-xs text-gray-400">
               <span>18</span>
               <span>100+</span>
             </div>
           </div>
-          
+
           {/* Distance */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <FormLabel>Maximum Distance</FormLabel>
               <span className="text-love font-medium">{distance} km</span>
             </div>
-            
+
             <div className="px-2">
               <Slider
                 min={1}
@@ -114,13 +106,13 @@ export const OnboardingPreferences = ({ initialData, onNext, onBack, isSubmittin
                 className="[&_[role=slider]]:bg-love"
               />
             </div>
-            
+
             <div className="flex justify-between text-xs text-gray-400">
               <span>1 km</span>
               <span>100+ km</span>
             </div>
           </div>
-          
+
           {/* Verified Only */}
           <FormField
             control={form.control}
@@ -129,11 +121,7 @@ export const OnboardingPreferences = ({ initialData, onNext, onBack, isSubmittin
               <FormItem>
                 <FormLabel>Show me</FormLabel>
                 <div className="flex gap-3 pt-1">
-                  <OptionButton
-                    label="Everyone"
-                    selected={!field.value}
-                    onClick={() => field.onChange(false)}
-                  />
+                  <OptionButton label="Everyone" selected={!field.value} onClick={() => field.onChange(false)} />
                   <OptionButton
                     label="Verified profiles only"
                     selected={!!field.value}
@@ -144,29 +132,21 @@ export const OnboardingPreferences = ({ initialData, onNext, onBack, isSubmittin
               </FormItem>
             )}
           />
-          
+
           <div className="flex space-x-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={onBack}
-              className="flex-1"
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={onBack} className="flex-1" disabled={isSubmitting}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
-            <Button 
-              type="submit" 
-              className="flex-1 bg-love hover:bg-love-dark"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" className="flex-1 bg-love hover:bg-love-dark" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Finishing...
                 </>
-              ) : "Complete Profile"}
+              ) : (
+                'Complete Profile'
+              )}
             </Button>
           </div>
         </form>

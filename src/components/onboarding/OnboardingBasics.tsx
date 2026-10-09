@@ -13,34 +13,28 @@ interface OnboardingBasicsProps {
   isSubmitting: boolean;
 }
 
-export function OnboardingBasics({
-  initialData,
-  onNext,
-  isSubmitting
-}: OnboardingBasicsProps) {
+export function OnboardingBasics({ initialData, onNext, isSubmitting }: OnboardingBasicsProps) {
   const [name, setName] = useState(initialData?.name || '');
-  const [date, setDate] = useState<Date | undefined>(
-    initialData?.dob ? new Date(initialData.dob) : undefined
-  );
+  const [date, setDate] = useState<Date | undefined>(initialData?.dob ? new Date(initialData.dob) : undefined);
   const [gender, setGender] = useState<string>(initialData?.gender || 'male');
   const [genderPreference, setGenderPreference] = useState<string>(initialData?.gender_preference || 'both');
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name.trim() || !date) {
       return;
     }
-    
+
     const age = calculateAge(date);
-    
+
     await onNext({
       name,
       dob: toDateOnlyString(date),
       age,
       gender,
       gender_preference: genderPreference,
-      show_age: true
+      show_age: true,
     });
   };
 
@@ -52,10 +46,12 @@ export function OnboardingBasics({
         <h1 className="text-2xl font-bold text-white text-center">Let's get to know you</h1>
         <p className="text-muted-foreground text-center mt-2">Tell us a bit about yourself</p>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-white">What's your name?</Label>
+          <Label htmlFor="name" className="text-white">
+            What's your name?
+          </Label>
           <Input
             id="name"
             value={name}
@@ -65,27 +61,14 @@ export function OnboardingBasics({
             className="bg-island-light/20 border-island-light text-white"
           />
         </div>
-        
-        <DateOfBirthPicker 
-          value={date} 
-          onChange={setDate}
-          minAge={18}
-          maxAge={100}
-        />
-        
+
+        <DateOfBirthPicker value={date} onChange={setDate} minAge={18} maxAge={100} />
+
         <div className="space-y-3">
           <Label className="text-white">I am a</Label>
-          <RadioGroup 
-            value={gender} 
-            onValueChange={setGender}
-            className="grid grid-cols-3 gap-4"
-          >
+          <RadioGroup value={gender} onValueChange={setGender} className="grid grid-cols-3 gap-4">
             <div>
-              <RadioGroupItem
-                value="male"
-                id="male"
-                className="peer sr-only"
-              />
+              <RadioGroupItem value="male" id="male" className="peer sr-only" />
               <Label
                 htmlFor="male"
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-island-light/20 p-4 hover:bg-island-light/30 hover:text-accent-foreground peer-data-[state=checked]:border-love peer-data-[state=checked]:text-love cursor-pointer"
@@ -94,11 +77,7 @@ export function OnboardingBasics({
               </Label>
             </div>
             <div>
-              <RadioGroupItem
-                value="female"
-                id="female"
-                className="peer sr-only"
-              />
+              <RadioGroupItem value="female" id="female" className="peer sr-only" />
               <Label
                 htmlFor="female"
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-island-light/20 p-4 hover:bg-island-light/30 hover:text-accent-foreground peer-data-[state=checked]:border-love peer-data-[state=checked]:text-love cursor-pointer"
@@ -107,11 +86,7 @@ export function OnboardingBasics({
               </Label>
             </div>
             <div>
-              <RadioGroupItem
-                value="other"
-                id="other"
-                className="peer sr-only"
-              />
+              <RadioGroupItem value="other" id="other" className="peer sr-only" />
               <Label
                 htmlFor="other"
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-island-light/20 p-4 hover:bg-island-light/30 hover:text-accent-foreground peer-data-[state=checked]:border-love peer-data-[state=checked]:text-love cursor-pointer"
@@ -121,20 +96,12 @@ export function OnboardingBasics({
             </div>
           </RadioGroup>
         </div>
-        
+
         <div className="space-y-3">
           <Label className="text-white">I want to see</Label>
-          <RadioGroup 
-            value={genderPreference} 
-            onValueChange={setGenderPreference}
-            className="grid grid-cols-3 gap-4"
-          >
+          <RadioGroup value={genderPreference} onValueChange={setGenderPreference} className="grid grid-cols-3 gap-4">
             <div>
-              <RadioGroupItem
-                value="male"
-                id="see-male"
-                className="peer sr-only"
-              />
+              <RadioGroupItem value="male" id="see-male" className="peer sr-only" />
               <Label
                 htmlFor="see-male"
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-island-light/20 p-4 hover:bg-island-light/30 hover:text-accent-foreground peer-data-[state=checked]:border-love peer-data-[state=checked]:text-love cursor-pointer"
@@ -143,11 +110,7 @@ export function OnboardingBasics({
               </Label>
             </div>
             <div>
-              <RadioGroupItem
-                value="female"
-                id="see-female"
-                className="peer sr-only"
-              />
+              <RadioGroupItem value="female" id="see-female" className="peer sr-only" />
               <Label
                 htmlFor="see-female"
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-island-light/20 p-4 hover:bg-island-light/30 hover:text-accent-foreground peer-data-[state=checked]:border-love peer-data-[state=checked]:text-love cursor-pointer"
@@ -156,11 +119,7 @@ export function OnboardingBasics({
               </Label>
             </div>
             <div>
-              <RadioGroupItem
-                value="both"
-                id="see-both"
-                className="peer sr-only"
-              />
+              <RadioGroupItem value="both" id="see-both" className="peer sr-only" />
               <Label
                 htmlFor="see-both"
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-island-light/20 p-4 hover:bg-island-light/30 hover:text-accent-foreground peer-data-[state=checked]:border-love peer-data-[state=checked]:text-love cursor-pointer"
@@ -170,9 +129,9 @@ export function OnboardingBasics({
             </div>
           </RadioGroup>
         </div>
-        
-        <Button 
-          type="submit" 
+
+        <Button
+          type="submit"
           className="w-full bg-love hover:bg-love-dark text-white"
           disabled={isSubmitting || !isValid}
         >
@@ -181,7 +140,9 @@ export function OnboardingBasics({
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Saving...
             </span>
-          ) : "Continue"}
+          ) : (
+            'Continue'
+          )}
         </Button>
       </form>
     </div>

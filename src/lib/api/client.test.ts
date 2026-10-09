@@ -32,7 +32,8 @@ describe('apiFetch', () => {
   });
 
   it('refreshes the session once on 401 and retries', async () => {
-    fetchMock.mockResolvedValueOnce(json(401, { status: 401, detail: 'Token expired' }))
+    fetchMock
+      .mockResolvedValueOnce(json(401, { status: 401, detail: 'Token expired' }))
       .mockResolvedValueOnce(json(200, { id: 'u1' }));
     await expect(apiFetch('/v1/me')).resolves.toEqual({ id: 'u1' });
     expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -40,7 +41,9 @@ describe('apiFetch', () => {
   });
 
   it('surfaces problem details as ApiError', async () => {
-    fetchMock.mockResolvedValue(json(409, { status: 409, detail: 'Already exists', code: 'conflict' }, 'application/problem+json'));
+    fetchMock.mockResolvedValue(
+      json(409, { status: 409, detail: 'Already exists', code: 'conflict' }, 'application/problem+json'),
+    );
     const error = await apiFetch('/v1/thing').catch((e) => e);
     expect(error).toBeInstanceOf(ApiError);
     expect(error).toMatchObject({ status: 409, message: 'Already exists', code: 'conflict' });

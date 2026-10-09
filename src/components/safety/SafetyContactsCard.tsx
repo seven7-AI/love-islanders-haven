@@ -17,7 +17,16 @@ interface SafetyContactsCardProps {
   onRemove: (id: string) => Promise<boolean>;
 }
 
-const SafetyContactsCard = ({ contacts, isLoading, isSaving, error, onRetry, onAdd, onUpdate, onRemove }: SafetyContactsCardProps) => {
+const SafetyContactsCard = ({
+  contacts,
+  isLoading,
+  isSaving,
+  error,
+  onRetry,
+  onAdd,
+  onUpdate,
+  onRemove,
+}: SafetyContactsCardProps) => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const atLimit = contacts.length >= MAX_SAFETY_CONTACTS;
@@ -37,8 +46,12 @@ const SafetyContactsCard = ({ contacts, isLoading, isSaving, error, onRetry, onA
           </div>
         ) : error ? (
           <div className="space-y-2">
-            <p role="alert" className="text-sm text-destructive">{error}</p>
-            <Button variant="outline" size="sm" onClick={onRetry}>Try again</Button>
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+            <Button variant="outline" size="sm" onClick={onRetry}>
+              Try again
+            </Button>
           </div>
         ) : (
           <>

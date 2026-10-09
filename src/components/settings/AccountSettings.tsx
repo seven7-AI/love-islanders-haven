@@ -41,7 +41,9 @@ const AccountSettings = () => {
       <div className="space-y-4">
         <h4 className="text-sm font-medium text-love">Email Address</h4>
         <div>
-          <Label htmlFor="current-email" className="text-xs text-muted-foreground">Current email</Label>
+          <Label htmlFor="current-email" className="text-xs text-muted-foreground">
+            Current email
+          </Label>
           <Input
             id="current-email"
             type="email"
@@ -51,7 +53,9 @@ const AccountSettings = () => {
           />
         </div>
         <form onSubmit={handleChangeEmail} className="space-y-2">
-          <Label htmlFor="new-email" className="text-xs text-muted-foreground">New email</Label>
+          <Label htmlFor="new-email" className="text-xs text-muted-foreground">
+            New email
+          </Label>
           <Input
             id="new-email"
             type="email"

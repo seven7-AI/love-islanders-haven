@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { AlertTriangle, Bell, Mail, MessageSquare, Phone } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -17,10 +24,7 @@ interface Coordinates {
   longitude: number;
 }
 
-type Result =
-  | { kind: 'sent' }
-  | { kind: 'not_configured' }
-  | { kind: 'failed'; message: string };
+type Result = { kind: 'sent' } | { kind: 'not_configured' } | { kind: 'failed'; message: string };
 
 /** Emergency number that works across the EU and on most mobile networks worldwide. */
 const EMERGENCY_NUMBER = '112';
@@ -44,10 +48,7 @@ const helpMessage = (location: Coordinates | null) =>
     : 'I need help. Please call me.';
 
 const EmergencyServicesLink = () => (
-  <a
-    href={`tel:${EMERGENCY_NUMBER}`}
-    className="inline-flex items-center gap-2 font-semibold underline"
-  >
+  <a href={`tel:${EMERGENCY_NUMBER}`} className="inline-flex items-center gap-2 font-semibold underline">
     <Phone className="h-4 w-4" />
     Call emergency services ({EMERGENCY_NUMBER})
   </a>
@@ -131,7 +132,10 @@ const EmergencyButton = ({ contacts, className }: EmergencyButtonProps) => {
                     <p>Or contact {manualContact.name} yourself:</p>
                     <div className="flex flex-wrap gap-3">
                       {manualContact.phone && (
-                        <a href={`sms:${manualContact.phone}?body=${text}`} className="inline-flex items-center gap-1 underline">
+                        <a
+                          href={`sms:${manualContact.phone}?body=${text}`}
+                          className="inline-flex items-center gap-1 underline"
+                        >
                           <MessageSquare className="h-4 w-4" /> Text {manualContact.name}
                         </a>
                       )}

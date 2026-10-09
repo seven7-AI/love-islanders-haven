@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Filter, Coffee, Briefcase, GraduationCap, Cigarette, Plus, Minus } from 'lucide-react';
 import {
@@ -10,18 +9,12 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
@@ -60,37 +53,47 @@ const DEFAULT_FILTERS: AdvancedFilterOptions = {
 };
 
 // Conversion helpers
-const cmToFeet = (cm: number) => Math.round(cm / 30.48 * 10) / 10;
+const cmToFeet = (cm: number) => Math.round((cm / 30.48) * 10) / 10;
 const feetToCm = (feet: number) => Math.round(feet * 30.48);
 
-const RELATIONSHIP_GOALS = [
-  'Casual dating',
-  'Long-term relationship',
-  'Marriage',
-  'Friendship',
-  'Not sure yet'
-];
+const RELATIONSHIP_GOALS = ['Casual dating', 'Long-term relationship', 'Marriage', 'Friendship', 'Not sure yet'];
 
 const EDUCATION_LEVELS = [
   'High School',
   'Associate Degree',
-  'Bachelor\'s Degree',
-  'Master\'s Degree',
+  "Bachelor's Degree",
+  "Master's Degree",
   'Ph.D. or Doctorate',
-  'Prefer not to say'
+  'Prefer not to say',
 ];
 
 const INTERESTS = [
-  'Travel', 'Cooking', 'Movies', 'Music', 'Reading',
-  'Sports', 'Fitness', 'Art', 'Photography', 'Gaming',
-  'Dancing', 'Hiking', 'Yoga', 'Meditation', 'Pets',
-  'Coffee', 'Wine', 'Food', 'Fashion', 'Technology'
+  'Travel',
+  'Cooking',
+  'Movies',
+  'Music',
+  'Reading',
+  'Sports',
+  'Fitness',
+  'Art',
+  'Photography',
+  'Gaming',
+  'Dancing',
+  'Hiking',
+  'Yoga',
+  'Meditation',
+  'Pets',
+  'Coffee',
+  'Wine',
+  'Food',
+  'Fashion',
+  'Technology',
 ];
 
 const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps) => {
   const [filters, setFilters] = useState<AdvancedFilterOptions>({
     ...DEFAULT_FILTERS,
-    ...activeFilters
+    ...activeFilters,
   });
   const [sheetOpen, setSheetOpen] = useState(false);
   const [newInterest, setNewInterest] = useState('');
@@ -98,13 +101,12 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
   // Count active filters
   const countActiveFilters = () => {
     let count = 0;
-    
+
     // Check for modified filters from default values
-    if (filters.ageRange[0] !== DEFAULT_FILTERS.ageRange[0] || 
-        filters.ageRange[1] !== DEFAULT_FILTERS.ageRange[1]) count++;
+    if (filters.ageRange[0] !== DEFAULT_FILTERS.ageRange[0] || filters.ageRange[1] !== DEFAULT_FILTERS.ageRange[1])
+      count++;
     if (filters.distance !== DEFAULT_FILTERS.distance) count++;
-    if (filters.height[0] !== DEFAULT_FILTERS.height[0] || 
-        filters.height[1] !== DEFAULT_FILTERS.height[1]) count++;
+    if (filters.height[0] !== DEFAULT_FILTERS.height[0] || filters.height[1] !== DEFAULT_FILTERS.height[1]) count++;
     if (filters.heightUnit !== DEFAULT_FILTERS.heightUnit) count++;
     if (filters.relationshipGoals.length > 0) count++;
     if (filters.hasChildren !== null) count++;
@@ -113,7 +115,7 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
     if (filters.education !== null) count++;
     if (filters.occupation !== null) count++;
     if (filters.interests.length > 0) count++;
-    
+
     return count;
   };
 
@@ -130,7 +132,7 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
     if (newInterest && !filters.interests.includes(newInterest)) {
       setFilters({
         ...filters,
-        interests: [...filters.interests, newInterest]
+        interests: [...filters.interests, newInterest],
       });
       setNewInterest('');
     }
@@ -139,7 +141,7 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
   const removeInterest = (interest: string) => {
     setFilters({
       ...filters,
-      interests: filters.interests.filter(i => i !== interest)
+      interests: filters.interests.filter((i) => i !== interest),
     });
   };
 
@@ -147,12 +149,12 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
     if (filters.relationshipGoals.includes(goal)) {
       setFilters({
         ...filters,
-        relationshipGoals: filters.relationshipGoals.filter(g => g !== goal)
+        relationshipGoals: filters.relationshipGoals.filter((g) => g !== goal),
       });
     } else {
       setFilters({
         ...filters,
-        relationshipGoals: [...filters.relationshipGoals, goal]
+        relationshipGoals: [...filters.relationshipGoals, goal],
       });
     }
   };
@@ -163,13 +165,13 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
       return {
         min: cmToFeet(filters.height[0]),
         max: cmToFeet(filters.height[1]),
-        unit: 'ft'
+        unit: 'ft',
       };
     }
     return {
       min: filters.height[0],
       max: filters.height[1],
-      unit: 'cm'
+      unit: 'cm',
     };
   };
 
@@ -177,7 +179,7 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
   const handleHeightUnitChange = (unit: 'cm' | 'ft') => {
     setFilters({
       ...filters,
-      heightUnit: unit
+      heightUnit: unit,
     });
   };
 
@@ -188,14 +190,14 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
         min: 4.5,
         max: 7.0,
         step: 0.1,
-        values: [cmToFeet(filters.height[0]), cmToFeet(filters.height[1])]
+        values: [cmToFeet(filters.height[0]), cmToFeet(filters.height[1])],
       };
     }
     return {
       min: 140,
       max: 220,
       step: 1,
-      values: filters.height
+      values: filters.height,
     };
   };
 
@@ -204,12 +206,12 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
     if (filters.heightUnit === 'ft') {
       setFilters({
         ...filters,
-        height: [feetToCm(values[0]), feetToCm(values[1])]
+        height: [feetToCm(values[0]), feetToCm(values[1])],
       });
     } else {
       setFilters({
         ...filters,
-        height: [values[0], values[1]]
+        height: [values[0], values[1]],
       });
     }
   };
@@ -234,11 +236,9 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
         <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Advanced Filters</SheetTitle>
-            <SheetDescription>
-              Refine your search with more specific criteria
-            </SheetDescription>
+            <SheetDescription>Refine your search with more specific criteria</SheetDescription>
           </SheetHeader>
-          
+
           <div className="py-4 space-y-6">
             {/* Age Range */}
             <div className="space-y-2">
@@ -253,37 +253,33 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
                 min={18}
                 max={70}
                 step={1}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   setFilters({ ...filters, ageRange: [value[0], value[1]] as [number, number] })
                 }
                 className="mt-2"
               />
             </div>
-            
+
             <Separator />
-            
+
             {/* Distance */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium">Distance</h3>
-                <span className="text-sm text-muted-foreground">
-                  Up to {filters.distance} km
-                </span>
+                <span className="text-sm text-muted-foreground">Up to {filters.distance} km</span>
               </div>
               <Slider
                 defaultValue={[filters.distance]}
                 min={1}
                 max={150}
                 step={1}
-                onValueChange={(value) => 
-                  setFilters({ ...filters, distance: value[0] })
-                }
+                onValueChange={(value) => setFilters({ ...filters, distance: value[0] })}
                 className="mt-2"
               />
             </div>
-            
+
             <Separator />
-            
+
             {/* Height Range */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -292,8 +288,8 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
                   <span className="text-sm text-muted-foreground">
                     {heightDisplay.min} - {heightDisplay.max} {heightDisplay.unit}
                   </span>
-                  <Select 
-                    value={filters.heightUnit} 
+                  <Select
+                    value={filters.heightUnit}
                     onValueChange={(value: 'cm' | 'ft') => handleHeightUnitChange(value)}
                   >
                     <SelectTrigger className="w-16 h-7">
@@ -315,17 +311,17 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
                 className="mt-2"
               />
             </div>
-            
+
             <Separator />
-            
+
             {/* Relationship Goals */}
             <div className="space-y-2">
               <h3 className="text-sm font-medium">Relationship Goals</h3>
               <div className="flex flex-wrap gap-2 mt-2">
-                {RELATIONSHIP_GOALS.map(goal => (
+                {RELATIONSHIP_GOALS.map((goal) => (
                   <Badge
                     key={goal}
-                    variant={filters.relationshipGoals.includes(goal) ? "default" : "outline"}
+                    variant={filters.relationshipGoals.includes(goal) ? 'default' : 'outline'}
                     className="cursor-pointer"
                     onClick={() => toggleRelationshipGoal(goal)}
                   >
@@ -334,24 +330,24 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
                 ))}
               </div>
             </div>
-            
+
             <Separator />
-            
+
             {/* Deal Breakers */}
             <div className="space-y-4">
               <h3 className="text-sm font-medium">Deal Breakers</h3>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Cigarette className="h-4 w-4 text-muted-foreground" />
                   <Label htmlFor="smoking">Smoking</Label>
                 </div>
                 <Select
-                  value={filters.smoking === null ? "any" : filters.smoking ? "yes" : "no"}
+                  value={filters.smoking === null ? 'any' : filters.smoking ? 'yes' : 'no'}
                   onValueChange={(value) => {
                     let smokingValue = null;
-                    if (value === "yes") smokingValue = true;
-                    if (value === "no") smokingValue = false;
+                    if (value === 'yes') smokingValue = true;
+                    if (value === 'no') smokingValue = false;
                     setFilters({ ...filters, smoking: smokingValue });
                   }}
                 >
@@ -365,18 +361,18 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Plus className="h-4 w-4 text-muted-foreground" />
                   <Label htmlFor="hasChildren">Has Children</Label>
                 </div>
                 <Select
-                  value={filters.hasChildren === null ? "any" : filters.hasChildren ? "yes" : "no"}
+                  value={filters.hasChildren === null ? 'any' : filters.hasChildren ? 'yes' : 'no'}
                   onValueChange={(value) => {
                     let childrenValue = null;
-                    if (value === "yes") childrenValue = true;
-                    if (value === "no") childrenValue = false;
+                    if (value === 'yes') childrenValue = true;
+                    if (value === 'no') childrenValue = false;
                     setFilters({ ...filters, hasChildren: childrenValue });
                   }}
                 >
@@ -390,18 +386,18 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Coffee className="h-4 w-4 text-muted-foreground" />
                   <Label htmlFor="hasPets">Has Pets</Label>
                 </div>
                 <Select
-                  value={filters.hasPets === null ? "any" : filters.hasPets ? "yes" : "no"}
+                  value={filters.hasPets === null ? 'any' : filters.hasPets ? 'yes' : 'no'}
                   onValueChange={(value) => {
                     let petsValue = null;
-                    if (value === "yes") petsValue = true;
-                    if (value === "no") petsValue = false;
+                    if (value === 'yes') petsValue = true;
+                    if (value === 'no') petsValue = false;
                     setFilters({ ...filters, hasPets: petsValue });
                   }}
                 >
@@ -416,9 +412,9 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
                 </Select>
               </div>
             </div>
-            
+
             <Separator />
-            
+
             {/* Education & Occupation */}
             <div className="space-y-4">
               <div className="space-y-2">
@@ -427,56 +423,53 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
                   <Label>Education</Label>
                 </div>
                 <Select
-                  value={filters.education || "any"}
-                  onValueChange={(value) => 
-                    setFilters({ ...filters, education: value === "any" ? null : value })
-                  }
+                  value={filters.education || 'any'}
+                  onValueChange={(value) => setFilters({ ...filters, education: value === 'any' ? null : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Any Education Level" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="any">Any Education Level</SelectItem>
-                    {EDUCATION_LEVELS.map(level => (
-                      <SelectItem key={level} value={level}>{level}</SelectItem>
+                    {EDUCATION_LEVELS.map((level) => (
+                      <SelectItem key={level} value={level}>
+                        {level}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Briefcase className="h-4 w-4 text-muted-foreground" />
                   <Label>Occupation</Label>
                 </div>
-                <Input 
-                  placeholder="Any occupation" 
-                  value={filters.occupation || ""} 
-                  onChange={(e) => 
-                    setFilters({ ...filters, occupation: e.target.value || null })
-                  }
+                <Input
+                  placeholder="Any occupation"
+                  value={filters.occupation || ''}
+                  onChange={(e) => setFilters({ ...filters, occupation: e.target.value || null })}
                 />
               </div>
             </div>
-            
+
             <Separator />
-            
+
             {/* Interests */}
             <div className="space-y-2">
               <h3 className="text-sm font-medium">Interests</h3>
               <p className="text-xs text-muted-foreground">Find people who share your interests</p>
-              
+
               <div className="flex gap-2 mt-2">
-                <Select
-                  value={newInterest}
-                  onValueChange={setNewInterest}
-                >
+                <Select value={newInterest} onValueChange={setNewInterest}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select interest" />
                   </SelectTrigger>
                   <SelectContent>
-                    {INTERESTS.filter(i => !filters.interests.includes(i)).map(interest => (
-                      <SelectItem key={interest} value={interest}>{interest}</SelectItem>
+                    {INTERESTS.filter((i) => !filters.interests.includes(i)).map((interest) => (
+                      <SelectItem key={interest} value={interest}>
+                        {interest}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -484,14 +477,10 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
                   Add
                 </Button>
               </div>
-              
+
               <div className="flex flex-wrap gap-2 mt-2">
-                {filters.interests.map(interest => (
-                  <Badge
-                    key={interest}
-                    variant="secondary"
-                    className="cursor-pointer"
-                  >
+                {filters.interests.map((interest) => (
+                  <Badge key={interest} variant="secondary" className="cursor-pointer">
                     {interest}
                     <button
                       className="ml-1 text-muted-foreground hover:text-foreground"
@@ -507,14 +496,12 @@ const AdvancedFilters = ({ onFilterChange, activeFilters }: AdvancedFiltersProps
               </div>
             </div>
           </div>
-          
+
           <SheetFooter className="sm:justify-between">
             <Button variant="outline" onClick={handleResetFilters}>
               Reset Filters
             </Button>
-            <Button onClick={handleApplyFilters}>
-              Apply Filters
-            </Button>
+            <Button onClick={handleApplyFilters}>Apply Filters</Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>

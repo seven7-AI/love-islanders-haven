@@ -1,4 +1,3 @@
-
 import { Shield } from 'lucide-react';
 
 interface PrivacyControlSectionProps {
@@ -8,11 +7,11 @@ interface PrivacyControlSectionProps {
   children?: React.ReactNode;
 }
 
-const PrivacyControlsSection = ({ 
+const PrivacyControlsSection = ({
   title,
   icon = <Shield size={16} className="text-muted-foreground" />,
-  className = "",
-  children
+  className = '',
+  children,
 }: PrivacyControlSectionProps) => {
   return (
     <div className={`space-y-4 pt-4 border-t border-island-light/30 ${className}`}>
@@ -20,9 +19,7 @@ const PrivacyControlsSection = ({
         {icon}
         {title}
       </h4>
-      <div className="space-y-3">
-        {children}
-      </div>
+      <div className="space-y-3">{children}</div>
     </div>
   );
 };

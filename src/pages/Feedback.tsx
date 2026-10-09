@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -6,14 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth';
 import { fetchMyFeedback } from '@/lib/api/insights';
 import { Loader2, ArrowLeft } from 'lucide-react';
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow 
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
@@ -36,7 +28,6 @@ const getCategoryColor = (category: string) => {
       return 'bg-gray-500';
   }
 };
-
 
 const FeedbackPage = () => {
   const navigate = useNavigate();
@@ -62,7 +53,7 @@ const FeedbackPage = () => {
             created_at: item.created_at,
             category: item.category || 'general',
           })),
-        )
+        );
       } catch (err) {
         console.error('Error fetching feedback:', err);
         setError('Failed to load feedback. Please try again.');
@@ -127,17 +118,11 @@ const FeedbackPage = () => {
                 <TableBody>
                   {feedbackItems.map((item) => (
                     <TableRow key={item.id} className="border-b border-island-light/20">
-                      <TableCell className="text-gray-300">
-                        {formatDate(item.created_at)}
-                      </TableCell>
+                      <TableCell className="text-gray-300">{formatDate(item.created_at)}</TableCell>
                       <TableCell>
-                        <Badge className={`${getCategoryColor(item.category)}`}>
-                          {item.category}
-                        </Badge>
+                        <Badge className={`${getCategoryColor(item.category)}`}>{item.category}</Badge>
                       </TableCell>
-                      <TableCell className="text-white">
-                        {item.feedback}
-                      </TableCell>
+                      <TableCell className="text-white">{item.feedback}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

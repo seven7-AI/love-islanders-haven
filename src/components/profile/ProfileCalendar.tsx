@@ -7,25 +7,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth';
 
 const ProfileCalendar = () => {
-  const { 
-    datePlans, 
-    upcomingDates, 
-    pastDates, 
-    isLoading, 
+  const {
+    datePlans,
+    upcomingDates,
+    pastDates,
+    isLoading,
     refresh,
     isGoogleAuthorized,
     isGoogleAvailable,
-    initiateGoogleAuth
+    initiateGoogleAuth,
   } = useProfileCalendar();
   const { toast } = useToast();
-  const [date, setDate] = React.useState<Date | undefined>(new Date())
-  
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
+
   useEffect(() => {
     refresh();
   }, []);
@@ -35,8 +35,8 @@ const ProfileCalendar = () => {
       initiateGoogleAuth();
     } else {
       toast({
-        title: "Already Authorized",
-        description: "You are already authorized with Google Calendar.",
+        title: 'Already Authorized',
+        description: 'You are already authorized with Google Calendar.',
       });
     }
   };
@@ -67,7 +67,7 @@ const ProfileCalendar = () => {
           )}
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Past Dates</CardTitle>
@@ -92,7 +92,7 @@ const ProfileCalendar = () => {
           )}
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Calendar</CardTitle>
@@ -101,14 +101,11 @@ const ProfileCalendar = () => {
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[240px] justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
+                variant={'outline'}
+                className={cn('w-[240px] justify-start text-left font-normal', !date && 'text-muted-foreground')}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : <span>Pick a date</span>}
+                {date ? format(date, 'PPP') : <span>Pick a date</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="center">
@@ -116,17 +113,15 @@ const ProfileCalendar = () => {
                 mode="single"
                 selected={date}
                 onSelect={setDate}
-                disabled={(date) =>
-                  date > new Date()
-                }
+                disabled={(date) => date > new Date()}
                 initialFocus
               />
             </PopoverContent>
           </Popover>
-          
+
           {isGoogleAvailable || isGoogleAuthorized ? (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full bg-island-light/10 border-island-light/40"
               onClick={handleGoogleAuth}
             >

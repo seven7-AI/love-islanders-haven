@@ -1,49 +1,44 @@
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Camera, X, Upload, Loader2, Plus } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import MultiImagePreview from './MultiImagePreview';
 
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Camera, X, Upload, Loader2, Plus } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
-import MultiImagePreview from "./MultiImagePreview";
-
-const StreakPostForm = ({ 
-  onSubmit, 
-  onCancel, 
-  isSubmitting = false 
-}) => {
+const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
   const [content, setContent] = useState<string[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [duration, setDuration] = useState(24); 
+  const [duration, setDuration] = useState(24);
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
-  
+
   // Handle image selection
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    
+
     // Check if adding new files would exceed the limit
     if (previewUrls.length + files.length > 10) {
       toast({
-        title: "Too many images",
-        description: "You can only upload up to 10 images for a streak post.",
-        variant: "destructive",
+        title: 'Too many images',
+        description: 'You can only upload up to 10 images for a streak post.',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     setIsUploading(true);
     const newImages: string[] = [];
     let processed = 0;
-    
-    Array.from(files).forEach(file => {
+
+    Array.from(files).forEach((file) => {
       // Type guard to check if file is really a File object with type property
       if (!file.type || !file.type.startsWith('image/')) {
         processed++;
         checkAllProcessed();
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = () => {
         if (reader.result) {
@@ -52,16 +47,16 @@ const StreakPostForm = ({
         processed++;
         checkAllProcessed();
       };
-      
+
       reader.onerror = () => {
         processed++;
         checkAllProcessed();
       };
-      
+
       // Only read the file as data URL if it's a valid file
       reader.readAsDataURL(file);
     });
-    
+
     function checkAllProcessed() {
       if (processed === files.length) {
         if (newImages.length > 0) {
@@ -73,61 +68,55 @@ const StreakPostForm = ({
       }
     }
   };
-  
+
   // Remove image
   const removeImage = (index: number) => {
-    setPreviewUrls(prev => {
+    setPreviewUrls((prev) => {
       const updated = prev.filter((_, i) => i !== index);
       setContent(updated); // Keep in sync
       return updated;
     });
   };
-  
+
   // Clear all images
   const clearImages = () => {
     setPreviewUrls([]);
     setContent([]);
   };
-  
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (content.length === 0) {
       toast({
-        title: "Missing content",
-        description: "Please select at least one image for your streak post.",
-        variant: "destructive",
+        title: 'Missing content',
+        description: 'Please select at least one image for your streak post.',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     try {
       const contentCopy = [...content];
       await onSubmit({ content: contentCopy, duration });
     } catch (error) {
-      console.error("Error submitting post:", error);
+      console.error('Error submitting post:', error);
     }
   };
-  
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Image Upload Section */}
       <div className="border-2 border-dashed border-muted-foreground/25 rounded-md overflow-hidden relative">
         {previewUrls.length > 0 ? (
           <div className="relative">
-            <MultiImagePreview 
-              images={previewUrls} 
-              onRemoveImage={removeImage} 
-              isUploading={isUploading}
-            />
-            
+            <MultiImagePreview images={previewUrls} onRemoveImage={removeImage} isUploading={isUploading} />
+
             {previewUrls.length < 10 && (
               <div className="p-2 flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">
-                  {previewUrls.length} of 10 images
-                </p>
-                <Button 
+                <p className="text-sm text-muted-foreground">{previewUrls.length} of 10 images</p>
+                <Button
                   type="button"
                   variant="outline"
                   size="sm"
@@ -147,9 +136,9 @@ const StreakPostForm = ({
                 </Button>
               </div>
             )}
-            
+
             {previewUrls.length > 1 && (
-              <Button 
+              <Button
                 type="button"
                 onClick={clearImages}
                 className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full"
@@ -164,10 +153,8 @@ const StreakPostForm = ({
         ) : (
           <div className="flex flex-col items-center justify-center p-8">
             <Camera className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-center text-muted-foreground mb-2">
-              Select photos for your streak (up to 10)
-            </p>
-            <Button 
+            <p className="text-center text-muted-foreground mb-2">Select photos for your streak (up to 10)</p>
+            <Button
               type="button"
               variant="outline"
               className="relative overflow-hidden flex items-center gap-2"
@@ -196,18 +183,18 @@ const StreakPostForm = ({
           </div>
         )}
       </div>
-      
+
       {/* Duration Selector */}
       <div className="space-y-2">
         <label className="text-sm font-medium">
           Streak Duration: {duration} {duration === 1 ? 'hour' : 'hours'}
         </label>
-        <Slider 
-          defaultValue={[24]} 
+        <Slider
+          defaultValue={[24]}
           value={[duration]}
-          max={24} 
-          min={1} 
-          step={1} 
+          max={24}
+          min={1}
+          step={1}
           onValueChange={(value) => setDuration(value[0])}
           disabled={isSubmitting}
         />
@@ -215,19 +202,14 @@ const StreakPostForm = ({
           Your streak will expire after {duration} {duration === 1 ? 'hour' : 'hours'} if not renewed.
         </p>
       </div>
-      
+
       {/* Form Controls */}
       <div className="flex gap-2 justify-end">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onCancel}
-          disabled={isSubmitting}
-        >
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
           Cancel
         </Button>
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={content.length === 0 || isUploading || isSubmitting}
           className="bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/20"
         >
@@ -237,7 +219,7 @@ const StreakPostForm = ({
               <span>Posting...</span>
             </>
           ) : (
-            "Post Streak"
+            'Post Streak'
           )}
         </Button>
       </div>

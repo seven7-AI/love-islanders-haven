@@ -14,7 +14,13 @@ interface SafetyContactFormProps {
   onCancel: () => void;
 }
 
-const SafetyContactForm = ({ initial, isSaving, submitLabel = 'Save Contact', onSubmit, onCancel }: SafetyContactFormProps) => {
+const SafetyContactForm = ({
+  initial,
+  isSaving,
+  submitLabel = 'Save Contact',
+  onSubmit,
+  onCancel,
+}: SafetyContactFormProps) => {
   const [name, setName] = useState(initial?.name ?? '');
   const [phone, setPhone] = useState(initial?.phone ?? '');
   const [email, setEmail] = useState(initial?.email ?? '');
@@ -43,7 +49,12 @@ const SafetyContactForm = ({ initial, isSaving, submitLabel = 'Save Contact', on
     <form onSubmit={handleSubmit} className="space-y-2 p-3 border rounded-md">
       <div>
         <Label htmlFor={`${idPrefix}-name`}>Name</Label>
-        <Input id={`${idPrefix}-name`} value={name} onChange={(e) => setName(e.target.value)} placeholder="Contact name" />
+        <Input
+          id={`${idPrefix}-name`}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Contact name"
+        />
       </div>
       <div>
         <Label htmlFor={`${idPrefix}-phone`}>Phone number</Label>
@@ -65,11 +76,13 @@ const SafetyContactForm = ({ initial, isSaving, submitLabel = 'Save Contact', on
           placeholder="Email address"
         />
       </div>
-      {!hasReachableDetail && (
-        <p className="text-xs text-muted-foreground">Add a phone number or an email address.</p>
-      )}
+      {!hasReachableDetail && <p className="text-xs text-muted-foreground">Add a phone number or an email address.</p>}
       <div className="flex items-center space-x-2">
-        <Checkbox id={`${idPrefix}-primary`} checked={isPrimary} onCheckedChange={(checked) => setIsPrimary(checked === true)} />
+        <Checkbox
+          id={`${idPrefix}-primary`}
+          checked={isPrimary}
+          onCheckedChange={(checked) => setIsPrimary(checked === true)}
+        />
         <Label htmlFor={`${idPrefix}-primary`}>Primary contact</Label>
       </div>
       <div className="flex gap-2">

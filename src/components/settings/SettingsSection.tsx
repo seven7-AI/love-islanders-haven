@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 import { ChevronRight } from 'lucide-react';
 
@@ -11,13 +10,13 @@ interface SettingsSectionProps {
   defaultOpen?: boolean;
 }
 
-const SettingsSection = ({ 
-  title, 
-  icon, 
-  children, 
+const SettingsSection = ({
+  title,
+  icon,
+  children,
   className = '',
   collapsible = false,
-  defaultOpen = true
+  defaultOpen = true,
 }: SettingsSectionProps) => {
   return (
     <div className={`bg-island-dark/80 rounded-lg p-4 ${className}`}>
@@ -32,9 +31,7 @@ const SettingsSection = ({
           </button>
         )}
       </div>
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -11,7 +10,7 @@ const ProfileCommentInput = ({ onClose }: ProfileCommentInputProps) => {
 
   const handleSendComment = () => {
     if (comment.trim()) {
-      toast.success("Comment sent!");
+      toast.success('Comment sent!');
       setComment('');
       onClose();
     }
@@ -27,10 +26,7 @@ const ProfileCommentInput = ({ onClose }: ProfileCommentInputProps) => {
           placeholder="Write a comment..."
           className="flex-1 px-3 py-2 rounded-full bg-white/20 text-white placeholder:text-white/50 focus:outline-none"
         />
-        <button 
-          onClick={handleSendComment}
-          className="bg-love hover:bg-love-dark text-white px-4 py-2 rounded-full"
-        >
+        <button onClick={handleSendComment} className="bg-love hover:bg-love-dark text-white px-4 py-2 rounded-full">
           Send
         </button>
       </div>

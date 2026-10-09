@@ -46,7 +46,9 @@ const ForgotPassword = () => {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             <div>
-              <label htmlFor="email" className="block text-white text-lg mb-2">Email</label>
+              <label htmlFor="email" className="block text-white text-lg mb-2">
+                Email
+              </label>
               <Input
                 id="email"
                 type="email"
@@ -57,7 +59,11 @@ const ForgotPassword = () => {
               />
             </div>
 
-            {error && <p role="alert" className="text-red-400 text-sm">{error}</p>}
+            {error && (
+              <p role="alert" className="text-red-400 text-sm">
+                {error}
+              </p>
+            )}
 
             <Button type="submit" className="w-full bg-love hover:bg-love-dark h-12 text-lg" disabled={isLoading}>
               {isLoading ? (
@@ -65,13 +71,17 @@ const ForgotPassword = () => {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Sending...
                 </span>
-              ) : 'Send reset link'}
+              ) : (
+                'Send reset link'
+              )}
             </Button>
           </form>
         )}
 
         <div className="text-center mt-6">
-          <Link to="/login" className="text-love hover:underline text-sm">Back to sign in</Link>
+          <Link to="/login" className="text-love hover:underline text-sm">
+            Back to sign in
+          </Link>
         </div>
       </div>
     </div>

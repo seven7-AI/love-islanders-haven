@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 
 interface AdSenseProps {
@@ -8,15 +7,10 @@ interface AdSenseProps {
   className?: string;
 }
 
-const AdSense: React.FC<AdSenseProps> = ({ 
-  adSlot = '',
-  adFormat = 'auto',
-  style = {},
-  className = ''
-}) => {
+const AdSense: React.FC<AdSenseProps> = ({ adSlot = '', adFormat = 'auto', style = {}, className = '' }) => {
   // Use a more generic ref type to avoid type issues
   const adRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     try {
       // Skip in development environment to avoid errors
@@ -24,7 +18,7 @@ const AdSense: React.FC<AdSenseProps> = ({
         console.log('AdSense disabled in development environment');
         return;
       }
-      
+
       // Add AdSense ad if it exists
       if (adRef.current && typeof window !== 'undefined') {
         const adsbygoogle = (window as any).adsbygoogle || [];
@@ -38,7 +32,7 @@ const AdSense: React.FC<AdSenseProps> = ({
   const defaultStyle: React.CSSProperties = {
     display: 'block',
     textAlign: 'center',
-    ...style
+    ...style,
   };
 
   return (

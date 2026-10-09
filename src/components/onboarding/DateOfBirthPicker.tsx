@@ -24,66 +24,47 @@ const months = [
   { value: '11', label: 'December' },
 ];
 
-export function DateOfBirthPicker({ 
-  value, 
-  onChange, 
-  minAge = 18, 
-  maxAge = 100 
-}: DateOfBirthPickerProps) {
+export function DateOfBirthPicker({ value, onChange, minAge = 18, maxAge = 100 }: DateOfBirthPickerProps) {
   const today = new Date();
   const currentYear = today.getFullYear();
   const minYear = currentYear - maxAge;
   const maxYear = currentYear - minAge;
-  
+
   // Generate years array (from newest valid to oldest)
-  const years = Array.from(
-    { length: maxAge - minAge + 1 }, 
-    (_, i) => maxYear - i
-  );
-  
+  const years = Array.from({ length: maxAge - minAge + 1 }, (_, i) => maxYear - i);
+
   // Parse initial value
-  const [selectedYear, setSelectedYear] = useState<string>(
-    value ? value.getFullYear().toString() : ''
-  );
-  const [selectedMonth, setSelectedMonth] = useState<string>(
-    value ? value.getMonth().toString() : ''
-  );
-  const [selectedDay, setSelectedDay] = useState<string>(
-    value ? value.getDate().toString() : ''
-  );
-  
+  const [selectedYear, setSelectedYear] = useState<string>(value ? value.getFullYear().toString() : '');
+  const [selectedMonth, setSelectedMonth] = useState<string>(value ? value.getMonth().toString() : '');
+  const [selectedDay, setSelectedDay] = useState<string>(value ? value.getDate().toString() : '');
+
   // Calculate days in selected month
   const getDaysInMonth = (year: number, month: number): number => {
     return new Date(year, month + 1, 0).getDate();
   };
-  
-  const daysInMonth = selectedYear && selectedMonth !== '' 
-    ? getDaysInMonth(parseInt(selectedYear), parseInt(selectedMonth))
-    : 31;
-    
+
+  const daysInMonth =
+    selectedYear && selectedMonth !== '' ? getDaysInMonth(parseInt(selectedYear), parseInt(selectedMonth)) : 31;
+
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  
+
   // Update parent when all fields are selected
   useEffect(() => {
     if (selectedYear && selectedMonth !== '' && selectedDay) {
-      const date = new Date(
-        parseInt(selectedYear),
-        parseInt(selectedMonth),
-        parseInt(selectedDay)
-      );
+      const date = new Date(parseInt(selectedYear), parseInt(selectedMonth), parseInt(selectedDay));
       onChange(date);
     } else {
       onChange(undefined);
     }
   }, [selectedYear, selectedMonth, selectedDay, onChange]);
-  
+
   // Reset day if it exceeds days in new month
   useEffect(() => {
     if (selectedDay && parseInt(selectedDay) > daysInMonth) {
       setSelectedDay('');
     }
   }, [daysInMonth, selectedDay]);
-  
+
   return (
     <div className="space-y-3">
       <Label className="text-white">When were you born?</Label>
@@ -100,7 +81,7 @@ export function DateOfBirthPicker({
             ))}
           </SelectContent>
         </Select>
-        
+
         <Select value={selectedDay} onValueChange={setSelectedDay}>
           <SelectTrigger className="bg-island-light/20 border-island-light text-white">
             <SelectValue placeholder="Day" />
@@ -113,7 +94,7 @@ export function DateOfBirthPicker({
             ))}
           </SelectContent>
         </Select>
-        
+
         <Select value={selectedYear} onValueChange={setSelectedYear}>
           <SelectTrigger className="bg-island-light/20 border-island-light text-white">
             <SelectValue placeholder="Year" />
@@ -127,11 +108,9 @@ export function DateOfBirthPicker({
           </SelectContent>
         </Select>
       </div>
-      
+
       {value && (
-        <p className="text-sm text-muted-foreground">
-          You'll be {currentYear - value.getFullYear()} years old
-        </p>
+        <p className="text-sm text-muted-foreground">You'll be {currentYear - value.getFullYear()} years old</p>
       )}
     </div>
   );

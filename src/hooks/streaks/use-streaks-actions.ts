@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { createStreakPost, setStreakLike, uploadStreakPhoto } from "@/lib/api/streaks";
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { createStreakPost, setStreakLike, uploadStreakPhoto } from '@/lib/api/streaks';
 
 /** Converts a data: URL from the post form into an uploadable Blob. */
 const toBlob = async (dataUrl: string) => (await fetch(dataUrl)).blob();
@@ -12,7 +12,7 @@ export const useStreaksActions = () => {
 
   const handlePostSubmit = async (postData: { content: string[]; duration?: number; caption?: string }) => {
     if (!postData.content?.length) {
-      toast({ title: "Missing image", description: "Please select at least one image", variant: "destructive" });
+      toast({ title: 'Missing image', description: 'Please select at least one image', variant: 'destructive' });
       return false;
     }
     setIsSubmitting(true);
@@ -26,13 +26,16 @@ export const useStreaksActions = () => {
         caption: postData.caption,
         duration_hours: postData.duration ?? 24,
       });
-      toast({ title: "Posted!", description: `Your streak is now ${post.streak_count} day${post.streak_count === 1 ? '' : 's'}.` });
+      toast({
+        title: 'Posted!',
+        description: `Your streak is now ${post.streak_count} day${post.streak_count === 1 ? '' : 's'}.`,
+      });
       return true;
     } catch (error) {
       toast({
-        title: "Could not post your streak",
-        description: error instanceof Error ? error.message : "Please try again.",
-        variant: "destructive",
+        title: 'Could not post your streak',
+        description: error instanceof Error ? error.message : 'Please try again.',
+        variant: 'destructive',
       });
       return false;
     } finally {
@@ -45,9 +48,9 @@ export const useStreaksActions = () => {
       return (await setStreakLike(postId, liked)).likes_count;
     } catch (error) {
       toast({
-        title: "Could not save your like",
-        description: error instanceof Error ? error.message : "Please try again.",
-        variant: "destructive",
+        title: 'Could not save your like',
+        description: error instanceof Error ? error.message : 'Please try again.',
+        variant: 'destructive',
       });
       return null;
     }

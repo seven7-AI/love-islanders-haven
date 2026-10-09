@@ -1,5 +1,4 @@
-
-import { Music } from "lucide-react";
+import { Music } from 'lucide-react';
 
 const EmptyStreaks = () => {
   return (
@@ -9,9 +8,7 @@ const EmptyStreaks = () => {
       </div>
       <div>
         <h3 className="text-lg font-medium mb-1">No streak posts yet</h3>
-        <p className="text-muted-foreground">
-          Be the first to share a streak with your favorite song!
-        </p>
+        <p className="text-muted-foreground">Be the first to share a streak with your favorite song!</p>
       </div>
     </div>
   );

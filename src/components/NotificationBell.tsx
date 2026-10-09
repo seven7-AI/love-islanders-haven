@@ -95,7 +95,9 @@ const NotificationBell = () => {
 
         <div className="overflow-y-auto flex-1">
           {error ? (
-            <div role="alert" className="text-center py-4 text-muted-foreground">{error}</div>
+            <div role="alert" className="text-center py-4 text-muted-foreground">
+              {error}
+            </div>
           ) : notifications.length === 0 ? (
             <div className="text-center py-4 text-muted-foreground">No notifications yet</div>
           ) : (

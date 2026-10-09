@@ -48,7 +48,13 @@ const AICompanion: React.FC = () => {
   const handleSendMessage = async (content: string) => {
     const text = content.trim();
     if (!text) return;
-    const pending: MessageType = { id: `pending-${Date.now()}`, role: 'user', content: text, timestamp: new Date(), type: 'chat' };
+    const pending: MessageType = {
+      id: `pending-${Date.now()}`,
+      role: 'user',
+      content: text,
+      timestamp: new Date(),
+      type: 'chat',
+    };
     setMessages((prev) => [...prev.filter((m) => m.id !== 'welcome'), pending]);
     setIsLoading(true);
     try {

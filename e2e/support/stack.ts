@@ -11,14 +11,19 @@ const json = async (response: Response) => {
   return text ? JSON.parse(text) : null;
 };
 
-export const uniqueEmail = (label: string) => `${label}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`;
+export const uniqueEmail = (label: string) =>
+  `${label}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`;
 
 /** Creates a confirmed user through the Supabase Auth admin API (as an operator would), returning its id. */
 export async function createConfirmedUser(email: string, name: string): Promise<string> {
   const user = await json(
     await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
       method: 'POST',
-      headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json' },
+      headers: {
+        apikey: SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ email, password: PASSWORD, email_confirm: true, user_metadata: { name } }),
     }),
   );
@@ -36,7 +41,11 @@ export async function signIn(email: string): Promise<string> {
   return session.access_token;
 }
 
-export async function api<T = unknown>(token: string, path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+export async function api<T = unknown>(
+  token: string,
+  path: string,
+  init: { method?: string; body?: unknown } = {},
+): Promise<T> {
   return json(
     await fetch(`${API_URL}${path}`, {
       method: init.method ?? 'GET',

@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { Message as MessageType } from '@/services/messages';
 import MessageItem from '@/components/messages/MessageItem';
 import MessageInput from '@/components/messages/MessageInput';
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface InlineChatContentProps {
   matchId: string;
@@ -25,7 +24,7 @@ const InlineChatContent: React.FC<InlineChatContentProps> = ({
   currentUserId,
   hasOlder,
   onLoadOlder,
-  onSendMessage
+  onSendMessage,
 }) => {
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -37,12 +36,16 @@ const InlineChatContent: React.FC<InlineChatContentProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [lastId]);
 
-  const handleSendMessage = async (content: string, contentType: 'text' | 'image' | 'audio' = 'text', mediaPath?: string) => {
+  const handleSendMessage = async (
+    content: string,
+    contentType: 'text' | 'image' | 'audio' = 'text',
+    mediaPath?: string,
+  ) => {
     setIsSending(true);
     try {
       const success = await onSendMessage(content, contentType, mediaPath);
       if (!success) {
-        toast({ title: "Message not sent", description: "Please try again.", variant: "destructive" });
+        toast({ title: 'Message not sent', description: 'Please try again.', variant: 'destructive' });
       }
     } finally {
       setIsSending(false);
@@ -53,17 +56,13 @@ const InlineChatContent: React.FC<InlineChatContentProps> = ({
     <>
       <ScrollArea className="flex-1 p-4 space-y-4">
         {isLoading ? (
-          <div className="text-center text-white/60 py-8">
-            Loading messages...
-          </div>
+          <div className="text-center text-white/60 py-8">Loading messages...</div>
         ) : error ? (
           <div role="alert" className="text-center text-white/80 py-8">
             Could not load this conversation: {error}
           </div>
         ) : messages.length === 0 ? (
-          <div className="text-center text-white/60 py-8">
-            No messages yet. Say hello to start the conversation!
-          </div>
+          <div className="text-center text-white/60 py-8">No messages yet. Say hello to start the conversation!</div>
         ) : (
           <div className="space-y-4">
             {hasOlder && onLoadOlder && (
@@ -74,11 +73,7 @@ const InlineChatContent: React.FC<InlineChatContentProps> = ({
               </div>
             )}
             {messages.map((msg) => (
-              <MessageItem
-                key={msg.id}
-                message={msg}
-                isCurrentUser={msg.sender_id === currentUserId}
-              />
+              <MessageItem key={msg.id} message={msg} isCurrentUser={msg.sender_id === currentUserId} />
             ))}
             <div ref={messagesEndRef} />
           </div>
@@ -86,11 +81,7 @@ const InlineChatContent: React.FC<InlineChatContentProps> = ({
       </ScrollArea>
 
       <div className="mt-auto">
-        <MessageInput
-          onSendMessage={handleSendMessage}
-          isSending={isSending}
-          matchId={matchId}
-        />
+        <MessageInput onSendMessage={handleSendMessage} isSending={isSending} matchId={matchId} />
       </div>
     </>
   );

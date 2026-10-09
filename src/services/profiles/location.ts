@@ -1,6 +1,5 @@
-
-import { apiFetch } from "@/lib/api/client";
-import { toast } from "sonner";
+import { apiFetch } from '@/lib/api/client';
+import { toast } from 'sonner';
 
 export interface UserLocation {
   latitude: number;
@@ -41,20 +40,20 @@ export const getCurrentLocation = (): Promise<UserLocation> => {
         reject(new Error('Location permission is denied. Please enable location services in your browser settings.'));
         return;
       }
-      
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           console.log('Got location:', position.coords);
           resolve({
             latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            longitude: position.coords.longitude,
           });
         },
         (error) => {
           console.error('Error getting location:', error);
           reject(error);
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
       );
     });
   });
@@ -69,7 +68,7 @@ export const requestAndUpdateLocation = async (): Promise<boolean> => {
     // Get current location
     const location = await getCurrentLocation();
     const success = await updateUserLocation(location);
-    
+
     if (success) {
       console.log('Location updated successfully');
       toast.success('Your location has been updated successfully');
@@ -81,7 +80,7 @@ export const requestAndUpdateLocation = async (): Promise<boolean> => {
     }
   } catch (error) {
     console.error('Error requesting and updating location:', error);
-    
+
     if (error instanceof GeolocationPositionError) {
       switch (error.code) {
         case error.PERMISSION_DENIED:
@@ -101,7 +100,7 @@ export const requestAndUpdateLocation = async (): Promise<boolean> => {
     } else {
       toast.error('Failed to update location');
     }
-    
+
     return false;
   }
 };

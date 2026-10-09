@@ -18,8 +18,13 @@ Some external services are replaced in tests; these tests check our code's handl
 - Language model, Google OAuth/Calendar, emergency-alert delivery: scripted fakes / mocked transports. No live test
   exists until credentials are provided (see docs/operations/production-actions.md).
 
+## Everything at once
+`make ci` runs every CI job locally: format check, lint, typecheck, unit tests and build; ruff, mypy and API tests;
+the backup/restore and data-copy drills; npm audit, pip-audit and gitleaks; the database policy tests; and the
+end-to-end suite. `make check` is the fast loop (web + API only).
+
 ## CI
-`.github/workflows/ci.yml` runs all suites on every pull request and on `main`: web (lint, typecheck, unit tests, build),
+`.github/workflows/ci.yml` runs all suites on every pull request and on `main`: web (Prettier format check, lint, typecheck, unit tests, build),
 backend (ruff, ruff format, mypy, pytest, drills, Docker build), database policies, security (npm audit, pip-audit,
 gitleaks) and end-to-end. Postgres and Python images come from the AWS public mirror of Docker Hub's official images
 because Docker Hub rate-limits anonymous pulls on shared runners.

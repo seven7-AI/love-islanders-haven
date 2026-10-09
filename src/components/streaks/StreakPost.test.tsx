@@ -3,8 +3,14 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import StreakPost from './StreakPost';
 
 const post = {
-  id: 'p1', user_id: 'u1', content: ['https://img/1.jpg'], created_at: new Date().toISOString(),
-  streak_count: 2, likes_count: 4, liked_by_me: false, user_name: 'Ava',
+  id: 'p1',
+  user_id: 'u1',
+  content: ['https://img/1.jpg'],
+  created_at: new Date().toISOString(),
+  streak_count: 2,
+  likes_count: 4,
+  liked_by_me: false,
+  user_name: 'Ava',
 };
 
 describe('StreakPost', () => {

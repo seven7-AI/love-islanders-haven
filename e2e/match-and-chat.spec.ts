@@ -4,10 +4,16 @@ import { api, onboardedUser, PASSWORD } from './support/stack';
 test('discover someone, match, and exchange messages', async ({ page }) => {
   const cleoName = `Cleo${Date.now().toString(36)}`;
   const cleo = await onboardedUser('cleo', {
-    name: cleoName, dob: '1996-03-10', gender: 'female', gender_preference: 'male',
+    name: cleoName,
+    dob: '1996-03-10',
+    gender: 'female',
+    gender_preference: 'male',
   });
   const dan = await onboardedUser('dan', {
-    name: 'Dan', dob: '1993-07-21', gender: 'male', gender_preference: 'female',
+    name: 'Dan',
+    dob: '1993-07-21',
+    gender: 'male',
+    gender_preference: 'female',
   });
   // Cleo already likes Dan.
   await api(cleo.token, '/v1/swipes', { method: 'POST', body: { target_id: dan.id, direction: 'right' } });

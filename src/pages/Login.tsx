@@ -52,7 +52,9 @@ const Login = () => {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-white text-lg mb-2">Email</label>
+            <label htmlFor="email" className="block text-white text-lg mb-2">
+              Email
+            </label>
             <Input
               id="email"
               type="email"
@@ -64,7 +66,9 @@ const Login = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-white text-lg mb-2">Password</label>
+            <label htmlFor="password" className="block text-white text-lg mb-2">
+              Password
+            </label>
             <Input
               id="password"
               type="password"
@@ -81,7 +85,9 @@ const Login = () => {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Logging in...
               </span>
-            ) : 'Sign In'}
+            ) : (
+              'Sign In'
+            )}
           </Button>
 
           <div className="text-center space-y-2">
@@ -92,11 +98,7 @@ const Login = () => {
             >
               Forgot password?
             </button>
-            <button
-              type="button"
-              onClick={() => navigate('/signup')}
-              className="text-love hover:underline text-sm"
-            >
+            <button type="button" onClick={() => navigate('/signup')} className="text-love hover:underline text-sm">
               Don't have an account? Sign up
             </button>
           </div>

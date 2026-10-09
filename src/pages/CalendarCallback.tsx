@@ -36,8 +36,12 @@ const CalendarCallback = () => {
       <div className="glass-card w-full max-w-md p-6 rounded-xl shadow-lg text-center space-y-4">
         {error ? (
           <>
-            <p role="alert" className="text-white">{error}</p>
-            <Link to="/profile" className="text-love hover:underline text-sm">Back to your profile</Link>
+            <p role="alert" className="text-white">
+              {error}
+            </p>
+            <Link to="/profile" className="text-love hover:underline text-sm">
+              Back to your profile
+            </Link>
           </>
         ) : (
           <div className="flex justify-center" aria-label="Connecting Google Calendar">

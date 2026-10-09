@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 
 type AudioPlayerContextType = {
@@ -28,24 +27,24 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     // Initialize audio element
     audioRef.current = new Audio();
-    
+
     // Set up event listeners
     const handleEnded = () => {
       setIsPlaying(false);
       setCurrentAudioId(null);
     };
-    
+
     const handleError = (error: any) => {
       console.error('Audio playback error:', error);
       setIsPlaying(false);
       setCurrentAudioId(null);
     };
-    
+
     if (audioRef.current) {
       audioRef.current.addEventListener('ended', handleEnded);
       audioRef.current.addEventListener('error', handleError);
     }
-    
+
     // Cleanup
     return () => {
       if (audioRef.current) {
@@ -59,17 +58,18 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const playAudio = (id: string, src: string) => {
     if (!audioRef.current) return;
-    
+
     // If a different audio is playing, stop it first
     if (isPlaying) {
       audioRef.current.pause();
     }
-    
+
     // Play the new audio
     try {
       audioRef.current.src = src;
       setCurrentSrc(src);
-      audioRef.current.play()
+      audioRef.current
+        .play()
         .then(() => {
           setIsPlaying(true);
           setCurrentAudioId(id);
@@ -87,7 +87,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const pauseAudio = () => {
     if (!audioRef.current) return;
-    
+
     audioRef.current.pause();
     setIsPlaying(false);
   };
@@ -101,14 +101,16 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   return (
-    <AudioPlayerContext.Provider value={{ 
-      playAudio, 
-      pauseAudio, 
-      isPlaying, 
-      currentAudioId,
-      currentSrc,
-      togglePlayPause 
-    }}>
+    <AudioPlayerContext.Provider
+      value={{
+        playAudio,
+        pauseAudio,
+        isPlaying,
+        currentAudioId,
+        currentSrc,
+        togglePlayPause,
+      }}
+    >
       {children}
     </AudioPlayerContext.Provider>
   );

@@ -69,8 +69,12 @@ const Matches = () => {
           </div>
         ) : error ? (
           <div className="text-center space-y-3 py-12">
-            <p role="alert" className="text-white">{error}</p>
-            <Button variant="secondary" onClick={load}>Try again</Button>
+            <p role="alert" className="text-white">
+              {error}
+            </p>
+            <Button variant="secondary" onClick={load}>
+              Try again
+            </Button>
           </div>
         ) : matches.length === 0 ? (
           <EmptyMatchState />
@@ -81,19 +85,27 @@ const Matches = () => {
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 bg-island-light">
                     {m.partner.photo_url ? (
-                      <img src={m.partner.photo_url} alt={m.partner.name ?? ''} className="w-full h-full object-cover" />
+                      <img
+                        src={m.partner.photo_url}
+                        alt={m.partner.name ?? ''}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-xl">💕</div>
                     )}
                   </div>
                   <div className="flex-grow min-w-0">
                     <h2 className="font-semibold truncate">
-                      {m.partner.name ?? 'Someone'}{m.partner.age ? `, ${m.partner.age}` : ''}
+                      {m.partner.name ?? 'Someone'}
+                      {m.partner.age ? `, ${m.partner.age}` : ''}
                     </h2>
                     <p className="text-sm text-love-light truncate">{preview(m)}</p>
                   </div>
                   {m.unread_count > 0 && (
-                    <span className="bg-love text-white text-xs rounded-full px-2 py-0.5" aria-label={`${m.unread_count} unread`}>
+                    <span
+                      className="bg-love text-white text-xs rounded-full px-2 py-0.5"
+                      aria-label={`${m.unread_count} unread`}
+                    >
                       {m.unread_count}
                     </span>
                   )}

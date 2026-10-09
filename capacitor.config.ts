@@ -1,4 +1,3 @@
-
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -31,9 +30,9 @@ const config: CapacitorConfig = {
   plugins: {
     // Configure deep links for auth redirects
     CapacitorHttp: {
-      enabled: true
-    }
-  }
+      enabled: true,
+    },
+  },
 };
 
 export default config;

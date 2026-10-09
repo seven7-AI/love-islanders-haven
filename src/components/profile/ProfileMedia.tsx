@@ -1,4 +1,3 @@
-
 import ProfileMediaSection from './ProfileMediaSection';
 import { Profile } from '@/utils/dummyData';
 
@@ -11,11 +10,7 @@ interface ProfileMediaProps {
 const ProfileMedia = ({ profile, visibleImagesIndices, isMyProfile = false }: ProfileMediaProps) => {
   return (
     <div className="space-y-4">
-      <ProfileMediaSection 
-        profile={profile} 
-        visibleImagesIndices={visibleImagesIndices}
-        isMyProfile={isMyProfile}
-      />
+      <ProfileMediaSection profile={profile} visibleImagesIndices={visibleImagesIndices} isMyProfile={isMyProfile} />
     </div>
   );
 };

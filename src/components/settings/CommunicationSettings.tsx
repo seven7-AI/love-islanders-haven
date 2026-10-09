@@ -12,7 +12,10 @@ const CommunicationSettings = () => {
 
   const handleNotificationsChange = async (checked: boolean) => {
     setIsUpdating(true);
-    await updateSettings('communication_settings', { ...settings.communication_settings, notifications_enabled: checked });
+    await updateSettings('communication_settings', {
+      ...settings.communication_settings,
+      notifications_enabled: checked,
+    });
     setIsUpdating(false);
   };
 
@@ -23,7 +26,9 @@ const CommunicationSettings = () => {
           <h4 className="text-sm font-medium text-love">Notifications</h4>
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <Label htmlFor="notifications-enabled" className="cursor-pointer">Notifications</Label>
+              <Label htmlFor="notifications-enabled" className="cursor-pointer">
+                Notifications
+              </Label>
               <span className="text-xs text-muted-foreground">Get notified about new matches and messages</span>
             </div>
             <Switch

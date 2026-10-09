@@ -22,7 +22,8 @@ interface DistanceSectionProps {
 
 const DistanceSection = ({ distanceKm, unit, disabled, onDistanceCommit, onUnitChange }: DistanceSectionProps) => {
   const toDisplay = (km: number) => (unit === 'mi' ? kmToMiles(km) : km);
-  const toKm = (display: number) => Math.min(MAX_DISTANCE_KM, Math.max(1, unit === 'mi' ? milesToKm(display) : display));
+  const toKm = (display: number) =>
+    Math.min(MAX_DISTANCE_KM, Math.max(1, unit === 'mi' ? milesToKm(display) : display));
 
   const [draft, setDraft] = useState(toDisplay(distanceKm));
   const [isUpdatingLocation, setIsUpdatingLocation] = useState(false);
@@ -69,7 +70,9 @@ const DistanceSection = ({ distanceKm, unit, disabled, onDistanceCommit, onUnitC
         />
         <div className="flex justify-between mt-2 text-sm text-muted-foreground">
           <span>1 {unit}</span>
-          <span>{draft} {unit}</span>
+          <span>
+            {draft} {unit}
+          </span>
         </div>
       </div>
 

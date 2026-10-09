@@ -36,7 +36,9 @@ const DatePlansList = ({ plans, contacts, isSaving, onStatusChange, onDelete }: 
             <div className="min-w-0">
               <p className="font-medium">{plan.title}</p>
               {plan.date_time && (
-                <p className="text-sm text-muted-foreground">{format(new Date(plan.date_time), 'EEE d MMM yyyy, h:mm a')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {format(new Date(plan.date_time), 'EEE d MMM yyyy, h:mm a')}
+                </p>
               )}
             </div>
             <Badge variant={plan.status === 'planned' ? 'secondary' : 'outline'}>{STATUS_LABEL[plan.status]}</Badge>
@@ -58,10 +60,22 @@ const DatePlansList = ({ plans, contacts, isSaving, onStatusChange, onDelete }: 
           <div className="flex flex-wrap gap-2">
             {plan.status === 'planned' && (
               <>
-                <Button size="sm" variant="outline" className="gap-1" disabled={isSaving} onClick={() => onStatusChange(plan.id, 'completed')}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1"
+                  disabled={isSaving}
+                  onClick={() => onStatusChange(plan.id, 'completed')}
+                >
                   <CheckCircle2 className="h-4 w-4" /> Mark as done
                 </Button>
-                <Button size="sm" variant="outline" className="gap-1" disabled={isSaving} onClick={() => onStatusChange(plan.id, 'cancelled')}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1"
+                  disabled={isSaving}
+                  onClick={() => onStatusChange(plan.id, 'cancelled')}
+                >
                   <XCircle className="h-4 w-4" /> Cancel
                 </Button>
               </>

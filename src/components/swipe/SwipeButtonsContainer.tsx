@@ -9,13 +9,7 @@ interface SwipeButtonsContainerProps {
 
 const SwipeButtonsContainer = ({ onSwipe, onSuperLike, disabled }: SwipeButtonsContainerProps) => (
   <div className="flex justify-center gap-3 mt-4 pb-16" aria-disabled={disabled}>
-    <SwipeButton
-      onClick={() => !disabled && onSwipe?.('left')}
-      icon={X}
-      color="rose-500"
-      size="md"
-      ariaLabel="Pass"
-    />
+    <SwipeButton onClick={() => !disabled && onSwipe?.('left')} icon={X} color="rose-500" size="md" ariaLabel="Pass" />
     {onSuperLike && (
       <SwipeButton
         onClick={() => !disabled && onSuperLike()}

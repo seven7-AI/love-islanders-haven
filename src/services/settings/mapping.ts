@@ -56,10 +56,10 @@ export function toApiPatch<K extends keyof UserSettings>(category: K, value: Use
   switch (category) {
     case 'privacy_settings': {
       const privacy = value as UserSettings['privacy_settings'];
-      return pick(
-        { show_online_status: privacy.show_online_status, location_sharing: privacy.location_sharing },
-        ['show_online_status', 'location_sharing'],
-      );
+      return pick({ show_online_status: privacy.show_online_status, location_sharing: privacy.location_sharing }, [
+        'show_online_status',
+        'location_sharing',
+      ]);
     }
     case 'communication_settings': {
       const communication = value as UserSettings['communication_settings'];
