@@ -1,11 +1,15 @@
-
-import { useState } from 'react';
-import { useAuth } from '@/context/auth';
-import ProfileImageGrid from './image-controls/ProfileImageGrid';
-import ImageUrlInput from './image-controls/ImageUrlInput';
-import VerificationSection from './verification/VerificationSection';
-import { uploadProfileImage } from '@/services/profiles/uploads';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import ProfileImageGrid from './image-controls/ProfileImageGrid';
+import VerificationSection from './verification/VerificationSection';
+import {
+  deletePhoto,
+  getMyProfile,
+  ProfileImage,
+  reorderPhotos,
+  setPhotoVisibility,
+  uploadProfilePhoto,
+} from '@/lib/api/profile';
 
 interface ProfileImageManagerProps {
   images: string[];
@@ -13,117 +17,98 @@ interface ProfileImageManagerProps {
   onImagesChange: (images: string[]) => void;
 }
 
-const ProfileImageManager = ({ 
-  images, 
-  verified, 
-  onImagesChange,
-}: ProfileImageManagerProps) => {
-  const { user } = useAuth();
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [imageInput, setImageInput] = useState('');
-  const minImages = 1;
-  const maxImages = 6;
-  
-  const handleAddImage = async (url: string) => {
-    if (images.length >= maxImages) {
-      toast.error(`You can only have up to ${maxImages} images.`);
-      return;
-    }
-    
-    if (!url) {
-      toast.error('Please enter a valid image URL');
-      return;
-    }
-    
-    try {
-      setUploadingImage(true);
-      
-      // Add image to profile
-      const newImages = [...images, url];
-      onImagesChange(newImages);
-      
-      setImageInput('');
-      toast.success('Image added successfully');
-    } catch (error) {
-      console.error('Error adding image:', error);
-      toast.error('Failed to add image. Please try again.');
-    } finally {
-      setUploadingImage(false);
-    }
+const MAX_IMAGES = 6;
+
+const errorMessage = (error: unknown) => (error instanceof Error ? error.message : 'Please try again.');
+
+/** Manages the signed-in user's photos; every change is saved through the API before the UI reflects it. */
+const ProfileImageManager = ({ verified, onImagesChange }: ProfileImageManagerProps) => {
+  const [photos, setPhotos] = useState<ProfileImage[]>([]);
+
+  const apply = (next: ProfileImage[]) => {
+    const sorted = [...next].sort((a, b) => a.position - b.position);
+    setPhotos(sorted);
+    onImagesChange(sorted.filter((p) => p.is_visible).map((p) => p.url));
   };
-  
-  const handleRemoveImage = (index: number) => {
-    if (images.length <= minImages) {
-      toast.error(`You must have at least ${minImages} image.`);
-      return;
-    }
-    
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    onImagesChange(newImages);
-    toast.success('Image removed successfully');
-  };
-  
+
+  useEffect(() => {
+    getMyProfile()
+      .then((profile) => apply(profile.images))
+      .catch((error) => toast.error(`Could not load your photos: ${errorMessage(error)}`));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleImageUploaded = async (file: File) => {
-    if (images.length >= maxImages) {
-      toast.error(`You can only have up to ${maxImages} images.`);
-      return;
-    }
-    
     try {
-      setUploadingImage(true);
-      
-      // Upload image to Supabase storage
-      const imageUrl = await uploadProfileImage(file, images.length);
-      
-      // Add the new image to the profile
-      const newImages = [...images, imageUrl];
-      onImagesChange(newImages);
-      
-      toast.success('Image uploaded successfully');
-      return imageUrl;
+      const photo = await uploadProfilePhoto(file);
+      apply([...photos, photo]);
+      toast.success('Photo added');
+      return photo.url;
     } catch (error) {
-      console.error('Error uploading image:', error);
-      toast.error('Failed to upload image. Please try again.');
+      toast.error(`Could not add the photo: ${errorMessage(error)}`);
       return null;
-    } finally {
-      setUploadingImage(false);
+    }
+  };
+
+  const handleRemoveImage = async (index: number) => {
+    const photo = photos[index];
+    if (!photo) return;
+    try {
+      await deletePhoto(photo.id);
+      apply(photos.filter((p) => p.id !== photo.id).map((p, i) => ({ ...p, position: i })));
+      toast.success('Photo removed');
+    } catch (error) {
+      toast.error(`Could not remove the photo: ${errorMessage(error)}`);
+    }
+  };
+
+  const handleToggleVisibility = async (index: number) => {
+    const photo = photos[index];
+    if (!photo) return;
+    try {
+      const updated = await setPhotoVisibility(photo.id, !photo.is_visible);
+      apply(photos.map((p) => (p.id === updated.id ? updated : p)));
+    } catch (error) {
+      toast.error(`Could not update the photo: ${errorMessage(error)}`);
+    }
+  };
+
+  const move = async (index: number, offset: -1 | 1) => {
+    const target = index + offset;
+    if (target < 0 || target >= photos.length) return;
+    const ids = photos.map((p) => p.id);
+    [ids[index], ids[target]] = [ids[target], ids[index]];
+    try {
+      apply(await reorderPhotos(ids));
+    } catch (error) {
+      toast.error(`Could not reorder photos: ${errorMessage(error)}`);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-love">Profile Images</h2>
+        <h2 className="text-sm font-medium text-love">Profile Photos</h2>
         <div className="text-xs text-muted-foreground">
-          {images.length}/{maxImages} images
+          {photos.length}/{MAX_IMAGES} photos
         </div>
       </div>
-      
-      <ProfileImageGrid 
-        images={images}
-        visibleImages={Array.from({ length: images.length }, (_, i) => i)}
-        maxImages={maxImages}
-        onImageUploaded={(file) => handleImageUploaded(file)}
+
+      <ProfileImageGrid
+        images={photos.map((p) => p.url)}
+        visibleImages={photos.flatMap((p, i) => (p.is_visible ? [i] : []))}
+        maxImages={MAX_IMAGES}
+        onImageUploaded={handleImageUploaded}
         onRemoveImage={handleRemoveImage}
-        onToggleVisibility={() => {}}
-        onMoveImageUp={() => {}}
-        onMoveImageDown={() => {}}
+        onToggleVisibility={handleToggleVisibility}
+        onMoveImageUp={(i) => move(i, -1)}
+        onMoveImageDown={(i) => move(i, 1)}
       />
-      
-      <div className="space-y-4">
-        <ImageUrlInput 
-          maxImages={maxImages}
-          currentImagesCount={images.length}
-          onAddImage={handleAddImage}
-          isSubmitting={uploadingImage}
-        />
-        
-        <div className="text-xs text-muted-foreground">
-          You must have at least {minImages} image and can add up to {maxImages} images.
-        </div>
+
+      <div className="text-xs text-muted-foreground">
+        Add up to {MAX_IMAGES} photos (JPEG, PNG or WebP, up to 5 MB). Hidden photos are only visible to you.
       </div>
-      
+
       <div className="pt-4 border-t border-island-light">
         <VerificationSection verified={verified} />
       </div>

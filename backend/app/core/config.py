@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     supabase_url: str | None = None
     supabase_jwt_secret: str | None = None
     supabase_jwt_audience: str = "authenticated"
+    # Server-side Supabase key for Storage (signed uploads, deletes). Never sent to browsers.
+    supabase_service_role_key: str | None = None
+    profile_images_bucket: str = "profile-images"
     db_pool_size: int = 5
     db_pool_timeout_seconds: float = 5.0
 

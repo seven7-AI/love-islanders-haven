@@ -78,32 +78,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } else if (event === 'SIGNED_OUT') {
           setPasswordRecovery(false);
         }
-
-        // Check if we need to redirect to onboarding
-        if (session && event === 'SIGNED_IN') {
-          try {
-            const { data: onboardingData } = await supabase
-              .from('profile_onboarding')
-              .select('completed')
-              .eq('profile_id', session.user.id)
-              .single();
-              
-            if (!onboardingData || !onboardingData.completed) {
-              // Create onboarding record if it doesn't exist
-              if (!onboardingData) {
-                await supabase
-                  .from('profile_onboarding')
-                  .insert({ 
-                    profile_id: session.user.id,
-                    completed: false,
-                    current_step: 'basics'
-                  });
-              }
-            }
-          } catch (error) {
-            console.error("Error checking onboarding status:", error);
-          }
-        }
       }
     );
 

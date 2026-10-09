@@ -1,77 +1,18 @@
-import { supabase } from "@/integrations/supabase/client";
+import { updateMyProfile } from "@/lib/api/profile";
 import { SupabaseProfile } from "./types";
 import { toast } from "sonner";
 
-const PROFILE_DB_FIELDS = new Set([
-  // verified, email_verified and streak_count are managed by the database
-  'name', 'age', 'dob', 'show_age', 'gender', 'gender_preference', 'height_cm',
-  'occupation', 'education', 'location', 'bio', 'avatar_url', 'interests',
-  'relationship_goal', 'drinking_habit', 'smoking_habit',
-  'communication_style', 'love_language', 'zodiac_sign', 'hometown', 'pronouns', 'city',
-  'country', 'display_name', 'age_range_min', 'age_range_max', 'distance_preference',
-  'show_me_verified_only', 'onboarding_completed', 'updated_at'
-]);
-
-const toProfileDbPayload = (profileData: Record<string, any>) => {
-  const normalized = {
-    ...profileData,
-    gender_preference: profileData.gender_preference ?? profileData.genderPreference,
-    relationship_goal: profileData.relationship_goal ?? profileData.relationshipGoal,
-    show_age: profileData.show_age ?? profileData.showAge,
-    height_cm: profileData.height_cm ?? profileData.heightCm,
-    drinking_habit: profileData.drinking_habit ?? profileData.drinking,
-    smoking_habit: profileData.smoking_habit ?? profileData.smoking,
-  };
-
-  return Object.fromEntries(
-    Object.entries(normalized).filter(([key, value]) => PROFILE_DB_FIELDS.has(key) && value !== undefined)
-  );
-};
-
 /**
- * Updates a user's profile information in Supabase
+ * Updates the signed-in user's profile through the API. Unknown and server-managed fields are dropped before sending.
  */
 export const updateUserProfile = async (profileData: Partial<SupabaseProfile>) => {
   try {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    const userId = user?.id;
-
-    if (!userId) {
-      toast.error("Authentication required to update profile");
-      throw new Error('Authentication required to update profile');
-    }
-    
-    console.log('Updating profile with data:', profileData);
-    
-    // Ensure any Date objects are converted to ISO strings
-    const cleanData = toProfileDbPayload(profileData as Record<string, any>);
-    Object.keys(cleanData).forEach(key => {
-      const value = cleanData[key];
-      // Check if value is a Date
-      if (value instanceof Date) {
-        cleanData[key] = value.toISOString();
-      }
-    });
-    
-    // Pass the profileData directly to Supabase
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(cleanData as any)
-      .eq('id', userId)
-      .select();
-    
-    if (error) {
-      console.error('Error updating profile:', error);
-      toast.error("Failed to update profile: " + error.message);
-      throw error;
-    }
-    
-    console.log('Profile updated successfully:', data);
+    const updated = await updateMyProfile(profileData as Record<string, unknown>);
     toast.success("Profile updated successfully");
-    return data;
+    return updated;
   } catch (error) {
-    console.error('Error in updateUserProfile:', error);
+    console.error('Error updating profile:', error);
+    toast.error(`Failed to update profile: ${error instanceof Error ? error.message : 'unknown error'}`);
     throw error;
   }
 };

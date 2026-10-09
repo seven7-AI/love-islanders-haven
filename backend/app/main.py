@@ -4,16 +4,23 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, me
+from app.api import health, me, profiles
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
 from app.db.session import Database, create_engine
 from app.integrations.auth import SupabaseTokenVerifier, TokenVerifier
+from app.integrations.storage import StorageProvider, SupabaseStorage
+from app.integrations.storage.provider import UnconfiguredStorage
 
 
-def create_app(settings: Settings | None = None, *, token_verifier: TokenVerifier | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    *,
+    token_verifier: TokenVerifier | None = None,
+    storage: StorageProvider | None = None,
+) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings.log_level, settings.log_json)
 
@@ -36,6 +43,7 @@ def create_app(settings: Settings | None = None, *, token_verifier: TokenVerifie
         jwt_secret=settings.supabase_jwt_secret,
         audience=settings.supabase_jwt_audience,
     )
+    app.state.storage = storage or _default_storage(settings)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -48,4 +56,11 @@ def create_app(settings: Settings | None = None, *, token_verifier: TokenVerifie
     register_error_handlers(app)
     app.include_router(health.router)
     app.include_router(me.router)
+    app.include_router(profiles.router)
     return app
+
+
+def _default_storage(settings: Settings) -> StorageProvider:
+    if settings.supabase_url and settings.supabase_service_role_key:
+        return SupabaseStorage(settings.supabase_url, settings.supabase_service_role_key)
+    return UnconfiguredStorage()
