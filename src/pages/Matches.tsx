@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth';
 import NotificationBell from '@/components/NotificationBell';
 import InlineChatOverlay from '@/components/messages/InlineChatOverlay';
@@ -7,68 +6,54 @@ import EmptyMatchState from '@/components/matches/EmptyMatchState';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Loader2 } from 'lucide-react';
-
-interface MatchRow {
-  id: string;
-  created_at: string;
-  partner: {
-    id: string;
-    name: string | null;
-    avatar_url: string | null;
-    age: number | null;
-  };
-}
+import { fetchMatches, MatchSummary } from '@/lib/api/discovery';
 
 const Matches = () => {
   const { user } = useAuth();
-  const [matches, setMatches] = useState<MatchRow[]>([]);
+  const [matches, setMatches] = useState<MatchSummary[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [activeChat, setActiveChat] = useState<{ id: string; name: string } | null>(null);
 
-  useEffect(() => {
-    const load = async () => {
-      if (!user?.id) return;
-      setLoading(true);
-      const { data: rows, error } = await supabase
-        .from('matches')
-        .select('id, created_at, user_id, matched_user_id, status')
-        .or(`user_id.eq.${user.id},matched_user_id.eq.${user.id}`)
-        .order('created_at', { ascending: false });
-
-      if (error || !rows) {
-        console.error('Matches load error', error);
-        setMatches([]);
-        setLoading(false);
-        return;
-      }
-
-      const partnerIds = rows.map((r) => (r.user_id === user.id ? r.matched_user_id : r.user_id));
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, name, avatar_url, age')
-        .in('id', partnerIds.length ? partnerIds : ['00000000-0000-0000-0000-000000000000']);
-
-      const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
-      setMatches(
-        rows.map((r) => {
-          const partnerId = r.user_id === user.id ? r.matched_user_id : r.user_id;
-          const p = profileMap.get(partnerId);
-          return {
-            id: r.id,
-            created_at: r.created_at,
-            partner: {
-              id: partnerId,
-              name: p?.name ?? 'Someone',
-              avatar_url: p?.avatar_url ?? null,
-              age: p?.age ?? null,
-            },
-          };
-        })
-      );
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const page = await fetchMatches();
+      setMatches(page.matches);
+      setCursor(page.next_cursor);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not load matches');
+    } finally {
       setLoading(false);
-    };
-    load();
-  }, [user?.id]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user?.id) load();
+  }, [user?.id, load]);
+
+  const loadMore = async () => {
+    if (!cursor) return;
+    setLoadingMore(true);
+    try {
+      const page = await fetchMatches(cursor);
+      setMatches((prev) => [...prev, ...page.matches]);
+      setCursor(page.next_cursor);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not load more matches');
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const preview = (m: MatchSummary) => {
+    if (!m.last_message) return 'New match! Say hello';
+    const prefix = m.last_message.sender_id === user?.id ? 'You: ' : '';
+    return prefix + m.last_message.content;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-island-dark via-island to-island-dark pb-20">
@@ -82,6 +67,11 @@ const Matches = () => {
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-love" />
           </div>
+        ) : error ? (
+          <div className="text-center space-y-3 py-12">
+            <p role="alert" className="text-white">{error}</p>
+            <Button variant="secondary" onClick={load}>Try again</Button>
+          </div>
         ) : matches.length === 0 ? (
           <EmptyMatchState />
         ) : (
@@ -90,21 +80,27 @@ const Matches = () => {
               <Card key={m.id} className="border-love/20 bg-island-light/20">
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 bg-island-light">
-                    {m.partner.avatar_url ? (
-                      <img src={m.partner.avatar_url} alt={m.partner.name ?? ''} className="w-full h-full object-cover" />
+                    {m.partner.photo_url ? (
+                      <img src={m.partner.photo_url} alt={m.partner.name ?? ''} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-xl">💕</div>
                     )}
                   </div>
                   <div className="flex-grow min-w-0">
                     <h2 className="font-semibold truncate">
-                      {m.partner.name}{m.partner.age ? `, ${m.partner.age}` : ''}
+                      {m.partner.name ?? 'Someone'}{m.partner.age ? `, ${m.partner.age}` : ''}
                     </h2>
-                    <p className="text-sm text-love-light truncate">New match! Say hello</p>
+                    <p className="text-sm text-love-light truncate">{preview(m)}</p>
                   </div>
+                  {m.unread_count > 0 && (
+                    <span className="bg-love text-white text-xs rounded-full px-2 py-0.5" aria-label={`${m.unread_count} unread`}>
+                      {m.unread_count}
+                    </span>
+                  )}
                   <Button
                     variant="ghost"
                     className="bg-love/10 hover:bg-love/20 p-2 rounded-full"
+                    aria-label={`Message ${m.partner.name ?? 'match'}`}
                     onClick={() => setActiveChat({ id: m.id, name: m.partner.name ?? '' })}
                   >
                     <MessageCircle size={20} className="text-love" />
@@ -112,6 +108,11 @@ const Matches = () => {
                 </CardContent>
               </Card>
             ))}
+            {cursor && (
+              <Button variant="secondary" className="w-full" onClick={loadMore} disabled={loadingMore}>
+                {loadingMore ? 'Loading…' : 'Load more'}
+              </Button>
+            )}
           </div>
         )}
       </main>

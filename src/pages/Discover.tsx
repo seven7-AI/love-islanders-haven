@@ -1,46 +1,55 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import EmailVerificationPopup from '@/components/auth/EmailVerificationPopup';
 import { useDiscoverProfiles } from '@/hooks/discover/useDiscoverProfiles';
 import { useEmailVerification } from '@/hooks/discover/useEmailVerification';
 import ProfileDisplay from '@/components/discover/ProfileDisplay';
-import SimpleDiscoverFilters, { SimpleFilters, DEFAULT_SIMPLE_FILTERS } from '@/components/discover/SimpleDiscoverFilters';
+import SimpleDiscoverFilters, { SimpleFilters } from '@/components/discover/SimpleDiscoverFilters';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import type { SwipeDirection } from '@/lib/api/discovery';
+import { DEFAULT_DISCOVER_PREFERENCES } from '@/services/profiles/profile-preferences';
 
 const Discover: React.FC = () => {
-  const [filters, setFilters] = useState<SimpleFilters>(DEFAULT_SIMPLE_FILTERS);
+  const navigate = useNavigate();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  const {
-    currentProfile,
-    isLoading,
-    handleSwipe,
-    setFilters: updateDiscoverFilters,
-  } = useDiscoverProfiles({
-    minAge: filters.ageRange[0],
-    maxAge: filters.ageRange[1],
-    maxDistance: filters.distance,
-    gender: filters.gender === 'any' ? undefined : filters.gender,
-  });
-
+  const { currentProfile, isLoading, swiping, error, filters, setFilters, refreshProfiles, handleSwipe } =
+    useDiscoverProfiles();
   const { showVerificationPopup, email: unconfirmedEmail, handleVerificationComplete } = useEmailVerification();
 
+  const simpleFilters: SimpleFilters = {
+    ageRange: [filters.minAge, filters.maxAge],
+    distance: filters.maxDistance,
+    gender: filters.gender ?? 'any',
+  };
+
   const apply = (next: SimpleFilters) => {
-    setFilters(next);
-    updateDiscoverFilters({
+    setFilters({
       minAge: next.ageRange[0],
       maxAge: next.ageRange[1],
       maxDistance: next.distance,
       gender: next.gender === 'any' ? undefined : next.gender,
-    }, true);
+    });
+  };
+
+  const onSwipe = async (profileId: string, direction: SwipeDirection) => {
+    const name = currentProfile?.name ?? 'them';
+    const result = await handleSwipe(profileId, direction);
+    if (result?.matched) {
+      toast.success(`It's a match with ${name}!`, {
+        description: 'Say hello from your matches.',
+        action: { label: 'Open matches', onClick: () => navigate('/matches') },
+      });
+    }
   };
 
   const activeCount =
-    (filters.ageRange[0] !== 18 || filters.ageRange[1] !== 35 ? 1 : 0) +
-    (filters.distance !== 50 ? 1 : 0) +
-    (filters.gender !== 'any' ? 1 : 0);
+    (filters.minAge !== DEFAULT_DISCOVER_PREFERENCES.minAge || filters.maxAge !== DEFAULT_DISCOVER_PREFERENCES.maxAge ? 1 : 0) +
+    (filters.maxDistance !== DEFAULT_DISCOVER_PREFERENCES.maxDistance ? 1 : 0) +
+    (filters.gender ? 1 : 0);
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950">
@@ -48,23 +57,26 @@ const Discover: React.FC = () => {
         <div className="container mx-auto px-4 py-8 pb-24">
           <h1 className="text-3xl font-bold text-center text-white mb-6">Discover People</h1>
 
-          {currentProfile ? (
-            <ProfileDisplay
-              profile={currentProfile}
-              isLoading={isLoading}
-              onSwipe={handleSwipe}
-              onOpenFilters={() => setIsFilterOpen(true)}
-              filterCount={activeCount}
-            />
+          {currentProfile && !isLoading ? (
+            <ProfileDisplay profile={currentProfile} disabled={swiping} onSwipe={onSwipe} />
           ) : (
             <div className="flex flex-col items-center justify-center h-64 gap-3">
-              <p className="text-white text-center">
-                {isLoading ? 'Loading profiles…' : 'No profiles match your filters yet.'}
-              </p>
-              {!isLoading && (
-                <Button variant="secondary" onClick={() => setIsFilterOpen(true)}>
-                  Adjust filters
-                </Button>
+              {error ? (
+                <>
+                  <p role="alert" className="text-white text-center">Could not load profiles: {error}</p>
+                  <Button variant="secondary" onClick={refreshProfiles}>Try again</Button>
+                </>
+              ) : (
+                <>
+                  <p className="text-white text-center">
+                    {isLoading ? 'Loading profiles…' : 'No more profiles match your preferences right now.'}
+                  </p>
+                  {!isLoading && (
+                    <Button variant="secondary" onClick={() => setIsFilterOpen(true)}>
+                      Adjust filters
+                    </Button>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -72,7 +84,7 @@ const Discover: React.FC = () => {
           <SimpleDiscoverFilters
             isOpen={isFilterOpen}
             onOpenChange={setIsFilterOpen}
-            activeFilters={filters}
+            activeFilters={simpleFilters}
             onApply={apply}
           />
 
