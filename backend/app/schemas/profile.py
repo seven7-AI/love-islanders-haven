@@ -122,6 +122,8 @@ class PublicProfile(BaseModel):
     interests: list[str]
     verified: bool
     images: list[str]
+    # Rounded to whole kilometres; null when either person has not shared a location.
+    distance_km: int | None = None
 
 
 class OnboardingStepUpdate(BaseModel):
@@ -155,3 +157,9 @@ class ImageUpdate(BaseModel):
 class ImageOrder(BaseModel):
     model_config = ConfigDict(extra="forbid")
     image_ids: list[uuid.UUID] = Field(min_length=1, max_length=6)
+
+
+class LocationUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    latitude: float = Field(ge=-90, le=90)
+    longitude: float = Field(ge=-180, le=180)

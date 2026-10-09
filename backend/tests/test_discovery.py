@@ -263,3 +263,51 @@ async def test_matches_pagination(client: AsyncClient, app: FastAPI) -> None:
     ids = [m["id"] for m in first["matches"] + second["matches"]]
     assert len(ids) == 3 == len(set(ids))
     assert second["next_cursor"] is None
+
+
+# --- distance --------------------------------------------------------------------------------------------------
+
+NAIROBI = (-1.2921, 36.8219)
+THIKA = (-1.0333, 37.0693)  # ~40 km from Nairobi
+MOMBASA = (-4.0435, 39.6682)  # ~440 km
+
+
+async def located(
+    client: AsyncClient, app: FastAPI, where: tuple[float, float] | None, gender: str = "female", pref: str = "both"
+) -> uuid.UUID:
+    pid = await person(app, gender=gender, pref=pref)
+    if where:
+        response = await client.put(
+            "/v1/me/location", headers=auth_headers(pid), json={"latitude": where[0], "longitude": where[1]}
+        )
+        assert response.status_code == 204
+    return pid
+
+
+async def test_location_is_stored_coarsely(client: AsyncClient, app: FastAPI) -> None:
+    me = await located(client, app, NAIROBI)
+    async with app.state.db.engine.connect() as conn:
+        row = (await conn.execute(text("SELECT latitude, longitude FROM profiles WHERE id = :id"), {"id": me})).one()
+    assert (row.latitude, row.longitude) == (-1.29, 36.82)
+    assert (await client.delete("/v1/me/location", headers=auth_headers(me))).status_code == 204
+    async with app.state.db.engine.connect() as conn:
+        assert (await conn.execute(text("SELECT latitude FROM profiles WHERE id = :id"), {"id": me})).scalar() is None
+
+
+async def test_feed_respects_distance_and_shows_rounded_distance(client: AsyncClient, app: FastAPI) -> None:
+    me = await located(client, app, NAIROBI, gender="male", pref="female")
+    await sql(app, "UPDATE profiles SET distance_preference = 100 WHERE id = :id", id=me)
+    near = await located(client, app, THIKA)
+    far = await located(client, app, MOMBASA)
+    unknown = await located(client, app, None)
+    profiles = (await client.get("/v1/discover", headers=auth_headers(me))).json()["profiles"]
+    by_id = {p["id"]: p for p in profiles}
+    assert str(far) not in by_id
+    assert 35 <= by_id[str(near)]["distance_km"] <= 45
+    assert by_id[str(unknown)]["distance_km"] is None  # no location shared: not excluded, no distance shown
+
+
+@pytest.mark.parametrize("body", [{"latitude": 91, "longitude": 0}, {"latitude": 0, "longitude": 181}, {"latitude": 0}])
+async def test_location_validation(client: AsyncClient, app: FastAPI, body: dict[str, object]) -> None:
+    me = await person(app)
+    assert (await client.put("/v1/me/location", headers=auth_headers(me), json=body)).status_code == 422

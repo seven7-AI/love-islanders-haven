@@ -14,6 +14,7 @@ from sqlalchemy import (
     CheckConstraint,
     Date,
     DateTime,
+    Double,
     ForeignKey,
     Index,
     Integer,
@@ -57,6 +58,13 @@ def _profile_fk(*, nullable: bool = False) -> Mapped[uuid.UUID]:
 
 class Profile(Base):
     __tablename__ = "profiles"
+    __table_args__ = (
+        CheckConstraint(
+            "(latitude IS NULL AND longitude IS NULL) OR "
+            "(latitude BETWEEN -90 AND 90 AND longitude BETWEEN -180 AND 180)",
+            name="coordinates_check",
+        ),
+    )
 
     # Equals the auth provider's user id (Supabase auth.users.id).
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
@@ -95,6 +103,9 @@ class Profile(Base):
     show_me_verified_only: Mapped[bool | None] = mapped_column(Boolean, server_default=text("false"))
     show_age: Mapped[bool | None] = mapped_column(Boolean, server_default=text("true"))
     onboarding_completed: Mapped[bool | None] = mapped_column(Boolean, server_default=text("false"))
+    latitude: Mapped[float | None] = mapped_column(Double)
+    longitude: Mapped[float | None] = mapped_column(Double)
+    location_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class ProfileOnboarding(Base):
