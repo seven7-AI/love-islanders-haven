@@ -21,3 +21,12 @@ export const authSchema = z.object({
 export const verificationSchema = z.object({
   code: z.string().length(4, { message: "Verification code must be 4 digits" })
 });
+
+// New password form (password recovery)
+export const newPasswordSchema = z.object({
+  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
