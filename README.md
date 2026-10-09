@@ -1,36 +1,37 @@
 # Love Islander
 
-A dating app: profiles, discovery and swiping, matches and chat, streaks, an AI companion, and safety tools.
+A dating app: profiles and photos, discovery with mutual matching, chat, daily photo streaks, an AI dating companion,
+Google Calendar date planning, and safety tools (blocking, reporting, safety contacts, date plans, emergency alerts).
 
-Frontend: Vite + React 18 + TypeScript, Tailwind and shadcn/ui, with a Capacitor shell for Android/iOS.
-Backend today: Supabase (Postgres, Auth, Storage, edge functions in `supabase/functions`).
-A FastAPI + Postgres + Alembic backend is being introduced. See [docs/STATUS.md](docs/STATUS.md) for progress and [docs/audit/2026-10-audit.md](docs/audit/2026-10-audit.md) for the current-state audit.
+- **Web/mobile client:** React 18 + TypeScript + Vite, Tailwind/shadcn, Capacitor shell (`src/`)
+- **API:** FastAPI + SQLAlchemy + Alembic on Python 3.12 (`backend/`)
+- **Platform:** Supabase Auth, Storage and Postgres (`supabase/`)
 
-## Requirements
-- Node.js 20+ and npm (use `npm ci`; `package-lock.json` is the only lockfile)
-- A Supabase project (URL and publishable key)
-
-## Getting started
+## Quick start
 ```bash
-npm ci
-cp .env.example .env   # fill in VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_API_URL
-make up                # Postgres + API (see backend/README.md; needs SUPABASE_URL or SUPABASE_JWT_SECRET)
-make migrate
-npm run dev            # http://localhost:8080
+npm ci && (cd backend && uv sync)
+KEEP_STACK=1 npm run test:e2e   # starts a local Supabase + API + web and runs the end-to-end tests
 ```
-Profiles, onboarding and photos go through the API (`backend/`); the remaining features still use Supabase directly
-until they are moved (see docs/STATUS.md).
+Full instructions: [docs/setup.md](docs/setup.md).
 
 ## Checks
 ```bash
-npm run lint
-npm run typecheck
-npm test
-npm run build
+make check   # web: format, lint, typecheck, tests, build; API: ruff, mypy, tests
+make ci      # everything CI runs, incl. database policy tests, security scans and end-to-end tests
 ```
 
-## Mobile
-`npm run build && npx cap sync android`, then see [docs/mobile/](docs/mobile/) and `npm run android:deploy`.
-Before the first store release the Capacitor `appId` in `capacitor.config.ts` must be set to the owner's final application id.
-
-CI (`.github/workflows/ci.yml`) runs the same four commands on every push to `main` and every pull request, plus a report-only `npm audit`.
+## Documentation
+| Topic | Document |
+|---|---|
+| Architecture | [docs/architecture.md](docs/architecture.md) |
+| Local setup | [docs/setup.md](docs/setup.md) |
+| Environment variables | [docs/environment.md](docs/environment.md) |
+| Database & migrations | [docs/database/migrations.md](docs/database/migrations.md), [schema reconciliation](docs/database/schema-reconciliation.md) |
+| Testing | [docs/testing.md](docs/testing.md) |
+| External services | [docs/external-services.md](docs/external-services.md) |
+| Deployment | [docs/deployment.md](docs/deployment.md) |
+| Security | [docs/security.md](docs/security.md) |
+| Operations | [backups & restore](docs/operations/database.md), [observability](docs/operations/observability.md), [pending production actions](docs/operations/production-actions.md) |
+| API reference | `GET /docs` on a non-production API (OpenAPI) and [backend/README.md](backend/README.md) |
+| Project status & audit | [docs/STATUS.md](docs/STATUS.md), [docs/audit/2026-10-audit.md](docs/audit/2026-10-audit.md) |
+| Mobile | [docs/mobile/](docs/mobile/) |

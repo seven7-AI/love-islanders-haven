@@ -33,7 +33,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 24 | 5 Hardening | Observability | ✅ |
 | 25 | 6 Testing | Playwright E2E | ✅ |
 | 26 | 6 Testing | Complete CI pipeline | ✅ |
-| 27 | 7 Docs | Documentation and deployment artifacts | ⏳ |
+| 27 | 7 Docs | Documentation and deployment artifacts | ✅ |
 | 28 | 7 Docs | Clean-clone verification and upstream PR | ⏳ |
 
 ## External blockers

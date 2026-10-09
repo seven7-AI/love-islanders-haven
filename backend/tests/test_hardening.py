@@ -70,5 +70,6 @@ def test_production_requires_explicit_https_origins(origins: list[str]) -> None:
 
 
 def test_production_settings_accept_https_origins() -> None:
-    settings: Settings = make_settings(environment="production", cors_origins=["https://app.example"])
-    assert settings.cors_origins == ["https://app.example"]
+    origins = ["https://app.example", "https://localhost", "capacitor://localhost"]
+    settings: Settings = make_settings(environment="production", cors_origins=origins)
+    assert settings.cors_origins == origins
