@@ -88,7 +88,14 @@ const Login = () => {
             ) : 'Sign In'}
           </Button>
 
-          <div className="text-center">
+          <div className="text-center space-y-2">
+            <button
+              type="button"
+              onClick={() => navigate('/forgot-password')}
+              className="block w-full text-love hover:underline text-sm"
+            >
+              Forgot password?
+            </button>
             <button
               type="button"
               onClick={() => navigate('/signup')}

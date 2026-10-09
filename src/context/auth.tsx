@@ -13,11 +13,19 @@ interface AuthContextType {
   }>;
   signUp: (email: string, password: string) => Promise<boolean>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
+  /** True after the user opened a password recovery link, until the password is updated. */
+  passwordRecovery: boolean;
+  resetPassword: (email: string) => Promise<{ error?: Error }>;
+  updatePassword: (password: string) => Promise<{ error?: Error }>;
   signInWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Captured at load time: supabase-js removes the hash once it has exchanged it for a session, and its
+// PASSWORD_RECOVERY event can fire before the provider subscribes.
+const openedFromRecoveryLink =
+  typeof window !== 'undefined' && new URLSearchParams(window.location.hash.slice(1)).get('type') === 'recovery';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -37,6 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [networkError, setNetworkError] = useState(false);
+  const [passwordRecovery, setPasswordRecovery] = useState(openedFromRecoveryLink);
 
   useEffect(() => {
     const getSession = async () => {
@@ -64,6 +73,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setSession(session ?? null);
         setIsAuthenticated(!!session);
         setLoading(false);
+
+        if (event === 'PASSWORD_RECOVERY') {
+          setPasswordRecovery(true);
+        } else if (event === 'SIGNED_OUT') {
+          setPasswordRecovery(false);
+        }
 
         // Check if we need to redirect to onboarding
         if (session && event === 'SIGNED_IN') {
@@ -211,15 +226,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Supabase sends the recovery email and does not reveal whether the account exists.
   const resetPassword = async (email: string) => {
-    setLoading(true);
-    try {
-      await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-    } finally {
-      setLoading(false);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    return error ? { error } : {};
+  };
+
+  // Only valid inside the session created by the recovery link.
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      return { error };
     }
+    setPasswordRecovery(false);
+    return {};
   };
 
   const signOut = async () => {
@@ -246,7 +268,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         signIn,
         signUp,
         signOut,
+        passwordRecovery,
         resetPassword,
+        updatePassword,
         signInWithGoogle
       }}
     >
