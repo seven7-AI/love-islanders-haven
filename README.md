@@ -28,3 +28,5 @@ npm run build
 ## Mobile
 `npm run build && npx cap sync android`, then see [docs/mobile/](docs/mobile/) and `npm run android:deploy`.
 Before the first store release the Capacitor `appId` in `capacitor.config.ts` must be set to the owner's final application id.
+
+CI (`.github/workflows/ci.yml`) runs the same four commands on every push to `main` and every pull request, plus a report-only `npm audit`.
