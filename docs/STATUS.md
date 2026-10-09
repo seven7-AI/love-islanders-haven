@@ -8,7 +8,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 |---|---|---|---|
 | 1 | 1 Audit | Publish technical audit report and status tracker | ✅ |
 | 2 | 1 Audit | Remove Lovable coupling, dead code, green tooling baseline | ✅ |
-| 3 | 1 Audit | CI workflow for the web app | ⏳ |
+| 3 | 1 Audit | CI workflow for the web app | ✅ |
 | 4 | 2 Security | Harden the password reset flow | ⏳ |
 | 5 | 2 Security | Harden profile write paths and read policies | ⏳ |
 | 6 | 2 Security | Move verification and auth state checks server-side | ⏳ |
