@@ -56,5 +56,9 @@ Run them with the same environment as the API (e.g. a cron job or the hosting pl
 | `LLM_MODEL` | no | `gpt-4o-mini` | |
 | `LLM_BASE_URL` | no | `https://api.openai.com/v1` | Any OpenAI-compatible endpoint |
 | `COMPANION_MESSAGES_PER_HOUR` | no | `30` | Per-user limit |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | for Google Calendar | – | OAuth client (Google Cloud console). Without them calendar endpoints return 503 `calendar_not_configured` |
+| `GOOGLE_REDIRECT_URI` | for Google Calendar | – | `https://<web-app>/calendar/callback`; must be registered on the OAuth client |
+| `TOKEN_ENCRYPTION_KEY` | for Google Calendar | – | Fernet key for stored refresh tokens: `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`. Rotating it disconnects existing calendars |
+| `OAUTH_STATE_SECRET` | no | token key | Signs OAuth state values (10-minute lifetime, bound to the user) |
 | `DB_POOL_SIZE` | no | `5` | |
 | `DB_POOL_TIMEOUT_SECONDS` | no | `5` | Connection and pool checkout timeout |

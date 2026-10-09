@@ -11,6 +11,7 @@ export function useProfileCalendar() {
     googleEvents,
     isLoading: isLoadingGoogle,
     isAuthorized: isGoogleAuthorized,
+    isAvailable: isGoogleAvailable,
     initiateGoogleAuth,
     fetchGoogleEvents
   } = useGoogleCalendar();
@@ -68,6 +69,7 @@ export function useProfileCalendar() {
       }
     },
     isGoogleAuthorized,
+    isGoogleAvailable,
     initiateGoogleAuth
   };
 }

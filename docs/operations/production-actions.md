@@ -19,6 +19,7 @@ Changes merged to the repository that only take effect once someone with access 
 | #17 | Choose and configure an emergency-alert delivery provider (SMS/email); until then the API answers 503 `alerts_not_configured` and the app tells users to call emergency services | implement `AlertSender` in `backend/app/integrations/alerts` | Blocked (provider) |
 | #18 | Apply migration `20261009160000_notifications.sql` | `supabase db push` | Pending |
 | #19 | Set `LLM_API_KEY` (and optionally `LLM_MODEL`/`LLM_BASE_URL`) on the API; schedule `python -m app.jobs.companion_checkins`; delete the `ai-companion` edge function | `supabase functions delete ai-companion --project-ref <project-ref>` | Blocked (API key) |
+| #20 | Create a Google OAuth client (Calendar read-only scope, redirect `https://<app>/calendar/callback`); set `GOOGLE_*` and `TOKEN_ENCRYPTION_KEY` on the API; apply migration `20261009170000_google_calendar_connections.sql`; delete the five old Google edge functions | Google Cloud console; `supabase db push`; `supabase functions delete <name>` | Blocked (OAuth client) |
 
 ## Known residual risks
 - Signed-in users can read other users' `dob` (and other profile columns) through the `profiles` table until profile reads move behind the API (#13).

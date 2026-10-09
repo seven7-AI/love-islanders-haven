@@ -32,6 +32,15 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-4o-mini"
     llm_base_url: str = "https://api.openai.com/v1"
     companion_messages_per_hour: int = 30
+    # Google Calendar. Without these the calendar endpoints answer 503.
+    google_client_id: str | None = None
+    google_client_secret: str | None = None
+    # Must exactly match an authorised redirect URI in the Google Cloud console, e.g. https://app.example/calendar/callback
+    google_redirect_uri: str | None = None
+    # Fernet key (base64, 32 bytes) used to encrypt stored refresh tokens.
+    token_encryption_key: str | None = None
+    # Secret for signing OAuth state values; falls back to the token key.
+    oauth_state_secret: str | None = None
     db_pool_size: int = 5
     db_pool_timeout_seconds: float = 5.0
 

@@ -20,6 +20,7 @@ const ProfileCalendar = () => {
     isLoading, 
     refresh,
     isGoogleAuthorized,
+    isGoogleAvailable,
     initiateGoogleAuth
   } = useProfileCalendar();
   const { toast } = useToast();
@@ -123,14 +124,18 @@ const ProfileCalendar = () => {
             </PopoverContent>
           </Popover>
           
-          <Button 
-            variant="outline" 
-            className="w-full bg-island-light/10 border-island-light/40"
-            onClick={handleGoogleAuth}
-          >
-            <Share2 size={16} className="mr-2" />
-            {isGoogleAuthorized ? 'Connected to Google Calendar' : 'Connect to Google Calendar'}
-          </Button>
+          {isGoogleAvailable || isGoogleAuthorized ? (
+            <Button 
+              variant="outline" 
+              className="w-full bg-island-light/10 border-island-light/40"
+              onClick={handleGoogleAuth}
+            >
+              <Share2 size={16} className="mr-2" />
+              {isGoogleAuthorized ? 'Connected to Google Calendar' : 'Connect to Google Calendar'}
+            </Button>
+          ) : (
+            <p className="text-xs text-muted-foreground text-center">Google Calendar sync isn't available yet.</p>
+          )}
         </CardContent>
       </Card>
     </div>

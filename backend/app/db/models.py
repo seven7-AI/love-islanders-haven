@@ -339,5 +339,18 @@ class Notification(Base):
     created_at: Mapped[datetime] = _created_at()
 
 
+class CalendarConnection(Base):
+    __tablename__ = "calendar_connections"
+    __table_args__ = (CheckConstraint("provider = 'google'::text", name="provider_check"),)
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), primary_key=True
+    )
+    provider: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'google'::text"))
+    refresh_token_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
+    scope: Mapped[str | None] = mapped_column(Text)
+    connected_at: Mapped[datetime] = _created_at()
+
+
 # Tables whose updated_at column is maintained by the set_updated_at() trigger.
 TABLES_WITH_UPDATED_AT = ("profiles", "profile_onboarding", "date_plans", "user_settings")

@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import companion, discovery, health, me, messages, notifications, profiles, safety, streaks
+from app.api import calendar, companion, discovery, health, me, messages, notifications, profiles, safety, streaks
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
@@ -12,9 +12,11 @@ from app.core.middleware import RequestContextMiddleware
 from app.db.session import Database, create_engine
 from app.integrations.alerts import AlertSender, UnconfiguredAlertSender
 from app.integrations.auth import SupabaseTokenVerifier, TokenVerifier
+from app.integrations.google import GoogleCalendarClient
 from app.integrations.llm import LLMProvider, OpenAICompatibleLLM, UnconfiguredLLM
 from app.integrations.storage import StorageProvider, SupabaseStorage
 from app.integrations.storage.provider import UnconfiguredStorage
+from app.services.calendar import build_config as build_calendar_config
 
 
 def create_app(
@@ -24,6 +26,7 @@ def create_app(
     storage: StorageProvider | None = None,
     alert_sender: AlertSender | None = None,
     llm: LLMProvider | None = None,
+    google_client: GoogleCalendarClient | None = None,
 ) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings.log_level, settings.log_json)
@@ -50,6 +53,7 @@ def create_app(
     app.state.storage = storage or _default_storage(settings)
     app.state.alert_sender = alert_sender or UnconfiguredAlertSender()
     app.state.llm = llm or _default_llm(settings)
+    app.state.calendar = build_calendar_config(settings, google_client)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -69,6 +73,7 @@ def create_app(
     app.include_router(safety.router)
     app.include_router(notifications.router)
     app.include_router(companion.router)
+    app.include_router(calendar.router)
     return app
 
 
