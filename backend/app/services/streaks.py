@@ -16,6 +16,7 @@ from app.core.errors import AppError
 from app.core.pagination import decode_cursor, encode_cursor
 from app.integrations.storage import SignedUpload, StorageError, StorageProvider
 from app.schemas.streaks import LeaderboardEntry, LikeState, StreakCreate, StreakFeed, StreakPost, StreakStatus
+from app.services.notifications import notify_streak_like
 from app.services.profiles import EXTENSIONS, NotFound, _storage_unavailable
 
 # Effective streak (in both queries below): the stored count while the latest post is from today or yesterday (UTC),
@@ -212,6 +213,7 @@ async def set_like(session: AsyncSession, me: uuid.UUID, post_id: uuid.UUID, lik
             ),
             {"me": me, "id": post_id},
         )
+        await notify_streak_like(session, post_id, me)
     else:
         changed = await session.scalar(
             text(

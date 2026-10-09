@@ -320,5 +320,24 @@ class Report(Base):
     created_at: Mapped[datetime] = _created_at()
 
 
+class Notification(Base):
+    __tablename__ = "notifications"
+    __table_args__ = (
+        CheckConstraint("type = ANY (ARRAY['match'::text, 'message'::text, 'streak_like'::text])", name="type_check"),
+        Index("notifications_user_created_idx", "user_id", "created_at"),
+    )
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    user_id: Mapped[uuid.UUID] = _profile_fk()
+    type: Mapped[str] = mapped_column(Text, nullable=False)
+    actor_id: Mapped[uuid.UUID | None] = _profile_fk(nullable=True)
+    match_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("matches.id", ondelete="CASCADE"))
+    streak_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("streaks.id", ondelete="CASCADE")
+    )
+    is_read: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    created_at: Mapped[datetime] = _created_at()
+
+
 # Tables whose updated_at column is maintained by the set_updated_at() trigger.
 TABLES_WITH_UPDATED_AT = ("profiles", "profile_onboarding", "date_plans", "user_settings")
