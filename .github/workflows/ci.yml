@@ -67,6 +67,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Apply migrations to a fresh Postgres and run policy tests
         run: supabase/test/run.sh
+        env:
+          # Official image via the AWS public mirror (Docker Hub rate-limits anonymous pulls on shared runners).
+          POSTGRES_IMAGE: public.ecr.aws/docker/library/postgres:15-alpine
 
   backend:
     name: Backend (ruff, mypy, pytest)
@@ -76,7 +79,7 @@ jobs:
         working-directory: backend
     services:
       postgres:
-        image: postgres:16-alpine
+        image: public.ecr.aws/docker/library/postgres:16-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
