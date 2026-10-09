@@ -91,8 +91,8 @@ const MessageInput = ({ onSendMessage, isSending, onTypingStatus, matchId }: Mes
     if (!selectedFile || !uploadType || !matchId) return;
     
     try {
-      // Get media URL (local URL for demo profiles or Supabase URL for real users)
-      const mediaUrl = await uploadMessageFile(matchId, selectedFile, uploadType);
+      // Upload to private storage; the message carries the storage path
+      const mediaUrl = await uploadMessageFile(matchId, selectedFile);
       
       // Send message with file URL
       let content = '';

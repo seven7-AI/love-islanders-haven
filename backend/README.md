@@ -42,5 +42,6 @@ Tests use a real Postgres (`TEST_DATABASE_URL`, default `postgresql+asyncpg://po
 | `SUPABASE_JWT_AUDIENCE` | no | `authenticated` | |
 | `SUPABASE_SERVICE_ROLE_KEY` | for photos | – | Server-side key for Supabase Storage (signed uploads, existence checks, deletes). Without it photo endpoints return 503 `storage_not_configured` |
 | `PROFILE_IMAGES_BUCKET` | no | `profile-images` | |
+| `CHAT_MEDIA_BUCKET` | no | `chat-media` | Private bucket; media is served through signed URLs valid for one hour |
 | `DB_POOL_SIZE` | no | `5` | |
 | `DB_POOL_TIMEOUT_SECONDS` | no | `5` | Connection and pool checkout timeout |

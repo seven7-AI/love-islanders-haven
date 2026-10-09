@@ -49,6 +49,19 @@ class SupabaseStorage:
     def public_url(self, bucket: str, path: str) -> str:
         return f"{self._base}/object/public/{self._object(bucket, path)}"
 
+    async def signed_download_url(self, bucket: str, path: str, expires_in: int) -> str:
+        response = await self._client.post(
+            f"{self._base}/object/sign/{self._object(bucket, path)}",
+            headers=self._headers,
+            json={"expiresIn": expires_in},
+        )
+        if response.status_code != 200:
+            raise StorageError(f"Signed download URL request failed ({response.status_code})")
+        relative = response.json().get("signedURL", "")
+        if not relative:
+            raise StorageError("Storage did not return a signed URL")
+        return f"{self._base}{relative}"
+
     def path_from_public_url(self, bucket: str, url: str) -> str | None:
         prefix = f"{self._base}/object/public/{quote(bucket)}/"
         return unquote(url[len(prefix) :]) if url.startswith(prefix) else None
