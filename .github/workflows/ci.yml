@@ -105,4 +105,4 @@ jobs:
           scripts/db/restore-drill.sh postgresql://postgres:postgres@localhost:5432/postgres
           scripts/db/copy-drill.sh postgresql://postgres:postgres@localhost:5432/postgres
       - name: Docker image builds
-        run: docker build -t love-islander-api .
+        run: docker build --build-arg PYTHON_IMAGE=public.ecr.aws/docker/library/python:3.12-slim -t love-islander-api .

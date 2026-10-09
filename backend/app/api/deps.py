@@ -1,6 +1,7 @@
 from collections.abc import AsyncIterator
 from typing import Annotated
 
+import structlog
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,6 +38,7 @@ class Unauthorized(AppError):
 
 
 async def get_current_user(
+    request: Request,
     session: SessionDep,
     verifier: Annotated[TokenVerifier, Depends(get_token_verifier)],
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)],
@@ -47,6 +49,9 @@ async def get_current_user(
         user = verifier.verify(credentials.credentials)
     except AuthError as exc:
         raise Unauthorized(str(exc)) from exc
+    # For log lines written by this request's handler and by the request-logging middleware.
+    structlog.contextvars.bind_contextvars(user_id=str(user.id))
+    request.state.user_id = str(user.id)
     await ensure_profile(session, user)
     return user
 

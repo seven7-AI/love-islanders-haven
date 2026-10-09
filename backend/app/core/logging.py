@@ -18,5 +18,6 @@ def configure_logging(level: str, json: bool) -> None:
         processors=[*shared, structlog.processors.format_exc_info, renderer],
         wrapper_class=structlog.make_filtering_bound_logger(logging.getLevelName(level)),
         logger_factory=structlog.PrintLoggerFactory(sys.stdout),
-        cache_logger_on_first_use=True,
+        # Not cached, so reconfiguring (e.g. a second app instance in tests) takes effect for existing loggers.
+        cache_logger_on_first_use=False,
     )

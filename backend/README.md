@@ -60,5 +60,8 @@ Run them with the same environment as the API (e.g. a cron job or the hosting pl
 | `GOOGLE_REDIRECT_URI` | for Google Calendar | – | `https://<web-app>/calendar/callback`; must be registered on the OAuth client |
 | `TOKEN_ENCRYPTION_KEY` | for Google Calendar | – | Fernet key for stored refresh tokens: `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`. Rotating it disconnects existing calendars |
 | `OAUTH_STATE_SECRET` | no | token key | Signs OAuth state values (10-minute lifetime, bound to the user) |
+| `METRICS_TOKEN` | recommended in production | – | Protects `/metrics` (Bearer token) |
+| `SENTRY_DSN` / `SENTRY_TRACES_SAMPLE_RATE` | no | – / `0` | Error tracking; see docs/operations/observability.md |
+| `RATE_LIMIT_ENABLED` | no | `true` | Per-user limits on write endpoints |
 | `DB_POOL_SIZE` | no | `5` | |
 | `DB_POOL_TIMEOUT_SECONDS` | no | `5` | Connection and pool checkout timeout |
