@@ -33,9 +33,9 @@ const ProfileImageGrid = ({
     if (!file) return;
 
     // Validate file type
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      toast.error("Invalid file type. Please upload a JPEG, PNG, WebP or GIF image.");
+      toast.error("Invalid file type. Please upload a JPEG, PNG or WebP image.");
       return;
     }
 

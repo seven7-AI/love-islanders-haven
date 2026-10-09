@@ -7,6 +7,8 @@ FastAPI service that will own the app's business logic and data (see `docs/STATU
 - `app/core/` – configuration (`pydantic-settings`), structured logging (`structlog`), RFC 9457 problem responses, request-id middleware
 - `app/db/` – async SQLAlchemy engine/session
 - `app/api/` – routers and dependencies (`/healthz` liveness, `/readyz` database readiness, `/v1/me`)
+- `app/integrations/storage/` – `StorageProvider` interface and the Supabase Storage implementation
+- `app/services/profiles.py` – profile, onboarding and photo rules (18+, field validation, photo limits, ownership)
 - `app/integrations/auth/` – `TokenVerifier` interface and the Supabase implementation. Endpoints get the user from
   `CurrentUser` (the verified token's `sub`); request bodies never carry user ids.
 
@@ -38,5 +40,7 @@ Tests use a real Postgres (`TEST_DATABASE_URL`, default `postgresql+asyncpg://po
 | `SUPABASE_URL` | one of these two | – | Supabase project URL; access tokens are verified against `<url>/auth/v1/.well-known/jwks.json` (signature, `exp`, `aud`, `iss`) |
 | `SUPABASE_JWT_SECRET` | one of these two | – | Legacy HS256 secret for projects without asymmetric signing keys |
 | `SUPABASE_JWT_AUDIENCE` | no | `authenticated` | |
+| `SUPABASE_SERVICE_ROLE_KEY` | for photos | – | Server-side key for Supabase Storage (signed uploads, existence checks, deletes). Without it photo endpoints return 503 `storage_not_configured` |
+| `PROFILE_IMAGES_BUCKET` | no | `profile-images` | |
 | `DB_POOL_SIZE` | no | `5` | |
 | `DB_POOL_TIMEOUT_SECONDS` | no | `5` | Connection and pool checkout timeout |

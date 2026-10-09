@@ -11,7 +11,8 @@ from alembic import command
 from app.core.config import Settings
 from app.db.models import Base
 from app.main import create_app
-from tests.auth_helpers import HS_SECRET
+from tests.auth_helpers import HS_SECRET, hs256_token
+from tests.fakes import FakeStorage
 
 # Integration tests use a real Postgres (docker compose service `db`, or the CI service container).
 TEST_DATABASE_URL = os.environ.get(
@@ -37,8 +38,13 @@ def settings() -> Settings:
 
 
 @pytest.fixture
-async def app(settings: Settings) -> AsyncIterator[FastAPI]:
-    application = create_app(settings)
+def storage() -> FakeStorage:
+    return FakeStorage()
+
+
+@pytest.fixture
+async def app(settings: Settings, storage: FakeStorage) -> AsyncIterator[FastAPI]:
+    application = create_app(settings, storage=storage)
     async with application.router.lifespan_context(application):
         yield application
 
@@ -64,3 +70,7 @@ async def clean_tables(app: FastAPI) -> AsyncIterator[None]:
     tables = ", ".join(t.name for t in Base.metadata.sorted_tables)
     async with app.state.db.engine.begin() as conn:
         await conn.exec_driver_sql(f"TRUNCATE {tables} CASCADE")
+
+
+def auth_headers(user_id: object) -> dict[str, str]:
+    return {"Authorization": f"Bearer {hs256_token(sub=user_id)}"}

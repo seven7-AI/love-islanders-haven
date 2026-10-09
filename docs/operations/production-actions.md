@@ -12,6 +12,7 @@ Changes merged to the repository that only take effect once someone with access 
 | #6 | Delete the `send-verification-email` and `ai-companion-proactive` edge functions | `supabase functions delete send-verification-email --project-ref <project-ref>` and the same for `ai-companion-proactive` | Pending |
 | #6 | Require email confirmation and allow the callback URL | Supabase dashboard → Authentication → Providers → Email: enable "Confirm email"; URL Configuration → Redirect URLs: add `https://<app-domain>/auth/callback` | Pending |
 | #7 | Apply migration `20261009130000_enforce_matching_rules.sql` (merges any duplicate reversed matches, keeping messages) | `supabase db push` | Pending |
+| #13 | Deploy the API with `DATABASE_URL` (Supabase direct connection), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CORS_ORIGINS`; run `alembic stamp 0001` (after #36); build the web app with `VITE_API_URL` | see `backend/README.md`, `docs/database/migrations.md` | Pending |
 
 ## Known residual risks
 - Signed-in users can read other users' `dob` (and other profile columns) through the `profiles` table until profile reads move behind the API (#13).

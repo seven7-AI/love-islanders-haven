@@ -13,9 +13,13 @@ A FastAPI + Postgres + Alembic backend is being introduced. See [docs/STATUS.md]
 ## Getting started
 ```bash
 npm ci
-cp .env.example .env   # fill in VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY
+cp .env.example .env   # fill in VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_API_URL
+make up                # Postgres + API (see backend/README.md; needs SUPABASE_URL or SUPABASE_JWT_SECRET)
+make migrate
 npm run dev            # http://localhost:8080
 ```
+Profiles, onboarding and photos go through the API (`backend/`); the remaining features still use Supabase directly
+until they are moved (see docs/STATUS.md).
 
 ## Checks
 ```bash

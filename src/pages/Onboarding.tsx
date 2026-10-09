@@ -9,11 +9,9 @@ import { OnboardingLifestyle } from '@/components/onboarding/OnboardingLifestyle
 import { OnboardingPersonality } from '@/components/onboarding/OnboardingPersonality';
 import { OnboardingPreferences } from '@/components/onboarding/OnboardingPreferences';
 import { OnboardingCompletion } from '@/components/onboarding/OnboardingCompletion';
-import { updateOnboardingProgress } from '@/services/profiles/onboarding';
+import { getMyProfile, setOnboardingStep, updateMyProfile, type OnboardingStep } from '@/lib/api/profile';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-
-type OnboardingStep = 'basics' | 'photos' | 'interests' | 'lifestyle' | 'personality' | 'preferences' | 'completed';
 
 const steps: OnboardingStep[] = ['basics', 'photos', 'interests', 'lifestyle', 'personality', 'preferences', 'completed'];
 
@@ -44,39 +42,21 @@ export const Onboarding = () => {
       }
       
       try {
-        const { data: onboardingData } = await supabase
-          .from('profile_onboarding')
-          .select('*')
-          .eq('profile_id', data.session.user.id)
-          .single();
-        
-        if (onboardingData?.completed) {
+        const profile = await getMyProfile();
+        if (profile.onboarding_completed) {
           navigate('/discover', { replace: true });
           return;
         }
-        
-        if (onboardingData?.current_step) {
-          setCurrentStep(onboardingData.current_step as OnboardingStep);
+        if (profile.onboarding_step && steps.includes(profile.onboarding_step as OnboardingStep)) {
+          setCurrentStep(profile.onboarding_step as OnboardingStep);
         }
-        
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', data.session.user.id)
-          .single();
-          
-        if (profileData) {
-          setProfileData({ ...profileData, id: data.session.user.id });
-        } else {
-          setProfileData({ id: data.session.user.id });
-        }
-      } catch (error) {
-        console.error("Error loading onboarding data:", error);
-        // Still allow continuing if no onboarding record exists
-        const { data: user } = await supabase.auth.getUser();
-        if (user.user) {
-          setProfileData({ id: user.user.id });
-        }
+        setProfileData(profile);
+      } catch (error: any) {
+        toast({
+          title: "Could not load your profile",
+          description: error.message || "Please try again.",
+          variant: "destructive"
+        });
       } finally {
         setIsLoading(false);
       }
@@ -92,53 +72,14 @@ export const Onboarding = () => {
       const updatedProfileData = { ...profileData, ...stepData };
       setProfileData(updatedProfileData);
       
-      // Whitelist of valid profile columns (matches DB schema)
-      const profileFields = new Set([
-        'name', 'display_name', 'bio', 'age', 'dob', 'gender', 'gender_preference',
-        'location', 'city', 'country', 'hometown', 'pronouns', 'avatar_url',
-        'interests', 'height_cm', 'occupation', 'education', 'exercise',
-        'drinking_habit', 'smoking_habit', 'relationship_goal', 'communication_style',
-        'love_language', 'zodiac_sign', 'age_range_min', 'age_range_max',
-        'distance_preference', 'show_me_verified_only', 'show_age',
-        'onboarding_completed',
-      ]);
-      const profileUpdate: any = {};
-      for (const key of Object.keys(stepData)) {
-        if (profileFields.has(key) && stepData[key] !== undefined) {
-          profileUpdate[key] = stepData[key];
-        }
-      }
-
       const currentIndex = steps.indexOf(currentStep);
       const nextStep = steps[currentIndex + 1] as OnboardingStep;
-      if (nextStep === 'completed') {
-        profileUpdate.onboarding_completed = true;
-      }
 
-      if (Object.keys(profileUpdate).length > 0) {
-        // Upsert to be safe in case the row doesn't exist yet
-        const { error: upsertError } = await supabase
-          .from('profiles')
-          .upsert({ id: profileData.id, ...profileUpdate }, { onConflict: 'id' });
+      // Unknown and server-managed fields (age, verification flags) are dropped by updateMyProfile.
+      await updateMyProfile(stepData);
+      // The server checks that the profile is complete before accepting 'completed'.
+      await setOnboardingStep(nextStep);
 
-        if (upsertError) {
-          console.error('Profile upsert error:', upsertError);
-          throw upsertError;
-        }
-      }
-
-      // Ensure onboarding tracking row exists, then update step
-      try {
-        await supabase
-          .from('profile_onboarding')
-          .upsert(
-            { profile_id: profileData.id, current_step: nextStep, completed: nextStep === 'completed' },
-            { onConflict: 'profile_id' }
-          );
-      } catch (onboardingError) {
-        console.error('Onboarding progress update error:', onboardingError);
-      }
-      
       setCurrentStep(nextStep);
       
       if (nextStep === 'completed') {
@@ -171,9 +112,7 @@ export const Onboarding = () => {
       setCurrentStep(previousStep);
       
       try {
-        await updateOnboardingProgress({
-          current_step: previousStep
-        });
+        await setOnboardingStep(previousStep);
       } catch (error) {
         console.error('Error updating onboarding progress:', error);
       }
