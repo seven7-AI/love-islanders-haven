@@ -31,6 +31,6 @@ for f in "$root"/supabase/migrations/*.sql; do psql "$src" -qX -v ON_ERROR_STOP=
 } | psql "$src" -qX -v ON_ERROR_STOP=1 >/dev/null
 unset PGOPTIONS
 
-(cd "$root/backend" && DATABASE_URL="${dst/postgresql:/postgresql+asyncpg:}" uv run alembic upgrade head >/dev/null 2>&1)
+(cd "$root/backend" && DATABASE_URL="${dst/postgresql:/postgresql+asyncpg:}" uv run alembic upgrade head >/dev/null)
 "$here/copy-data.sh" "$src" "$dst"
 echo "Copy drill passed"

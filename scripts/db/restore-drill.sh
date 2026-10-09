@@ -19,7 +19,7 @@ cleanup() {
 trap cleanup EXIT
 
 psql "$admin" -qX -c "create database $src_db" -c "create database $dst_db"
-(cd "$root/backend" && DATABASE_URL="${src/postgresql:/postgresql+asyncpg:}" uv run alembic upgrade head >/dev/null 2>&1)
+(cd "$root/backend" && DATABASE_URL="${src/postgresql:/postgresql+asyncpg:}" uv run alembic upgrade head >/dev/null)
 psql "$src" -qX -v ON_ERROR_STOP=1 -f "$here/seed-sample.sql" >/dev/null
 
 file="$("$here/backup.sh" "$src" "$out")"
