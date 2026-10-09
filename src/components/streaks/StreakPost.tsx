@@ -2,8 +2,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Flame, User } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Heart, Flame, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { StreakPost as StreakPostType } from "./types";
 import { 
@@ -16,23 +15,23 @@ import {
 
 interface StreakPostProps {
   post: StreakPostType;
-  onLike: () => void;
+  /** Saves the like state; resolves to the server's like count, or null if it failed. */
+  onLike: (liked: boolean) => Promise<number | null>;
 }
 
 const StreakPost = ({ post, onLike }: StreakPostProps) => {
-  const [liked, setLiked] = useState(false);
-  const [showComments, setShowComments] = useState(false);
-  const [commentText, setCommentText] = useState("");
+  const [liked, setLiked] = useState(post.liked_by_me);
+  const [likesCount, setLikesCount] = useState(post.likes_count);
+  const [saving, setSaving] = useState(false);
 
-  const handleLike = () => {
-    if (!liked) {
-      setLiked(true);
-      onLike();
+  const handleLike = async () => {
+    setSaving(true);
+    const count = await onLike(!liked);
+    if (count !== null) {
+      setLiked(!liked);
+      setLikesCount(count);
     }
-  };
-
-  const handleComment = () => {
-    setShowComments(!showComments);
+    setSaving(false);
   };
 
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
@@ -112,45 +111,21 @@ const StreakPost = ({ post, onLike }: StreakPostProps) => {
       </CardContent>
       <CardFooter className="px-4 py-2 flex justify-between">
         <div className="flex gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleLike} 
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLike}
+            disabled={saving}
+            aria-pressed={liked}
+            aria-label={liked ? 'Unlike' : 'Like'}
             className={`flex items-center gap-1 ${liked ? 'text-love' : ''}`}
           >
             <Heart className={`h-5 w-5 ${liked ? 'fill-love' : ''}`} />
-            <span>{post.likes_count + (liked && !post.likes_count.toString().includes('+1') ? ' +1' : '')}</span>
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleComment} 
-            className="flex items-center gap-1"
-          >
-            <MessageCircle className="h-5 w-5" />
-            <span>{post.comments_count}</span>
+            <span>{likesCount}</span>
           </Button>
         </div>
       </CardFooter>
       
-      {showComments && (
-        <div className="px-4 py-2">
-          <Separator className="my-2" />
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">No comments yet. Be the first to comment!</p>
-            <div className="flex gap-2">
-              <input 
-                type="text" 
-                value={commentText} 
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Add a comment..." 
-                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
-              />
-              <Button size="sm">Post</Button>
-            </div>
-          </div>
-        </div>
-      )}
     </Card>
   );
 };

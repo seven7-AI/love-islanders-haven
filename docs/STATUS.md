@@ -22,7 +22,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 13 | 4 Features | Profiles, images, onboarding via API | ✅ (deployment pending) |
 | 14 | 4 Features | Discover, swipes, matches via API | ✅ |
 | 15 | 4 Features | Messaging via API | ✅ (production action pending) |
-| 16 | 4 Features | Streaks via API | ⏳ |
+| 16 | 4 Features | Streaks via API | ✅ (job scheduling pending) |
 | 17 | 4 Features | Settings, privacy, blocking, reports, safety | ⏳ |
 | 18 | 4 Features | Notifications | ⏳ |
 | 19 | 4 Features | AI companion on LLM provider interface | ⏳ (live check ⛔ OpenAI key) |

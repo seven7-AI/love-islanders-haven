@@ -8,7 +8,7 @@ import AdSense from "@/components/ads/AdSense";
 interface StreaksListProps {
   loading: boolean;
   posts: StreakPostType[];
-  onLike: (postId: string) => void;
+  onLike: (postId: string, liked: boolean) => Promise<number | null>;
 }
 
 const StreaksList = ({ loading, posts, onLike }: StreaksListProps) => {
@@ -29,7 +29,7 @@ const StreaksList = ({ loading, posts, onLike }: StreaksListProps) => {
       <StreakPost 
         key={post.id} 
         post={post}
-        onLike={() => onLike(post.id)}
+        onLike={(liked) => onLike(post.id, liked)}
       />
     );
     
