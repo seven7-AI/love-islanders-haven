@@ -11,9 +11,23 @@ import LoginRequired from "@/components/streaks/LoginRequired";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { fetchStreakPosts } from "@/hooks/streaks/api/streak-posts";
-import { checkUserDailyPost, getTopStreaks } from "@/hooks/streaks/api/streak-interactions";
+import { fetchStreakFeed, getLeaderboard, getStreakStatus, StreakPostData } from "@/lib/api/streaks";
+import type { StreakPost } from "@/components/streaks/types";
 import useStreaksActions from "@/hooks/streaks/use-streaks-actions";
+
+const toPost = (p: StreakPostData): StreakPost => ({
+  id: p.id,
+  user_id: p.user_id,
+  content: p.images,
+  caption: p.caption ?? undefined,
+  created_at: p.created_at,
+  streak_count: p.streak_count,
+  likes_count: p.likes_count,
+  liked_by_me: p.liked_by_me,
+  user_name: p.author_name ?? 'Someone',
+  user_profile_image: p.author_photo_url ?? undefined,
+  expires_at: p.expires_at ?? undefined,
+});
 
 const Streaks = () => {
   const { isAuthenticated, user } = useAuth();
@@ -21,10 +35,11 @@ const Streaks = () => {
   
   // State
   const [loading, setLoading] = useState(true);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<StreakPost[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
   const [hasPostedToday, setHasPostedToday] = useState(false);
   const [userStreakCount, setUserStreakCount] = useState(0);
-  const [topStreaks, setTopStreaks] = useState([]);
+  const [topStreaks, setTopStreaks] = useState<{ id: string; name: string; count: number }[]>([]);
   const [showPostForm, setShowPostForm] = useState(false);
   
   // Load data
@@ -33,20 +48,12 @@ const Streaks = () => {
     
     setLoading(true);
     try {
-      // Get streak posts
-      const postsData = await fetchStreakPosts();
-      setPosts(postsData);
-      
-      // Check if user has posted today
-      if (user?.id) {
-        const { hasPostedToday: postedToday, streakCount } = await checkUserDailyPost(user.id);
-        setHasPostedToday(postedToday);
-        setUserStreakCount(streakCount);
-      }
-      
-      // Get top streaks
-      const topStreaksData = await getTopStreaks();
-      setTopStreaks(topStreaksData);
+      const [feed, status, leaderboard] = await Promise.all([fetchStreakFeed(), getStreakStatus(), getLeaderboard()]);
+      setPosts(feed.posts.map(toPost));
+      setCursor(feed.next_cursor);
+      setHasPostedToday(status.has_posted_today);
+      setUserStreakCount(status.streak_count);
+      setTopStreaks(leaderboard.map((e) => ({ id: e.user_id, name: e.name ?? 'Anonymous', count: e.streak_count })));
     } catch (error) {
       console.error("Error fetching data:", error);
       toast({
@@ -67,7 +74,18 @@ const Streaks = () => {
   }, [isAuthenticated]);
   
   // Actions
-  const { handlePostSubmit, handleLikePost, isSubmitting } = useStreaksActions(user, fetchData);
+  const { handlePostSubmit, handleLikePost, isSubmitting } = useStreaksActions();
+
+  const loadMore = async () => {
+    if (!cursor) return;
+    try {
+      const feed = await fetchStreakFeed(cursor);
+      setPosts((prev) => [...prev, ...feed.posts.map(toPost)]);
+      setCursor(feed.next_cursor);
+    } catch (error) {
+      toast({ title: "Error", description: "Could not load more posts.", variant: "destructive" });
+    }
+  };
   
   const onPostSubmit = async (postData) => {
     const success = await handlePostSubmit(postData);
@@ -127,6 +145,11 @@ const Streaks = () => {
             posts={posts} 
             onLike={handleLikePost} 
           />
+          {cursor && !loading && (
+            <Button variant="secondary" className="w-full mt-4" onClick={loadMore}>
+              Load more
+            </Button>
+          )}
         </div>
       </ScrollArea>
       <Navbar />

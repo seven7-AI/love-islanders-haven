@@ -29,6 +29,13 @@ Auth tests use locally generated keys and a local JWKS endpoint (`tests/auth_hel
 Auth; they verify the API's token handling, not Supabase itself.
 Tests use a real Postgres (`TEST_DATABASE_URL`, default `postgresql+asyncpg://postgres:postgres@localhost:5433/love_islander_test`).
 
+## Scheduled jobs
+| Command | Schedule | Purpose |
+|---|---|---|
+| `python -m app.jobs.expire_streaks --retention-hours 24` | hourly | Deletes streak posts that expired more than the retention period ago, and their photos. Posts whose photos cannot be deleted are kept and retried on the next run. |
+
+Run them with the same environment as the API (e.g. a cron job or the hosting platform's scheduler running the API image).
+
 ## Configuration
 | Variable | Required | Default | Purpose |
 |---|---|---|---|
