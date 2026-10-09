@@ -17,6 +17,7 @@ import Signup from '@/pages/Signup';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import AuthCallback from '@/pages/AuthCallback';
+import CalendarCallback from '@/pages/CalendarCallback';
 import NotFound from '@/pages/NotFound';
 import { Toaster as ToastContainer } from 'sonner';
 import MobileNavigation from '@/components/MobileNavigation';
@@ -77,6 +78,14 @@ function App() {
             {/* Not redirected when signed in: the recovery link itself creates the session. */}
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route
+              path="/calendar/callback"
+              element={
+                <PrivateRoute guardOnboarding={false}>
+                  <CalendarCallback />
+                </PrivateRoute>
+              }
+            />
             
             <Route
               path="/onboarding"

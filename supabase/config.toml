@@ -14,7 +14,3 @@ additional_redirect_urls = [
 
 [auth.email]
 enable_confirmations = true
-
-# Google redirects the browser here without a Supabase JWT.
-[functions.google-calendar-callback]
-verify_jwt = false
