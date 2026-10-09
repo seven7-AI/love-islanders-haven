@@ -27,6 +27,11 @@ class Settings(BaseSettings):
     supabase_service_role_key: str | None = None
     profile_images_bucket: str = "profile-images"
     chat_media_bucket: str = "chat-media"
+    # AI companion (OpenAI-compatible Chat Completions). Without a key the companion endpoints answer 503.
+    llm_api_key: str | None = None
+    llm_model: str = "gpt-4o-mini"
+    llm_base_url: str = "https://api.openai.com/v1"
+    companion_messages_per_hour: int = 30
     db_pool_size: int = 5
     db_pool_timeout_seconds: float = 5.0
 
