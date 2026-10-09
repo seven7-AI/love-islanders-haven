@@ -35,7 +35,7 @@ export const updateUserProfile = async (profileData: Partial<SupabaseProfile>) =
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     // For development or when Supabase auth is not fully available
-    let userId = user?.id;
+    const userId = user?.id;
     const devMode = !userId && (localStorage.getItem('isAuthenticated') === 'true' || import.meta.env.MODE === 'development');
     
     if (!userId && !devMode) {

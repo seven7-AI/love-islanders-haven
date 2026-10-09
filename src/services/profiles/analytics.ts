@@ -33,7 +33,7 @@ export const fetchProfileStats = async (timeRange: 'week' | 'month' | 'year'): P
   
   // Get date range for query
   const now = new Date();
-  let startDate = new Date();
+  const startDate = new Date();
   
   if (timeRange === 'week') {
     startDate.setDate(now.getDate() - 7);

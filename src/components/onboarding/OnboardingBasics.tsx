@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import DateOfBirthPicker from './DateOfBirthPicker';
+import { calculateAge, toDateOnlyString } from '@/lib/age';
 
 interface OnboardingBasicsProps {
   initialData: any;
@@ -24,16 +25,6 @@ export function OnboardingBasics({
   const [gender, setGender] = useState<string>(initialData?.gender || 'male');
   const [genderPreference, setGenderPreference] = useState<string>(initialData?.gender_preference || 'both');
   
-  const calculateAge = (birthdate: Date): number => {
-    const today = new Date();
-    let age = today.getFullYear() - birthdate.getFullYear();
-    const m = today.getMonth() - birthdate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -45,7 +36,7 @@ export function OnboardingBasics({
     
     await onNext({
       name,
-      dob: date?.toISOString().split('T')[0],
+      dob: toDateOnlyString(date),
       age,
       gender,
       gender_preference: genderPreference,

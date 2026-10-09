@@ -24,7 +24,7 @@ export const updateSettingsCategory = async <T extends keyof UserSettings>(
     const userId = userData.user.id;
     
     // Map settings category to simple table columns
-    let updateData: Record<string, any> = {
+    const updateData: Record<string, any> = {
       updated_at: new Date().toISOString()
     };
     

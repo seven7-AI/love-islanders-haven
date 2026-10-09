@@ -22,7 +22,7 @@ export const fetchUserProfile = async () => {
       throw new Error('Authentication error');
     }
     
-    let userId = user?.id;
+    const userId = user?.id;
     
     if (!userId) {
       console.warn('No authenticated user found');
@@ -32,7 +32,7 @@ export const fetchUserProfile = async () => {
     console.log('fetchUserProfile: User authenticated, id:', userId);
 
     // Fetch the user's profile data
-    let { data: profileData, error: profileError } = await supabase
+    const { data: existingProfile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -42,7 +42,8 @@ export const fetchUserProfile = async () => {
       console.error('Error fetching profile:', profileError);
       throw profileError;
     }
-    
+
+    let profileData = existingProfile;
     if (!profileData) {
       console.warn('No profile found for user:', userId);
       const fallbackName = user.user_metadata?.name || user.email?.split('@')[0] || 'New User';
