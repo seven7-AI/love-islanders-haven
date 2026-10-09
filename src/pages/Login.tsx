@@ -32,7 +32,6 @@ const Login = () => {
         return;
       }
       if (data.session) {
-        localStorage.setItem('isAuthenticated', 'true');
         toast.success('Welcome back!');
         // Decide destination based on onboarding status
         const { data: profile } = await supabase

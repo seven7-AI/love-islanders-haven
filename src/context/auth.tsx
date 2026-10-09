@@ -170,10 +170,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(true);
     try {
       await supabase.auth.signOut();
-      localStorage.removeItem('emailVerificationCompleted');
-      localStorage.removeItem('isAuthenticated');
-      localStorage.removeItem('authMethod');
-      localStorage.removeItem('authContact');
+      // Remove flags written by earlier versions of the app; they no longer affect anything.
+      for (const key of ['emailVerificationCompleted', 'isAuthenticated', 'authMethod', 'authContact', 'verificationCode']) {
+        localStorage.removeItem(key);
+      }
     } finally {
       setLoading(false);
     }

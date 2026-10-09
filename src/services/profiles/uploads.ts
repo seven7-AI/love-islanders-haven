@@ -10,14 +10,8 @@ export const uploadProfileImage = async (file: File, position: number = 0): Prom
   // First, check for valid session
   const { data, error: sessionError } = await supabase.auth.getSession();
   
-  let userId = data.session?.user.id;
-  
-  // If no userId but localStorage shows authenticated, create a development user ID
-  if (!userId && (localStorage.getItem('isAuthenticated') === 'true' || import.meta.env.MODE === 'development')) {
-    console.log('Using development user ID for uploads');
-    userId = 'dev-user-123';
-  }
-  
+  const userId = data.session?.user.id;
+
   if (!userId) {
     toast.error("Authentication required to upload images");
     throw new Error('User not authenticated');

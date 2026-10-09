@@ -16,6 +16,8 @@ import Privacy from '@/pages/Privacy';
 import Signup from '@/pages/Signup';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import AuthCallback from '@/pages/AuthCallback';
+import NotFound from '@/pages/NotFound';
 import { Toaster as ToastContainer } from 'sonner';
 import MobileNavigation from '@/components/MobileNavigation';
 import useOnline from '@/hooks/useOnline';
@@ -74,6 +76,7 @@ function App() {
             <Route path="/forgot-password" element={isAuthenticated && user ? <Navigate to="/discover" replace /> : <ForgotPassword />} />
             {/* Not redirected when signed in: the recovery link itself creates the session. */}
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             
             <Route
               path="/onboarding"
@@ -161,10 +164,11 @@ function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/" element={<Navigate to="/discover" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           
           {/* Hide MobileNavigation on auth/onboarding routes */}
-          {isAuthenticated && user && !['/onboarding', '/login', '/signup', '/verify', '/forgot-password', '/reset-password'].includes(location.pathname) && (
+          {isAuthenticated && user && !['/onboarding', '/login', '/signup', '/verify', '/forgot-password', '/reset-password', '/auth/callback'].includes(location.pathname) && (
             <MobileNavigation />
           )}
           
