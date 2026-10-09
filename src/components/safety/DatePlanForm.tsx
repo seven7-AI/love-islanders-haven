@@ -61,17 +61,33 @@ const DatePlanForm = ({ contacts, isSaving, onSubmit }: DatePlanFormProps) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="plan-title">What's the plan?</Label>
-        <Input id="plan-title" placeholder="Coffee, dinner, a walk…" value={title} onChange={(e) => setTitle(e.target.value)} required />
+        <Input
+          id="plan-title"
+          placeholder="Coffee, dinner, a walk…"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="plan-partner">Who are you meeting?</Label>
-        <Input id="plan-partner" placeholder="Their name" value={partnerName} onChange={(e) => setPartnerName(e.target.value)} />
+        <Input
+          id="plan-partner"
+          placeholder="Their name"
+          value={partnerName}
+          onChange={(e) => setPartnerName(e.target.value)}
+        />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="plan-location">Meeting location</Label>
-        <Input id="plan-location" placeholder="Where you're meeting" value={location} onChange={(e) => setLocation(e.target.value)} />
+        <Input
+          id="plan-location"
+          placeholder="Where you're meeting"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-2">
@@ -85,7 +101,13 @@ const DatePlanForm = ({ contacts, isSaving, onSubmit }: DatePlanFormProps) => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
-              <Calendar mode="single" selected={day} onSelect={setDay} initialFocus className="p-3 pointer-events-auto" />
+              <Calendar
+                mode="single"
+                selected={day}
+                onSelect={setDay}
+                initialFocus
+                className="p-3 pointer-events-auto"
+              />
             </PopoverContent>
           </Popover>
         </div>
@@ -97,7 +119,12 @@ const DatePlanForm = ({ contacts, isSaving, onSubmit }: DatePlanFormProps) => {
 
       <div className="space-y-2">
         <Label htmlFor="plan-notes">Notes</Label>
-        <Textarea id="plan-notes" placeholder="Anything your contact should know" value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <Textarea
+          id="plan-notes"
+          placeholder="Anything your contact should know"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
       </div>
 
       <div className="space-y-2">

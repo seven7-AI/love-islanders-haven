@@ -1,12 +1,14 @@
-import { supabase } from "@/integrations/supabase/client";
-import { getMyProfile } from "@/lib/api/profile";
-import { SupabaseProfile } from "../types";
+import { supabase } from '@/integrations/supabase/client';
+import { getMyProfile } from '@/lib/api/profile';
+import { SupabaseProfile } from '../types';
 
 /**
  * Fetches the signed-in user's profile from the API. Returns null when nobody is signed in.
  */
 export const fetchUserProfile = async (): Promise<(SupabaseProfile & { images: string[] }) | null> => {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) {
     return null;
   }

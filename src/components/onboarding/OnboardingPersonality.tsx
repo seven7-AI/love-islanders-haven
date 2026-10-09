@@ -9,15 +9,19 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
-  bio: z.string().min(20, { message: "Bio must be at least 20 characters" })
-    .max(500, { message: "Bio must be 500 characters or less" }),
-  relationship_goal: z.enum(["long_term", "short_term", "friends", "figuring_out"], {
+  bio: z
+    .string()
+    .min(20, { message: 'Bio must be at least 20 characters' })
+    .max(500, { message: 'Bio must be 500 characters or less' }),
+  relationship_goal: z.enum(['long_term', 'short_term', 'friends', 'figuring_out'], {
     required_error: "Please select what you're looking for",
   }),
-  communication_style: z.enum(["texting", "calling", "video_chat", "in_person"], {
-    required_error: "Please select your style",
-  }).optional(),
-  love_language: z.enum(["words", "touch", "gifts", "time", "service"]).optional(),
+  communication_style: z
+    .enum(['texting', 'calling', 'video_chat', 'in_person'], {
+      required_error: 'Please select your style',
+    })
+    .optional(),
+  love_language: z.enum(['words', 'touch', 'gifts', 'time', 'service']).optional(),
   zodiac: z.string().optional(),
 });
 
@@ -28,16 +32,16 @@ interface OnboardingPersonalityProps {
   isSubmitting: boolean;
 }
 
-const OptionButton = ({ 
-  value, 
-  label, 
-  selected, 
+const OptionButton = ({
+  value,
+  label,
+  selected,
   onClick,
-  emoji
-}: { 
-  value: string; 
-  label: string; 
-  selected: boolean; 
+  emoji,
+}: {
+  value: string;
+  label: string;
+  selected: boolean;
   onClick: () => void;
   emoji?: string;
 }) => (
@@ -45,10 +49,8 @@ const OptionButton = ({
     type="button"
     onClick={onClick}
     className={cn(
-      "px-4 py-2 rounded-full text-sm transition-all",
-      selected 
-        ? "bg-love text-white" 
-        : "bg-island-light/20 text-white/80 hover:bg-island-light/30"
+      'px-4 py-2 rounded-full text-sm transition-all',
+      selected ? 'bg-love text-white' : 'bg-island-light/20 text-white/80 hover:bg-island-light/30',
     )}
   >
     {emoji && <span className="mr-1">{emoji}</span>}
@@ -67,19 +69,19 @@ export const OnboardingPersonality = ({ initialData, onNext, onBack, isSubmittin
       zodiac: initialData?.zodiac_sign || initialData?.zodiac || undefined,
     },
   });
-  
+
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     onNext({
       ...data,
       zodiac_sign: data.zodiac,
     });
   };
-  
+
   return (
     <div className="bg-island-dark/80 backdrop-blur-sm rounded-lg p-6 text-white animate-fade-in shadow-lg border border-island-light/30">
       <h1 className="text-2xl font-bold mb-2 text-gradient">About You</h1>
       <p className="text-gray-300 mb-6">Let potential matches know who you are.</p>
-      
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           {/* Bio */}
@@ -98,15 +100,13 @@ export const OnboardingPersonality = ({ initialData, onNext, onBack, isSubmittin
                 </FormControl>
                 <div className="flex justify-between text-xs text-gray-400">
                   <span>{field.value.length}/500 characters</span>
-                  {field.value.length < 20 && (
-                    <span className="text-love">At least 20 characters required</span>
-                  )}
+                  {field.value.length < 20 && <span className="text-love">At least 20 characters required</span>}
                 </div>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
+
           {/* Relationship Goal */}
           <FormField
             control={form.control}
@@ -135,7 +135,7 @@ export const OnboardingPersonality = ({ initialData, onNext, onBack, isSubmittin
               </FormItem>
             )}
           />
-          
+
           {/* Communication Style */}
           <FormField
             control={form.control}
@@ -164,7 +164,7 @@ export const OnboardingPersonality = ({ initialData, onNext, onBack, isSubmittin
               </FormItem>
             )}
           />
-          
+
           {/* Love Language */}
           <FormField
             control={form.control}
@@ -193,7 +193,7 @@ export const OnboardingPersonality = ({ initialData, onNext, onBack, isSubmittin
               </FormItem>
             )}
           />
-          
+
           {/* Zodiac */}
           <FormField
             control={form.control}
@@ -226,29 +226,21 @@ export const OnboardingPersonality = ({ initialData, onNext, onBack, isSubmittin
               </FormItem>
             )}
           />
-          
+
           <div className="flex space-x-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={onBack}
-              className="flex-1"
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={onBack} className="flex-1" disabled={isSubmitting}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
-            <Button 
-              type="submit" 
-              className="flex-1 bg-love hover:bg-love-dark"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" className="flex-1 bg-love hover:bg-love-dark" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
-              ) : "Continue"}
+              ) : (
+                'Continue'
+              )}
             </Button>
           </div>
         </form>

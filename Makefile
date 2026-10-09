@@ -3,7 +3,7 @@
 # Local compose database unless overridden (e.g. DATABASE_URL=... make migrate).
 DATABASE_URL ?= postgresql+asyncpg://postgres:postgres@localhost:$(or $(DB_PORT),5433)/love_islander
 export DATABASE_URL
-.PHONY: help up down db api-test api-lint api-typecheck api-check web-check check migrate migration db-backup db-restore-drill
+.PHONY: help up down db api-test api-lint api-typecheck api-check web-check check migrate migration db-backup db-restore-drill security-check ci
 
 help:
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -28,10 +28,10 @@ api-test: db ## Backend tests against the compose Postgres
 
 api-check: api-lint api-typecheck api-test ## All backend checks
 
-web-check: ## Frontend lint, typecheck, tests, build
-	npm run lint && npm run typecheck && npm test && npm run build
+web-check: ## Frontend format check, lint, typecheck, tests, build
+	npm run format:check && npm run lint && npm run typecheck && npm test && npm run build
 
-check: web-check api-check ## Everything CI runs (except the Supabase policy tests: npm run test:db)
+check: web-check api-check ## Web + API checks (fast local loop)
 
 migrate: db ## Apply Alembic migrations to the local database
 	cd backend && uv run alembic upgrade head
@@ -45,3 +45,12 @@ db-backup: ## Back up the local database to backups/
 db-restore-drill: db ## Backup/restore drill + Supabase→Alembic copy drill on disposable databases
 	scripts/db/restore-drill.sh postgresql://postgres:postgres@localhost:$(or $(DB_PORT),5433)/postgres
 	scripts/db/copy-drill.sh postgresql://postgres:postgres@localhost:$(or $(DB_PORT),5433)/postgres
+
+security-check: ## npm audit (runtime), pip-audit, gitleaks — as in CI
+	npm audit --omit=dev --audit-level=high
+	cd backend && uv export --frozen --format requirements-txt --no-hashes > /tmp/love-islander-requirements.txt && uvx pip-audit -r /tmp/love-islander-requirements.txt
+	docker run --rm -v "$(CURDIR):/repo" ghcr.io/gitleaks/gitleaks:v8.21.2 git /repo --no-banner --redact
+
+ci: web-check api-check db-restore-drill security-check ## Every CI job locally (needs Docker; E2E downloads the Supabase stack)
+	npm run test:db
+	npm run test:e2e

@@ -46,14 +46,38 @@ export interface OwnProfile {
   images: ProfileImage[];
 }
 
-export type OnboardingStep = 'basics' | 'photos' | 'interests' | 'lifestyle' | 'personality' | 'preferences' | 'completed';
+export type OnboardingStep =
+  'basics' | 'photos' | 'interests' | 'lifestyle' | 'personality' | 'preferences' | 'completed';
 
 /** Fields the API accepts in PATCH /v1/me/profile (server-managed fields are rejected). */
 const EDITABLE_FIELDS = [
-  'name', 'display_name', 'bio', 'dob', 'gender', 'gender_preference', 'relationship_goal', 'height_cm',
-  'occupation', 'education', 'exercise', 'drinking_habit', 'smoking_habit', 'communication_style',
-  'love_language', 'zodiac_sign', 'hometown', 'pronouns', 'location', 'city', 'country', 'interests',
-  'age_range_min', 'age_range_max', 'distance_preference', 'show_age', 'show_me_verified_only',
+  'name',
+  'display_name',
+  'bio',
+  'dob',
+  'gender',
+  'gender_preference',
+  'relationship_goal',
+  'height_cm',
+  'occupation',
+  'education',
+  'exercise',
+  'drinking_habit',
+  'smoking_habit',
+  'communication_style',
+  'love_language',
+  'zodiac_sign',
+  'hometown',
+  'pronouns',
+  'location',
+  'city',
+  'country',
+  'interests',
+  'age_range_min',
+  'age_range_max',
+  'distance_preference',
+  'show_age',
+  'show_me_verified_only',
 ] as const;
 
 const CAMEL_ALIASES: Record<string, string> = {

@@ -59,7 +59,12 @@ const InlineChatHeader: React.FC<InlineChatHeaderProps> = ({ matchName, partnerI
         {partnerId && (
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-white hover:bg-island-light/20" aria-label="Chat options">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-island-light/20"
+                aria-label="Chat options"
+              >
                 <MoreVertical size={18} />
               </Button>
             </DropdownMenuTrigger>
@@ -75,7 +80,13 @@ const InlineChatHeader: React.FC<InlineChatHeaderProps> = ({ matchName, partnerI
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-white hover:bg-island-light/20" aria-label="Close chat">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="text-white hover:bg-island-light/20"
+          aria-label="Close chat"
+        >
           <X size={18} />
         </Button>
       </div>

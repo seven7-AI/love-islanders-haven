@@ -1,7 +1,6 @@
-
-import { Award, Flame, User } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TopStreak } from "./types";
+import { Award, Flame, User } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TopStreak } from './types';
 
 interface TopStreaksCardProps {
   topStreaks: TopStreak[];
@@ -30,9 +29,7 @@ const TopStreaksCard = ({ topStreaks }: TopStreaksCardProps) => {
               </div>
             ))
           ) : (
-            <div className="text-center py-2 text-muted-foreground">
-              No active streaks yet.
-            </div>
+            <div className="text-center py-2 text-muted-foreground">No active streaks yet.</div>
           )}
         </div>
       </CardContent>

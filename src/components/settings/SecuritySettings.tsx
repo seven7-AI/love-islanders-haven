@@ -32,9 +32,7 @@ const SecuritySettings = () => {
       <div className="space-y-6">
         <div className="space-y-3">
           <h4 className="text-sm font-medium text-love">Password</h4>
-          <p className="text-xs text-muted-foreground">
-            We'll email you a link to choose a new password.
-          </p>
+          <p className="text-xs text-muted-foreground">We'll email you a link to choose a new password.</p>
           <Button variant="outline" className="w-full" onClick={handleChangePassword} disabled={isSending}>
             {isSending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Change password

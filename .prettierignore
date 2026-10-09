@@ -1,0 +1,10 @@
+dist
+coverage
+node_modules
+backend
+supabase
+playwright-report
+test-results
+package-lock.json
+src/integrations/supabase/types.ts
+*.md

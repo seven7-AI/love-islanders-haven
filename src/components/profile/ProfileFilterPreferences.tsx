@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -66,21 +65,21 @@ const ProfileFilterPreferences = ({ onPreferencesUpdated }: ProfileFilterPrefere
       };
 
       await saveDiscoverFilters(discoverFilters);
-      
+
       toast({
-        title: "Preferences Saved",
-        description: "Your discovery preferences have been updated.",
+        title: 'Preferences Saved',
+        description: 'Your discovery preferences have been updated.',
       });
-      
+
       if (onPreferencesUpdated) {
         onPreferencesUpdated();
       }
     } catch (error) {
       console.error('Error saving filters:', error);
       toast({
-        title: "Save Failed",
-        description: "There was an error saving your preferences.",
-        variant: "destructive"
+        title: 'Save Failed',
+        description: 'There was an error saving your preferences.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -90,14 +89,14 @@ const ProfileFilterPreferences = ({ onPreferencesUpdated }: ProfileFilterPrefere
   const handleAgeRangeChange = (value: number[]) => {
     setFilters((prev) => ({
       ...prev,
-      ageRange: value as [number, number]
+      ageRange: value as [number, number],
     }));
   };
 
   const handleDistanceChange = (value: number[]) => {
     setFilters((prev) => ({
       ...prev,
-      distance: value[0]
+      distance: value[0],
     }));
   };
 
@@ -105,12 +104,14 @@ const ProfileFilterPreferences = ({ onPreferencesUpdated }: ProfileFilterPrefere
     <div className="space-y-6">
       <div>
         <h3 className="text-sm font-medium text-white mb-4">Discovery Preferences</h3>
-        
+
         <div className="space-y-8">
           {/* Age Range Slider */}
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label htmlFor="age-range" className="text-sm">Age Range</Label>
+              <Label htmlFor="age-range" className="text-sm">
+                Age Range
+              </Label>
               <Badge variant="outline" className="text-xs">
                 {filters.ageRange[0]} - {filters.ageRange[1]}
               </Badge>
@@ -125,11 +126,13 @@ const ProfileFilterPreferences = ({ onPreferencesUpdated }: ProfileFilterPrefere
               className="my-4"
             />
           </div>
-          
+
           {/* Distance Slider */}
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label htmlFor="distance" className="text-sm">Distance (km)</Label>
+              <Label htmlFor="distance" className="text-sm">
+                Distance (km)
+              </Label>
               <Badge variant="outline" className="text-xs">
                 {filters.distance}
               </Badge>
@@ -146,13 +149,9 @@ const ProfileFilterPreferences = ({ onPreferencesUpdated }: ProfileFilterPrefere
           </div>
         </div>
       </div>
-      
-      <Button 
-        onClick={handleSaveFilters} 
-        disabled={isLoading} 
-        className="w-full"
-      >
-        {isLoading ? "Saving..." : "Save Discovery Preferences"}
+
+      <Button onClick={handleSaveFilters} disabled={isLoading} className="w-full">
+        {isLoading ? 'Saving...' : 'Save Discovery Preferences'}
       </Button>
     </div>
   );

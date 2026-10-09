@@ -1,4 +1,3 @@
-
 import { useRef } from 'react';
 import { Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,14 +10,14 @@ interface MediaUploadButtonProps {
 
 const MediaUploadButton = ({ onFileSelected, type, disabled }: MediaUploadButtonProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     onFileSelected(file, type);
   };
-  
+
   return (
     <>
       <input
@@ -28,7 +27,7 @@ const MediaUploadButton = ({ onFileSelected, type, disabled }: MediaUploadButton
         onChange={handleFileChange}
         ref={fileInputRef}
       />
-      
+
       <Button
         type="button"
         variant="ghost"

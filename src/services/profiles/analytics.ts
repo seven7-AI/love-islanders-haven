@@ -1,4 +1,4 @@
-import { fetchInsights, InsightsRange } from "@/lib/api/insights";
+import { fetchInsights, InsightsRange } from '@/lib/api/insights';
 
 /** Activity numbers for the profile insights page. Rates are null when there is not enough activity yet. */
 export interface ProfileStats {

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Compass, Heart, Bot, Flame, User, LogOut } from 'lucide-react';

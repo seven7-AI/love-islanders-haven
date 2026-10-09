@@ -1,13 +1,6 @@
-
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
-} from "@/components/ui/carousel";
+import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 interface MultiImagePreviewProps {
   images: string[];
@@ -23,13 +16,9 @@ const MultiImagePreview = ({ images, onRemoveImage, isUploading }: MultiImagePre
           {images.map((imageUrl, index) => (
             <CarouselItem key={index} className="relative">
               <div className="aspect-square overflow-hidden">
-                <img 
-                  src={imageUrl} 
-                  alt={`Preview ${index + 1}`} 
-                  className="w-full h-full object-cover"
-                />
+                <img src={imageUrl} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
               </div>
-              <Button 
+              <Button
                 type="button"
                 onClick={() => onRemoveImage(index)}
                 disabled={isUploading}

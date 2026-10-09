@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { LucideIcon } from 'lucide-react';
@@ -11,17 +10,11 @@ interface SwipeButtonProps {
   ariaLabel: string;
 }
 
-const SwipeButton = ({ 
-  onClick, 
-  icon: Icon, 
-  color, 
-  size = 'md', 
-  ariaLabel 
-}: SwipeButtonProps) => {
+const SwipeButton = ({ onClick, icon: Icon, color, size = 'md', ariaLabel }: SwipeButtonProps) => {
   const sizeClasses = {
     sm: 'w-12 h-12',
     md: 'w-14 h-14',
-    lg: 'w-16 h-16'
+    lg: 'w-16 h-16',
   };
 
   // Map color string to actual Tailwind classes
@@ -31,9 +24,9 @@ const SwipeButton = ({
       'green-500': 'text-green-500 border-green-500/20',
       'blue-500': 'text-blue-500 border-blue-500/20',
       'yellow-500': 'text-yellow-500 border-yellow-500/20',
-      'purple-500': 'text-purple-500 border-purple-500/20'
+      'purple-500': 'text-purple-500 border-purple-500/20',
     };
-    
+
     return colorMap[colorName] || `text-${colorName} border-${color}/20`;
   };
 
@@ -41,8 +34,8 @@ const SwipeButton = ({
   const [textColorClass, borderColorClass] = colorClass.split(' ');
 
   return (
-    <button 
-      onClick={onClick} 
+    <button
+      onClick={onClick}
       className={`${sizeClasses[size]} bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center ${borderColorClass} shadow-lg transition-all`}
       aria-label={ariaLabel}
     >

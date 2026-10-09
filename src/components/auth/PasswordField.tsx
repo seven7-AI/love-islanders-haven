@@ -1,9 +1,8 @@
-
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { UseFormReturn } from 'react-hook-form';
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface PasswordFieldProps {
   form: UseFormReturn<any>;
@@ -24,7 +23,7 @@ const PasswordField = ({ form, name, label }: PasswordFieldProps) => {
           <div className="relative">
             <FormControl>
               <Input
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 {...field}
                 className="bg-island-light/20 border-island-light pr-10"

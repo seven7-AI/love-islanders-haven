@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AudioPlayerProvider } from '@/hooks/use-audio-player';
 import { useInlineChat } from './useInlineChat';
@@ -22,14 +21,9 @@ const InlineChatOverlay: React.FC<InlineChatOverlayProps> = ({ matchId, matchNam
     <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
       <AudioPlayerProvider>
         <div className="bg-island-dark border border-island-light/20 rounded-lg w-full max-w-md h-[80vh] flex flex-col overflow-hidden animate-fade-in chat-container">
-          <InlineChatHeader 
-            matchName={matchName}
-            partnerId={partnerId}
-            onClose={onClose}
-            onBlocked={onBlocked}
-          />
+          <InlineChatHeader matchName={matchName} partnerId={partnerId} onClose={onClose} onBlocked={onBlocked} />
 
-          <InlineChatContent 
+          <InlineChatContent
             matchId={matchId}
             messages={messages}
             isLoading={isLoading}

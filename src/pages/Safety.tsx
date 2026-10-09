@@ -33,9 +33,7 @@ const Safety = () => {
           <Card>
             <CardHeader>
               <CardTitle>Emergency</CardTitle>
-              <CardDescription>
-                If you are in immediate danger, call your local emergency number first.
-              </CardDescription>
+              <CardDescription>If you are in immediate danger, call your local emergency number first.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap items-center gap-3">
               <Button asChild variant="outline" className="gap-2">
@@ -83,7 +81,9 @@ const Safety = () => {
                 </div>
               ) : plans.error ? (
                 <div className="space-y-2">
-                  <p role="alert" className="text-sm text-destructive">{plans.error}</p>
+                  <p role="alert" className="text-sm text-destructive">
+                    {plans.error}
+                  </p>
                   <Button variant="outline" size="sm" onClick={() => plans.fetchDatePlans().catch(() => undefined)}>
                     Try again
                   </Button>

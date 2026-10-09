@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth';
@@ -68,51 +67,53 @@ export function useProfilePage() {
 
   const isAuthenticated = !!sessionUser?.id;
   const user = sessionUser;
-  
+
   // Load user profile when component mounts or when auth state changes
   useEffect(() => {
     if (!authReady) {
       return; // Don't do anything while auth is loading
     }
-    
+
     if (user?.id) {
-      setProfile((current: any) => current?.id === 'local-profile' ? createDefaultProfile(user.email, user.id) : current);
+      setProfile((current: any) =>
+        current?.id === 'local-profile' ? createDefaultProfile(user.email, user.id) : current,
+      );
       void loadUserProfile();
     } else {
       toast({
-        title: "Authentication required",
-        description: "Please log in to view and edit your profile.",
-        variant: "destructive"
+        title: 'Authentication required',
+        description: 'Please log in to view and edit your profile.',
+        variant: 'destructive',
       });
       setIsLoading(false);
     }
   }, [authReady, user?.id, retryCount]);
-  
+
   const loadUserProfile = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       console.log('Loading user profile...');
-      
+
       if (!user?.id) {
         console.log('No authentication detected');
         throw new Error('Authentication required');
       }
-      
+
       console.log('Authentication status: Supabase =', isAuthenticated);
       const userData = await fetchUserProfile();
-      
+
       if (userData) {
         console.log('Profile loaded successfully');
         setProfile(userData);
       } else {
         console.log('No profile found, creating default');
         setProfile(createDefaultProfile(user?.email, user?.id));
-        
+
         toast({
-          title: "Complete your profile",
-          description: "Please add your profile details to get started.",
+          title: 'Complete your profile',
+          description: 'Please add your profile details to get started.',
         });
       }
     } catch (error: any) {
@@ -126,7 +127,7 @@ export function useProfilePage() {
       setIsLoading(false);
     }
   };
-  
+
   const handleEditProfile = () => {
     setIsEditing(!isEditing);
     if (isEditing) {
@@ -134,20 +135,20 @@ export function useProfilePage() {
       loadUserProfile();
     }
   };
-  
+
   const handleRetry = () => {
     // Initialize Supabase session if needed
     if (networkError) {
       supabase.auth.refreshSession();
     }
-    setRetryCount(prev => prev + 1);
+    setRetryCount((prev) => prev + 1);
   };
 
   const handleImagesChange = (newImages: string[]) => {
     if (profile) {
       setProfile({
         ...profile,
-        images: newImages
+        images: newImages,
       });
     }
   };
@@ -156,7 +157,7 @@ export function useProfilePage() {
     if (profile) {
       setProfile({
         ...profile,
-        verified: true
+        verified: true,
       });
     }
   };
@@ -164,8 +165,8 @@ export function useProfilePage() {
   const handlePreferencesUpdated = () => {
     loadUserProfile();
     toast({
-      title: "Profile updated",
-      description: "Your profile settings have been saved successfully.",
+      title: 'Profile updated',
+      description: 'Your profile settings have been saved successfully.',
     });
   };
 
@@ -174,13 +175,13 @@ export function useProfilePage() {
     isLoading,
     isEditing,
     error,
-      loading: !authReady,
+    loading: !authReady,
     isAuthenticated,
-      user,
+    user,
     handleEditProfile,
     handleRetry,
     handleImagesChange,
     handleVerificationSuccess,
-    handlePreferencesUpdated
+    handlePreferencesUpdated,
   };
 }

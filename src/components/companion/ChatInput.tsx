@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,12 +8,9 @@ type ChatInputProps = {
   isLoading: boolean;
 };
 
-const ChatInput: React.FC<ChatInputProps> = ({
-  onSendMessage,
-  isLoading
-}) => {
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
   const [message, setMessage] = useState('');
-  
+
   // Common emoji shortcuts
   const emojiShortcuts: Record<string, string> = {
     ':)': '😊',
@@ -31,12 +27,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
     let result = text;
     Object.entries(emojiShortcuts).forEach(([shortcut, emoji]) => {
       // Escape special characters in the shortcut for regex
-      const escapedShortcut = shortcut.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
+      const escapedShortcut = shortcut.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
       result = result.replace(new RegExp(escapedShortcut, 'g'), emoji);
     });
     return result;
   };
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !isLoading) {
@@ -54,25 +50,25 @@ const ChatInput: React.FC<ChatInputProps> = ({
       handleSubmit(e);
     }
   };
-  
+
   return (
-    <form 
-      onSubmit={handleSubmit} 
+    <form
+      onSubmit={handleSubmit}
       className="flex items-center gap-2 p-3 bg-island border-t border-island-light w-full sticky bottom-0 z-10"
     >
-      <Input 
-        value={message} 
-        onChange={e => setMessage(e.target.value)}
+      <Input
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Type a message..." 
-        disabled={isLoading} 
-        className="flex-1 bg-island-dark text-white border-island-light" 
-        autoFocus 
+        placeholder="Type a message..."
+        disabled={isLoading}
+        className="flex-1 bg-island-dark text-white border-island-light"
+        autoFocus
       />
-      <Button 
-        type="submit" 
-        size="icon" 
-        disabled={isLoading || !message.trim()} 
+      <Button
+        type="submit"
+        size="icon"
+        disabled={isLoading || !message.trim()}
         className="bg-love hover:bg-love-dark text-white"
         onClick={handleSubmit}
       >

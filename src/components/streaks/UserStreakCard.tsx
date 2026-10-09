@@ -1,6 +1,5 @@
-
-import { Flame, Clock } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Flame, Clock } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface UserStreakCardProps {
   streakCount: number;

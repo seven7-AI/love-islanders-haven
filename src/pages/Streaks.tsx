@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "@/context/auth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera } from "lucide-react";
-import StreakPostForm from "@/components/streaks/StreakPostForm";
-import UserStreakCard from "@/components/streaks/UserStreakCard";
-import TopStreaksCard from "@/components/streaks/TopStreaksCard";
-import StreaksList from "@/components/streaks/StreaksList";
-import LoginRequired from "@/components/streaks/LoginRequired";
-import Navbar from "@/components/Navbar";
-import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { fetchStreakFeed, getLeaderboard, getStreakStatus, StreakPostData } from "@/lib/api/streaks";
-import type { StreakPost } from "@/components/streaks/types";
-import useStreaksActions from "@/hooks/streaks/use-streaks-actions";
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/auth';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Camera } from 'lucide-react';
+import StreakPostForm from '@/components/streaks/StreakPostForm';
+import UserStreakCard from '@/components/streaks/UserStreakCard';
+import TopStreaksCard from '@/components/streaks/TopStreaksCard';
+import StreaksList from '@/components/streaks/StreaksList';
+import LoginRequired from '@/components/streaks/LoginRequired';
+import Navbar from '@/components/Navbar';
+import { useToast } from '@/hooks/use-toast';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { fetchStreakFeed, getLeaderboard, getStreakStatus, StreakPostData } from '@/lib/api/streaks';
+import type { StreakPost } from '@/components/streaks/types';
+import useStreaksActions from '@/hooks/streaks/use-streaks-actions';
 
 const toPost = (p: StreakPostData): StreakPost => ({
   id: p.id,
@@ -32,7 +32,7 @@ const toPost = (p: StreakPostData): StreakPost => ({
 const Streaks = () => {
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
-  
+
   // State
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<StreakPost[]>([]);
@@ -41,11 +41,11 @@ const Streaks = () => {
   const [userStreakCount, setUserStreakCount] = useState(0);
   const [topStreaks, setTopStreaks] = useState<{ id: string; name: string; count: number }[]>([]);
   const [showPostForm, setShowPostForm] = useState(false);
-  
+
   // Load data
   const fetchData = async () => {
     if (!isAuthenticated) return;
-    
+
     setLoading(true);
     try {
       const [feed, status, leaderboard] = await Promise.all([fetchStreakFeed(), getStreakStatus(), getLeaderboard()]);
@@ -55,24 +55,24 @@ const Streaks = () => {
       setUserStreakCount(status.streak_count);
       setTopStreaks(leaderboard.map((e) => ({ id: e.user_id, name: e.name ?? 'Anonymous', count: e.streak_count })));
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
       toast({
-        title: "Error",
-        description: "Failed to load streak data. Please try again later.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to load streak data. Please try again later.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
   };
-  
+
   // Fetch data when component mounts or user authenticates
   useEffect(() => {
     if (isAuthenticated) {
       fetchData();
     }
   }, [isAuthenticated]);
-  
+
   // Actions
   const { handlePostSubmit, handleLikePost, isSubmitting } = useStreaksActions();
 
@@ -83,10 +83,10 @@ const Streaks = () => {
       setPosts((prev) => [...prev, ...feed.posts.map(toPost)]);
       setCursor(feed.next_cursor);
     } catch (error) {
-      toast({ title: "Error", description: "Could not load more posts.", variant: "destructive" });
+      toast({ title: 'Error', description: 'Could not load more posts.', variant: 'destructive' });
     }
   };
-  
+
   const onPostSubmit = async (postData) => {
     const success = await handlePostSubmit(postData);
     if (success) {
@@ -95,12 +95,12 @@ const Streaks = () => {
     }
     return success;
   };
-  
+
   // If not authenticated, show login required
   if (!isAuthenticated) {
     return <LoginRequired />;
   }
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-island-dark via-island to-island-dark">
       <ScrollArea className="h-screen w-full overflow-auto">
@@ -121,8 +121,8 @@ const Streaks = () => {
                 <CardTitle>Create Streak Post</CardTitle>
               </CardHeader>
               <CardContent>
-                <StreakPostForm 
-                  onSubmit={onPostSubmit} 
+                <StreakPostForm
+                  onSubmit={onPostSubmit}
                   onCancel={() => setShowPostForm(false)}
                   isSubmitting={isSubmitting}
                 />
@@ -131,20 +131,13 @@ const Streaks = () => {
           )}
 
           <div className="grid grid-cols-1 gap-4 mb-6">
-            <UserStreakCard 
-              streakCount={userStreakCount} 
-              hasPostedToday={hasPostedToday} 
-            />
+            <UserStreakCard streakCount={userStreakCount} hasPostedToday={hasPostedToday} />
             <TopStreaksCard topStreaks={topStreaks} />
           </div>
 
           <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
-          
-          <StreaksList 
-            loading={loading} 
-            posts={posts} 
-            onLike={handleLikePost} 
-          />
+
+          <StreaksList loading={loading} posts={posts} onLike={handleLikePost} />
           {cursor && !loading && (
             <Button variant="secondary" className="w-full mt-4" onClick={loadMore}>
               Load more

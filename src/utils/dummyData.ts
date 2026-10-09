@@ -49,7 +49,7 @@ export const userProfile: Profile = {
   education: "Bachelor's Degree",
   images: [
     'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1964&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1615109398623-88346a601842?q=80&w=1964&auto=format&fit=crop'
+    'https://images.unsplash.com/photo-1615109398623-88346a601842?q=80&w=1964&auto=format&fit=crop',
   ],
   interests: ['Design', 'Photography', 'Travel', 'Coffee'],
   relationshipGoal: 'both',
@@ -70,7 +70,7 @@ export const userProfile: Profile = {
   hasPets: true,
   petType: 'dog',
   activityStatus: 'Online',
-  showAge: true
+  showAge: true,
 };
 
 // Sample profiles for discover page
@@ -85,7 +85,7 @@ export const profiles: Profile[] = [
     education: "Master's Degree",
     images: [
       'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1964&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1964&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1964&auto=format&fit=crop',
     ],
     interests: ['Hiking', 'Dogs', 'Technology', 'Photography'],
     relationshipGoal: 'long-term',
@@ -105,7 +105,7 @@ export const profiles: Profile[] = [
     hasPets: true,
     petType: 'dog',
     activityStatus: 'Recently active',
-    showAge: true
+    showAge: true,
   },
   {
     id: 'profile-2',
@@ -117,7 +117,7 @@ export const profiles: Profile[] = [
     education: "Bachelor's Degree",
     images: [
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1964&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1964&auto=format&fit=crop',
     ],
     interests: ['Art', 'Music', 'Fashion', 'Travel'],
     relationshipGoal: 'both',
@@ -137,7 +137,7 @@ export const profiles: Profile[] = [
     hasPets: true,
     petType: 'cat',
     activityStatus: 'Active today',
-    showAge: true
+    showAge: true,
   },
   {
     id: 'profile-3',
@@ -146,10 +146,10 @@ export const profiles: Profile[] = [
     bio: 'Food enthusiast and amateur chef. Looking for someone to cook for and explore new restaurants.',
     distance: 15,
     occupation: 'Chef',
-    education: "Culinary School",
+    education: 'Culinary School',
     images: [
       'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1964&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1964&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1964&auto=format&fit=crop',
     ],
     interests: ['Cooking', 'Food', 'Restaurants', 'Travel'],
     relationshipGoal: 'long-term',
@@ -168,8 +168,8 @@ export const profiles: Profile[] = [
     hasChildren: false,
     hasPets: false,
     activityStatus: 'Online',
-    showAge: true
-  }
+    showAge: true,
+  },
 ];
 
 // Sample matches for messages page
@@ -187,7 +187,7 @@ export const matches: Match[] = [
       education: "Master's Degree",
       images: [
         'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1964&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1964&auto=format&fit=crop'
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1964&auto=format&fit=crop',
       ],
       interests: ['Hiking', 'Dogs', 'Technology', 'Photography'],
       relationshipGoal: 'long-term',
@@ -207,8 +207,8 @@ export const matches: Match[] = [
       hasPets: true,
       petType: 'dog',
       activityStatus: 'Recently active',
-      showAge: true
-    }
+      showAge: true,
+    },
   },
   {
     id: 'match-2',
@@ -223,7 +223,7 @@ export const matches: Match[] = [
       education: "Bachelor's Degree",
       images: [
         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1964&auto=format&fit=crop'
+        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1964&auto=format&fit=crop',
       ],
       interests: ['Art', 'Music', 'Fashion', 'Travel'],
       relationshipGoal: 'both',
@@ -243,13 +243,13 @@ export const matches: Match[] = [
       hasPets: true,
       petType: 'cat',
       activityStatus: 'Active today',
-      showAge: true
-    }
-  }
+      showAge: true,
+    },
+  },
 ];
 
 // Fix type for the heightUnit in the profile samples
-profiles.forEach(profile => {
+profiles.forEach((profile) => {
   if (profile.heightUnit && !['ft', 'm', 'cm'].includes(profile.heightUnit as string)) {
     profile.heightUnit = 'cm';
   }

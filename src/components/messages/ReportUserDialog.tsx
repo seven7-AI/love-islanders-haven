@@ -4,7 +4,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { ReportReason, reportUser } from '@/lib/api/safety';
 
@@ -50,7 +57,9 @@ const ReportUserDialog = ({ open, onOpenChange, userId, userName, onBlocked }: R
         ...(details.trim() ? { details: details.trim() } : {}),
         also_block: alsoBlock,
       });
-      toast.success(alsoBlock ? `Thanks. ${userName} has been reported and blocked.` : `Thanks. ${userName} has been reported.`);
+      toast.success(
+        alsoBlock ? `Thanks. ${userName} has been reported and blocked.` : `Thanks. ${userName} has been reported.`,
+      );
       reset();
       onOpenChange(false);
       if (alsoBlock) onBlocked();
@@ -99,7 +108,11 @@ const ReportUserDialog = ({ open, onOpenChange, userId, userName, onBlocked }: R
           </div>
 
           <div className="flex items-center space-x-2">
-            <Checkbox id="report-also-block" checked={alsoBlock} onCheckedChange={(checked) => setAlsoBlock(checked === true)} />
+            <Checkbox
+              id="report-also-block"
+              checked={alsoBlock}
+              onCheckedChange={(checked) => setAlsoBlock(checked === true)}
+            />
             <Label htmlFor="report-also-block">Also block {userName}</Label>
           </div>
         </div>

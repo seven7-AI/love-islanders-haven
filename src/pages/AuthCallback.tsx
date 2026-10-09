@@ -38,7 +38,9 @@ const AuthCallback = () => {
             <p role="alert" className="text-white">
               {redirectError || 'This link is invalid or has expired.'}
             </p>
-            <Link to="/login" className="text-love hover:underline text-sm">Back to sign in</Link>
+            <Link to="/login" className="text-love hover:underline text-sm">
+              Back to sign in
+            </Link>
           </>
         ) : (
           <div className="flex justify-center" aria-label="Signing you in">

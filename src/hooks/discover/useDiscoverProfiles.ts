@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchDiscoverPage, PublicProfile, swipe, SwipeDirection, SwipeResult } from "@/lib/api/discovery";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { fetchDiscoverPage, PublicProfile, swipe, SwipeDirection, SwipeResult } from '@/lib/api/discovery';
 import {
   DEFAULT_DISCOVER_PREFERENCES,
   DiscoverPreferences,
   getDiscoverFilters,
   saveDiscoverFilters,
-} from "@/services/profiles/profile-preferences";
-import { useAuth } from "@/context/auth";
-import { useToast } from "@/hooks/use-toast";
+} from '@/services/profiles/profile-preferences';
+import { useAuth } from '@/context/auth';
+import { useToast } from '@/hooks/use-toast';
 
 // Fetch the next page when this many unseen profiles remain.
 const PREFETCH_THRESHOLD = 3;
@@ -33,7 +33,7 @@ export const useDiscoverProfiles = () => {
       setHasMore(page.next_cursor !== null);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load profiles");
+      setError(err instanceof Error ? err.message : 'Failed to load profiles');
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ export const useDiscoverProfiles = () => {
       setCursor(page.next_cursor);
       setHasMore(page.next_cursor !== null);
     } catch (err) {
-      console.error("Error loading more profiles:", err);
+      console.error('Error loading more profiles:', err);
     } finally {
       loadingMore.current = false;
     }
@@ -56,7 +56,9 @@ export const useDiscoverProfiles = () => {
 
   useEffect(() => {
     if (!user?.id) return;
-    getDiscoverFilters().then(setFiltersState).catch((err) => console.error("Error loading preferences:", err));
+    getDiscoverFilters()
+      .then(setFiltersState)
+      .catch((err) => console.error('Error loading preferences:', err));
     loadFirstPage();
   }, [user?.id, loadFirstPage]);
 
@@ -72,9 +74,9 @@ export const useDiscoverProfiles = () => {
       await loadFirstPage();
     } catch (err) {
       toast({
-        title: "Could not save your preferences",
-        description: err instanceof Error ? err.message : "Please try again.",
-        variant: "destructive",
+        title: 'Could not save your preferences',
+        description: err instanceof Error ? err.message : 'Please try again.',
+        variant: 'destructive',
       });
     }
   };
@@ -88,9 +90,9 @@ export const useDiscoverProfiles = () => {
       return result;
     } catch (err) {
       toast({
-        title: "Could not save your swipe",
-        description: err instanceof Error ? err.message : "Please try again.",
-        variant: "destructive",
+        title: 'Could not save your swipe',
+        description: err instanceof Error ? err.message : 'Please try again.',
+        variant: 'destructive',
       });
       return null;
     } finally {

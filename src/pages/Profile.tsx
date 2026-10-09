@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useProfilePage } from '@/hooks/use-profile-page';
 import { useAuth } from '@/context/auth';
@@ -40,11 +39,11 @@ const Profile = () => {
     handleRetry,
     handleImagesChange,
     handleVerificationSuccess,
-    handlePreferencesUpdated
+    handlePreferencesUpdated,
   } = useProfilePage();
   const hasAuthenticatedUser = !!authUser?.id || authIsAuthenticated;
   const resolvedProfile = profile ?? createFallbackProfile();
-  
+
   if (authLoading && !hasAuthenticatedUser) {
     return <ProfileLoadingState />;
   }
@@ -58,7 +57,7 @@ const Profile = () => {
   }
 
   return (
-    <ProfileContent 
+    <ProfileContent
       profile={resolvedProfile}
       isEditing={isEditing}
       handleEditProfile={handleEditProfile}
@@ -79,28 +78,23 @@ interface ProfileContentProps {
   handlePreferencesUpdated: () => void;
 }
 
-const ProfileContent = ({ 
-  profile, 
-  isEditing, 
+const ProfileContent = ({
+  profile,
+  isEditing,
   handleEditProfile,
   handleImagesChange,
   handleVerificationSuccess,
-  handlePreferencesUpdated
+  handlePreferencesUpdated,
 }: ProfileContentProps) => {
   const [activeTab, setActiveTab] = useState('profile');
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-island-dark via-island to-island-dark pb-20">
       <div className="page-container">
         <ProfileHeader isEditing={isEditing} onEditToggle={handleEditProfile} />
-        
+
         {!isEditing ? (
-          <ProfileTabs 
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            profile={profile}
-            onEdit={handleEditProfile}
-          />
+          <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} profile={profile} onEdit={handleEditProfile} />
         ) : (
           <ProfileEditContent
             profile={profile}

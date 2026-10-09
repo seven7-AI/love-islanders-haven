@@ -18,7 +18,9 @@ const renderPage = () =>
 
 describe('getAuthRedirectError', () => {
   it('reads error_description from the hash', () => {
-    expect(getAuthRedirectError('', '#error=access_denied&error_description=Email+link+is+invalid')).toBe('Email link is invalid');
+    expect(getAuthRedirectError('', '#error=access_denied&error_description=Email+link+is+invalid')).toBe(
+      'Email link is invalid',
+    );
   });
 
   it('reads error from the query string', () => {

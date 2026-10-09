@@ -1,22 +1,6 @@
 import { useEffect, useState } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Smile, Frown, Users, Clock, Eye, Heart } from 'lucide-react';
 import { fetchProfileStats, fetchDemographics, ProfileStats } from '@/services/profiles/analytics';
@@ -43,16 +27,16 @@ const ProfileInsights = () => {
 
   useEffect(() => {
     fetchProfileStats(timeRange)
-      .then(data => setStats(data))
-      .catch(error => console.error('Error fetching profile stats:', error))
+      .then((data) => setStats(data))
+      .catch((error) => console.error('Error fetching profile stats:', error))
       .finally(() => setIsLoading(false));
-    
+
     fetchDemographics(timeRange)
-      .then(data => {
+      .then((data) => {
         setAgeDistribution(data.age);
         setLocationDistribution(data.location);
       })
-      .catch(error => console.error('Error fetching demographics:', error));
+      .catch((error) => console.error('Error fetching demographics:', error));
   }, [timeRange]);
 
   if (isLoading && !stats) {
@@ -83,22 +67,22 @@ const ProfileInsights = () => {
           </div>
           <div className="flex items-center">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger 
-                value="week" 
+              <TabsTrigger
+                value="week"
                 onClick={() => setTimeRange('week')}
                 className={timeRange === 'week' ? 'data-[state=active]:bg-love/20' : ''}
               >
                 Week
               </TabsTrigger>
-              <TabsTrigger 
-                value="month" 
+              <TabsTrigger
+                value="month"
                 onClick={() => setTimeRange('month')}
                 className={timeRange === 'month' ? 'data-[state=active]:bg-love/20' : ''}
               >
                 Month
               </TabsTrigger>
-              <TabsTrigger 
-                value="year" 
+              <TabsTrigger
+                value="year"
                 onClick={() => setTimeRange('year')}
                 className={timeRange === 'year' ? 'data-[state=active]:bg-love/20' : ''}
               >
@@ -115,7 +99,7 @@ const ProfileInsights = () => {
             <TabsTrigger value="demographics">Demographics</TabsTrigger>
             <TabsTrigger value="engagement">Engagement</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card>
@@ -143,16 +127,20 @@ const ProfileInsights = () => {
                 <CardContent className="p-4 flex flex-col items-center">
                   <Clock className="mb-2 text-love h-5 w-5" />
                   <p className="text-sm text-muted-foreground">Avg. Response</p>
-                  <h3 className="text-2xl font-bold">{stats?.averageResponseTime != null ? `${Math.round(stats.averageResponseTime)}m` : '—'}</h3>
+                  <h3 className="text-2xl font-bold">
+                    {stats?.averageResponseTime != null ? `${Math.round(stats.averageResponseTime)}m` : '—'}
+                  </h3>
                 </CardContent>
               </Card>
             </div>
-            
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Conversion Rate</CardTitle>
                 <CardDescription>
-                  {stats?.conversionRate != null ? `${stats.conversionRate.toFixed(1)}% of likes lead to matches` : 'Not enough likes yet'}
+                  {stats?.conversionRate != null
+                    ? `${stats.conversionRate.toFixed(1)}% of likes lead to matches`
+                    : 'Not enough likes yet'}
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-2">
@@ -176,15 +164,13 @@ const ProfileInsights = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="demographics" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Age Distribution</CardTitle>
-                  <CardDescription>
-                    Age ranges of people who view your profile
-                  </CardDescription>
+                  <CardDescription>Age ranges of people who view your profile</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[200px]">
@@ -211,13 +197,11 @@ const ProfileInsights = () => {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Location Distribution</CardTitle>
-                  <CardDescription>
-                    Locations of people who view your profile
-                  </CardDescription>
+                  <CardDescription>Locations of people who view your profile</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[200px]">
@@ -246,14 +230,12 @@ const ProfileInsights = () => {
               </Card>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="engagement" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Response Rate</CardTitle>
-                <CardDescription>
-                  How often you respond to messages
-                </CardDescription>
+                <CardDescription>How often you respond to messages</CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center items-center p-6">
                 <div className="relative w-32 h-32">
@@ -282,7 +264,7 @@ const ProfileInsights = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
                 <CardContent className="p-6 flex flex-col items-center justify-center h-full">
@@ -295,7 +277,7 @@ const ProfileInsights = () => {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardContent className="p-6 flex flex-col items-center justify-center h-full">
                   <div className="flex items-center mb-2">

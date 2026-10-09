@@ -1,4 +1,3 @@
-
 import { useMemo } from 'react';
 import { Music, Image as ImageIcon } from 'lucide-react';
 import { Message } from '@/services/messages';
@@ -15,17 +14,17 @@ const MessageItem = ({ message, isCurrentUser }: MessageItemProps) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
-  
+
   const formattedTime = useMemo(() => formatTime(message.created_at), [message.created_at]);
-  
+
   const renderMessageContent = () => {
     switch (message.content_type) {
       case 'image':
         return (
           <div className="mb-2">
-            <img 
-              src={message.media_url} 
-              alt="Message image" 
+            <img
+              src={message.media_url}
+              alt="Message image"
               className="rounded-md max-w-full max-h-60 object-contain"
               onClick={() => window.open(message.media_url, '_blank')}
             />
@@ -33,7 +32,7 @@ const MessageItem = ({ message, isCurrentUser }: MessageItemProps) => {
         );
       case 'audio':
         return (
-          <div 
+          <div
             className="flex items-center space-x-2 cursor-pointer hover:opacity-90 p-2 bg-black/20 rounded-md mb-2"
             onClick={() => playAudio(message.id, message.media_url || '')}
           >
@@ -54,24 +53,16 @@ const MessageItem = ({ message, isCurrentUser }: MessageItemProps) => {
         return <p>{message.content}</p>;
     }
   };
-  
+
   return (
-    <div 
-      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-    >
-      <div 
+    <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+      <div
         className={`max-w-[80%] p-3 rounded-lg ${
-          isCurrentUser 
-            ? 'bg-love/80 text-white' 
-            : 'bg-gray-700/60 text-white'
+          isCurrentUser ? 'bg-love/80 text-white' : 'bg-gray-700/60 text-white'
         }`}
       >
         {renderMessageContent()}
-        <p className={`text-xs mt-1 ${
-          isCurrentUser ? 'text-white/70' : 'text-white/50'
-        }`}>
-          {formattedTime}
-        </p>
+        <p className={`text-xs mt-1 ${isCurrentUser ? 'text-white/70' : 'text-white/50'}`}>{formattedTime}</p>
       </div>
     </div>
   );

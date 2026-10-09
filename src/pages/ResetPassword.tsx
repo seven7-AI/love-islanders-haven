@@ -50,14 +50,19 @@ const ResetPassword = () => {
     content = (
       <p role="alert" className="text-white text-center">
         This password reset link is invalid or has expired.{' '}
-        <Link to="/forgot-password" className="text-love hover:underline">Request a new link</Link>.
+        <Link to="/forgot-password" className="text-love hover:underline">
+          Request a new link
+        </Link>
+        .
       </p>
     );
   } else {
     content = (
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         <div>
-          <label htmlFor="password" className="block text-white text-lg mb-2">New password</label>
+          <label htmlFor="password" className="block text-white text-lg mb-2">
+            New password
+          </label>
           <Input
             id="password"
             type="password"
@@ -68,7 +73,9 @@ const ResetPassword = () => {
           />
         </div>
         <div>
-          <label htmlFor="confirmPassword" className="block text-white text-lg mb-2">Confirm new password</label>
+          <label htmlFor="confirmPassword" className="block text-white text-lg mb-2">
+            Confirm new password
+          </label>
           <Input
             id="confirmPassword"
             type="password"
@@ -79,7 +86,11 @@ const ResetPassword = () => {
           />
         </div>
 
-        {error && <p role="alert" className="text-red-400 text-sm">{error}</p>}
+        {error && (
+          <p role="alert" className="text-red-400 text-sm">
+            {error}
+          </p>
+        )}
 
         <Button type="submit" className="w-full bg-love hover:bg-love-dark h-12 text-lg" disabled={isSaving}>
           {isSaving ? (
@@ -87,7 +98,9 @@ const ResetPassword = () => {
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Saving...
             </span>
-          ) : 'Update password'}
+          ) : (
+            'Update password'
+          )}
         </Button>
       </form>
     );

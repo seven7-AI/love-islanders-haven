@@ -47,7 +47,9 @@ const Discover: React.FC = () => {
   };
 
   const activeCount =
-    (filters.minAge !== DEFAULT_DISCOVER_PREFERENCES.minAge || filters.maxAge !== DEFAULT_DISCOVER_PREFERENCES.maxAge ? 1 : 0) +
+    (filters.minAge !== DEFAULT_DISCOVER_PREFERENCES.minAge || filters.maxAge !== DEFAULT_DISCOVER_PREFERENCES.maxAge
+      ? 1
+      : 0) +
     (filters.maxDistance !== DEFAULT_DISCOVER_PREFERENCES.maxDistance ? 1 : 0) +
     (filters.gender ? 1 : 0);
 
@@ -63,8 +65,12 @@ const Discover: React.FC = () => {
             <div className="flex flex-col items-center justify-center h-64 gap-3">
               {error ? (
                 <>
-                  <p role="alert" className="text-white text-center">Could not load profiles: {error}</p>
-                  <Button variant="secondary" onClick={refreshProfiles}>Try again</Button>
+                  <p role="alert" className="text-white text-center">
+                    Could not load profiles: {error}
+                  </p>
+                  <Button variant="secondary" onClick={refreshProfiles}>
+                    Try again
+                  </Button>
                 </>
               ) : (
                 <>
@@ -88,7 +94,11 @@ const Discover: React.FC = () => {
             onApply={apply}
           />
 
-          <EmailVerificationPopup isOpen={showVerificationPopup} email={unconfirmedEmail} onClose={handleVerificationComplete} />
+          <EmailVerificationPopup
+            isOpen={showVerificationPopup}
+            email={unconfirmedEmail}
+            onClose={handleVerificationComplete}
+          />
 
           <div className="fixed bottom-20 left-6 z-10">
             <Button
@@ -100,7 +110,10 @@ const Discover: React.FC = () => {
               <Filter className="h-4 w-4" />
               <span>Filters</span>
               {activeCount > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 flex items-center justify-center rounded-full bg-purple-600 text-white text-[10px]">
+                <Badge
+                  variant="secondary"
+                  className="ml-1 h-5 w-5 p-0 flex items-center justify-center rounded-full bg-purple-600 text-white text-[10px]"
+                >
                   {activeCount}
                 </Badge>
               )}

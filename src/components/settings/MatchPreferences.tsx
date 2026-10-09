@@ -71,7 +71,9 @@ const MatchPreferences = () => {
   return (
     <SettingsSection title="Match Preferences" icon={<Heart size={20} />}>
       {loadError ? (
-        <p role="alert" className="text-sm text-destructive">{loadError}</p>
+        <p role="alert" className="text-sm text-destructive">
+          {loadError}
+        </p>
       ) : !range ? (
         <div className="flex justify-center py-4">
           <Loader2 className="h-5 w-5 animate-spin text-love" />

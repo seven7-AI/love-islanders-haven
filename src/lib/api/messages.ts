@@ -22,7 +22,10 @@ export interface MessagePage {
 
 const base = (matchId: string) => `/v1/matches/${encodeURIComponent(matchId)}`;
 
-export function listMessages(matchId: string, options: { before?: string | null; after?: string | null; limit?: number } = {}) {
+export function listMessages(
+  matchId: string,
+  options: { before?: string | null; after?: string | null; limit?: number } = {},
+) {
   const params = new URLSearchParams();
   if (options.before) params.set('before', options.before);
   if (options.after) params.set('after', options.after);

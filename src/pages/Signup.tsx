@@ -39,7 +39,7 @@ const Signup = () => {
       if (data.user) {
         // Profile and onboarding rows are created by the database when the auth user is created.
         if (data.session) {
-          toast.success('Account created! Let\'s set up your profile.');
+          toast.success("Account created! Let's set up your profile.");
           navigate('/onboarding', { replace: true });
         } else {
           navigate(`/verify?email=${encodeURIComponent(email)}`, { replace: true });
@@ -59,19 +59,43 @@ const Signup = () => {
 
         <form onSubmit={handleSignUp} className="space-y-6">
           <div>
-            <label htmlFor="name" className="block text-white text-lg mb-2">Name</label>
-            <Input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name" className="bg-island-light/20 border-island-light text-white h-12" />
+            <label htmlFor="name" className="block text-white text-lg mb-2">
+              Name
+            </label>
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              className="bg-island-light/20 border-island-light text-white h-12"
+            />
           </div>
           <div>
-            <label htmlFor="email" className="block text-white text-lg mb-2">Email</label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@example.com" className="bg-island-light/20 border-island-light text-white h-12" />
+            <label htmlFor="email" className="block text-white text-lg mb-2">
+              Email
+            </label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@example.com"
+              className="bg-island-light/20 border-island-light text-white h-12"
+            />
           </div>
           <div>
-            <label htmlFor="password" className="block text-white text-lg mb-2">Password</label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 8 characters" className="bg-island-light/20 border-island-light text-white h-12" />
+            <label htmlFor="password" className="block text-white text-lg mb-2">
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 8 characters"
+              className="bg-island-light/20 border-island-light text-white h-12"
+            />
           </div>
 
           <Button type="submit" className="w-full bg-love hover:bg-love-dark h-12 text-lg" disabled={isLoading}>
@@ -80,12 +104,13 @@ const Signup = () => {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Creating account...
               </span>
-            ) : 'Sign Up'}
+            ) : (
+              'Sign Up'
+            )}
           </Button>
 
           <div className="text-center">
-            <button type="button" onClick={() => navigate('/login')}
-              className="text-love hover:underline text-sm">
+            <button type="button" onClick={() => navigate('/login')} className="text-love hover:underline text-sm">
               Already have an account? Sign in
             </button>
           </div>

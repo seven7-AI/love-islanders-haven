@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Heart, X } from 'lucide-react';
 
@@ -16,7 +15,7 @@ const SwipeIndicator = ({ offsetX }: SwipeIndicatorProps) => {
       </div>
     );
   }
-  
+
   if (offsetX < -50) {
     return (
       <div className="absolute inset-0 flex items-center justify-center">
@@ -26,7 +25,7 @@ const SwipeIndicator = ({ offsetX }: SwipeIndicatorProps) => {
       </div>
     );
   }
-  
+
   return null;
 };
 

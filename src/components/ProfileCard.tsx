@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { Profile } from '../utils/dummyData';
 import { Info, MessageCircle } from 'lucide-react';
@@ -22,12 +21,13 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   // If profile has no images, use placeholder images
-  const images = profile.images && profile.images.length > 0 
-    ? profile.images 
-    : [
-        'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1964&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop'
-      ];
+  const images =
+    profile.images && profile.images.length > 0
+      ? profile.images
+      : [
+          'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1964&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop',
+        ];
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -37,7 +37,7 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
 
   const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
     if (!isSwiping) return;
-    
+
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const newOffsetX = clientX - startX;
     setOffsetX(newOffsetX);
@@ -45,7 +45,7 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
 
   const handleTouchEnd = () => {
     if (!isSwiping) return;
-    
+
     const threshold = 100;
     // The Discover page reports the saved result (errors, matches); no optimistic toast here.
     if (offsetX > threshold) {
@@ -53,7 +53,7 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
     } else if (offsetX < -threshold) {
       onSwipe('left');
     }
-    
+
     setIsSwiping(false);
     setOffsetX(0);
   };
@@ -73,7 +73,7 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
   };
 
   return (
-    <div 
+    <div
       ref={cardRef}
       className="relative w-full max-w-md mx-auto h-[70vh] overflow-hidden rounded-xl shadow-xl bg-black/10"
       style={cardStyle}
@@ -88,13 +88,13 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
       <div className="h-full w-full">
         {/* Image Carousel */}
         <ProfileImageCarousel images={images} name={profile.name} />
-        
+
         {/* Swipe Indicator (like/dislike) */}
         <SwipeIndicator offsetX={offsetX} />
-        
+
         {/* More info button */}
         <div className="absolute top-4 right-4">
-          <button 
+          <button
             onClick={toggleMoreInfo}
             className="w-8 h-8 rounded-full flex items-center justify-center bg-black/20 backdrop-blur-sm"
             aria-label="More information"
@@ -102,20 +102,16 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
             <Info size={18} className="text-white" />
           </button>
         </div>
-        
+
         {/* Comment button */}
         {/* Removed the comment button here */}
-        
+
         {/* Comment input overlay */}
-        {showCommentInput && (
-          <ProfileCommentInput onClose={() => setShowCommentInput(false)} />
-        )}
-        
+        {showCommentInput && <ProfileCommentInput onClose={() => setShowCommentInput(false)} />}
+
         {/* More info panel */}
-        {showMoreInfo && (
-          <ProfileInfoPanel profile={profile} onClose={toggleMoreInfo} />
-        )}
-        
+        {showMoreInfo && <ProfileInfoPanel profile={profile} onClose={toggleMoreInfo} />}
+
         {/* Activity status */}
         {profile.activityStatus && (
           <div className="absolute top-6 left-4">
@@ -124,7 +120,7 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
             </div>
           </div>
         )}
-        
+
         {/* Profile info at bottom */}
         <ProfileBottomInfo profile={profile} />
       </div>

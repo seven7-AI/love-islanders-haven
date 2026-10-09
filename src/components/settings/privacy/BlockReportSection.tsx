@@ -55,8 +55,12 @@ const BlockReportSection = () => {
           </div>
         ) : error ? (
           <div className="space-y-2">
-            <p role="alert" className="text-sm text-destructive">{error}</p>
-            <Button variant="outline" size="sm" onClick={load}>Try again</Button>
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+            <Button variant="outline" size="sm" onClick={load}>
+              Try again
+            </Button>
           </div>
         ) : blockedUsers.length === 0 ? (
           <p className="text-sm text-muted-foreground">You haven't blocked any users.</p>

@@ -53,7 +53,9 @@ describe('ReportUserDialog', () => {
     fireEvent.click(screen.getByLabelText('Also block Jamie'));
     fireEvent.click(screen.getByRole('button', { name: 'Send report' }));
 
-    await waitFor(() => expect(reportUser).toHaveBeenCalledWith({ user_id: 'user-42', reason: 'spam', also_block: false }));
+    await waitFor(() =>
+      expect(reportUser).toHaveBeenCalledWith({ user_id: 'user-42', reason: 'spam', also_block: false }),
+    );
     await waitFor(() => expect(toastSuccess).toHaveBeenCalled());
     expect(onBlocked).not.toHaveBeenCalled();
   });

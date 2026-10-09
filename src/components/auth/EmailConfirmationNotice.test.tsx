@@ -3,7 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import EmailConfirmationNotice from './EmailConfirmationNotice';
 
 const resend = vi.fn();
-vi.mock('@/integrations/supabase/client', () => ({ supabase: { auth: { resend: (...args: unknown[]) => resend(...args) } } }));
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: { auth: { resend: (...args: unknown[]) => resend(...args) } },
+}));
 
 describe('EmailConfirmationNotice', () => {
   beforeEach(() => resend.mockReset());
@@ -17,7 +19,9 @@ describe('EmailConfirmationNotice', () => {
   });
 
   it('shows the provider error instead of claiming success', async () => {
-    resend.mockResolvedValue({ error: new Error('For security purposes, you can only request this after 60 seconds.') });
+    resend.mockResolvedValue({
+      error: new Error('For security purposes, you can only request this after 60 seconds.'),
+    });
     render(<EmailConfirmationNotice email="a@example.com" />);
     fireEvent.click(screen.getByRole('button', { name: 'Resend confirmation email' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('60 seconds');

@@ -22,10 +22,14 @@ const Verify = () => {
         {email ? (
           <EmailConfirmationNotice email={email} />
         ) : (
-          <p className="text-white text-center">Check your inbox for the confirmation link we sent when you signed up.</p>
+          <p className="text-white text-center">
+            Check your inbox for the confirmation link we sent when you signed up.
+          </p>
         )}
         <div className="text-center">
-          <Link to="/login" className="text-love hover:underline text-sm">Back to sign in</Link>
+          <Link to="/login" className="text-love hover:underline text-sm">
+            Back to sign in
+          </Link>
         </div>
       </div>
     </div>

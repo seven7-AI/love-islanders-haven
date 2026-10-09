@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
@@ -36,19 +35,25 @@ function App() {
   const online = useOnline();
   const location = useLocation();
   const { toast } = useToast();
-  
+
   useEffect(() => {
     if (!online) {
       toast({
-        title: "No internet connection",
-        description: "Some features may be unavailable",
+        title: 'No internet connection',
+        description: 'Some features may be unavailable',
         duration: 5000,
       });
     }
   }, [online, toast]);
 
   // Custom PrivateRoute component
-  const PrivateRoute = ({ children, guardOnboarding = true }: { children: React.ReactNode; guardOnboarding?: boolean }) => {
+  const PrivateRoute = ({
+    children,
+    guardOnboarding = true,
+  }: {
+    children: React.ReactNode;
+    guardOnboarding?: boolean;
+  }) => {
     const hasAuthenticatedUser = !!user?.id || isAuthenticated;
 
     if (loading && !hasAuthenticatedUser) {
@@ -72,9 +77,15 @@ function App() {
         <>
           <Routes>
             <Route path="/login" element={isAuthenticated && user ? <Navigate to="/discover" replace /> : <Login />} />
-            <Route path="/signup" element={isAuthenticated && user ? <Navigate to="/discover" replace /> : <Signup />} />
+            <Route
+              path="/signup"
+              element={isAuthenticated && user ? <Navigate to="/discover" replace /> : <Signup />}
+            />
             <Route path="/verify" element={<Verify />} />
-            <Route path="/forgot-password" element={isAuthenticated && user ? <Navigate to="/discover" replace /> : <ForgotPassword />} />
+            <Route
+              path="/forgot-password"
+              element={isAuthenticated && user ? <Navigate to="/discover" replace /> : <ForgotPassword />}
+            />
             {/* Not redirected when signed in: the recovery link itself creates the session. */}
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
@@ -86,7 +97,7 @@ function App() {
                 </PrivateRoute>
               }
             />
-            
+
             <Route
               path="/onboarding"
               element={
@@ -95,7 +106,7 @@ function App() {
                 </PrivateRoute>
               }
             />
-            
+
             <Route
               path="/profile"
               element={
@@ -175,12 +186,20 @@ function App() {
             <Route path="/" element={<Navigate to="/discover" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          
+
           {/* Hide MobileNavigation on auth/onboarding routes */}
-          {isAuthenticated && user && !['/onboarding', '/login', '/signup', '/verify', '/forgot-password', '/reset-password', '/auth/callback'].includes(location.pathname) && (
-            <MobileNavigation />
-          )}
-          
+          {isAuthenticated &&
+            user &&
+            ![
+              '/onboarding',
+              '/login',
+              '/signup',
+              '/verify',
+              '/forgot-password',
+              '/reset-password',
+              '/auth/callback',
+            ].includes(location.pathname) && <MobileNavigation />}
+
           <ToastContainer />
         </>
       ) : (

@@ -1,4 +1,4 @@
-import { getMyProfile, updateMyProfile } from "@/lib/api/profile";
+import { getMyProfile, updateMyProfile } from '@/lib/api/profile';
 
 /** Who the user wants to see in Discover. Stored on the profile, so it applies on every device. */
 export interface DiscoverPreferences {
@@ -12,9 +12,10 @@ export const DEFAULT_DISCOVER_PREFERENCES: DiscoverPreferences = { minAge: 18, m
 
 export const getDiscoverFilters = async (): Promise<DiscoverPreferences> => {
   const profile = await getMyProfile();
-  const gender = profile.gender_preference === 'male' || profile.gender_preference === 'female'
-    ? profile.gender_preference
-    : undefined;
+  const gender =
+    profile.gender_preference === 'male' || profile.gender_preference === 'female'
+      ? profile.gender_preference
+      : undefined;
   return {
     minAge: profile.age_range_min ?? DEFAULT_DISCOVER_PREFERENCES.minAge,
     maxAge: profile.age_range_max ?? DEFAULT_DISCOVER_PREFERENCES.maxAge,

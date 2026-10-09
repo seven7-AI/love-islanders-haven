@@ -1,4 +1,3 @@
-
 export interface SupabaseProfile {
   id: string;
   name: string;

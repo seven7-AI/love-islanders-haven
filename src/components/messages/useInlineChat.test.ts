@@ -14,7 +14,14 @@ vi.mock('@/lib/api/messages', () => ({
 vi.mock('@/context/auth', () => ({ useAuth: () => ({ user: { id: 'me' } }) }));
 
 const msg = (id: string, sender: string, at: string, is_read = false) => ({
-  id, match_id: 'm1', sender_id: sender, content: id, content_type: 'text', media_url: null, is_read, created_at: at,
+  id,
+  match_id: 'm1',
+  sender_id: sender,
+  content: id,
+  content_type: 'text',
+  media_url: null,
+  is_read,
+  created_at: at,
 });
 
 describe('useInlineChat', () => {
@@ -50,7 +57,11 @@ describe('useInlineChat', () => {
       ok = await result.current.handleSendMessage('hello');
     });
     expect(ok).toBe(true);
-    expect(sendChatMessage).toHaveBeenCalledWith('m1', { content: 'hello', content_type: 'text', media_path: undefined });
+    expect(sendChatMessage).toHaveBeenCalledWith('m1', {
+      content: 'hello',
+      content_type: 'text',
+      media_path: undefined,
+    });
     expect(result.current.messages.map((m) => m.id)).toEqual(['s']);
   });
 

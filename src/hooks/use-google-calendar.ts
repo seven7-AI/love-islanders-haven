@@ -81,5 +81,13 @@ export function useGoogleCalendar() {
     }
   };
 
-  return { isAvailable, isAuthorized, isLoading, googleEvents, initiateGoogleAuth, fetchGoogleEvents, disconnectGoogleCalendar };
+  return {
+    isAvailable,
+    isAuthorized,
+    isLoading,
+    googleEvents,
+    initiateGoogleAuth,
+    fetchGoogleEvents,
+    disconnectGoogleCalendar,
+  };
 }

@@ -4,7 +4,9 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import CalendarCallback from './CalendarCallback';
 
 const completeGoogleCalendarAuth = vi.fn();
-vi.mock('@/lib/api/calendar', () => ({ completeGoogleCalendarAuth: (c: string, s: string) => completeGoogleCalendarAuth(c, s) }));
+vi.mock('@/lib/api/calendar', () => ({
+  completeGoogleCalendarAuth: (c: string, s: string) => completeGoogleCalendarAuth(c, s),
+}));
 vi.mock('sonner', () => ({ toast: { success: vi.fn() } }));
 
 const renderAt = (url: string) =>
@@ -33,7 +35,9 @@ describe('CalendarCallback', () => {
   });
 
   it('shows the API error (e.g. a link started by another account)', async () => {
-    completeGoogleCalendarAuth.mockRejectedValue(new Error('This Google sign-in link is invalid or expired; please try again.'));
+    completeGoogleCalendarAuth.mockRejectedValue(
+      new Error('This Google sign-in link is invalid or expired; please try again.'),
+    );
     renderAt('/calendar/callback?code=abc&state=forged');
     expect(await screen.findByRole('alert')).toHaveTextContent('invalid or expired');
   });

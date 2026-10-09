@@ -26,7 +26,7 @@ export const OnboardingPhotos = ({ onNext, onBack, isSubmitting }: OnboardingPho
     getMyProfile()
       .then((profile) => setPhotos(profile.images))
       .catch((error) =>
-        toast({ title: "Could not load your photos", description: error.message, variant: "destructive" }),
+        toast({ title: 'Could not load your photos', description: error.message, variant: 'destructive' }),
       );
   }, [toast]);
 
@@ -36,11 +36,15 @@ export const OnboardingPhotos = ({ onNext, onBack, isSubmitting }: OnboardingPho
     if (!file) return;
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      toast({ title: "Invalid file type", description: "Please choose a JPEG, PNG or WebP image", variant: "destructive" });
+      toast({
+        title: 'Invalid file type',
+        description: 'Please choose a JPEG, PNG or WebP image',
+        variant: 'destructive',
+      });
       return;
     }
     if (file.size > MAX_BYTES) {
-      toast({ title: "File too large", description: "Photos must be smaller than 5 MB", variant: "destructive" });
+      toast({ title: 'File too large', description: 'Photos must be smaller than 5 MB', variant: 'destructive' });
       return;
     }
 
@@ -49,9 +53,9 @@ export const OnboardingPhotos = ({ onNext, onBack, isSubmitting }: OnboardingPho
       // Resolves only after the file is stored and the photo is saved to the profile.
       const photo = await uploadProfilePhoto(file);
       setPhotos((prev) => [...prev, photo]);
-      toast({ title: "Photo added", description: "Your photo has been added to your profile" });
+      toast({ title: 'Photo added', description: 'Your photo has been added to your profile' });
     } catch (error: any) {
-      toast({ title: "Upload failed", description: error.message || "Please try again", variant: "destructive" });
+      toast({ title: 'Upload failed', description: error.message || 'Please try again', variant: 'destructive' });
     } finally {
       setIsUploading(false);
     }
@@ -61,9 +65,9 @@ export const OnboardingPhotos = ({ onNext, onBack, isSubmitting }: OnboardingPho
     try {
       await deletePhoto(photo.id);
       setPhotos((prev) => prev.filter((p) => p.id !== photo.id));
-      toast({ title: "Removed", description: "The photo has been removed from your profile" });
+      toast({ title: 'Removed', description: 'The photo has been removed from your profile' });
     } catch (error: any) {
-      toast({ title: "Could not remove the photo", description: error.message, variant: "destructive" });
+      toast({ title: 'Could not remove the photo', description: error.message, variant: 'destructive' });
     }
   };
 
@@ -76,15 +80,21 @@ export const OnboardingPhotos = ({ onNext, onBack, isSubmitting }: OnboardingPho
   return (
     <div className="bg-island-dark/80 backdrop-blur-sm rounded-lg p-6 text-white animate-fade-in shadow-lg border border-island-light/30">
       <h1 className="text-2xl font-bold mb-2 text-gradient">Add Your Photos</h1>
-      <p className="text-gray-300 mb-4">Add at least {MIN_PHOTOS} photos (up to {MAX_PHOTOS}).</p>
+      <p className="text-gray-300 mb-4">
+        Add at least {MIN_PHOTOS} photos (up to {MAX_PHOTOS}).
+      </p>
 
       <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-island-light/10">
         <AlertCircle className="h-4 w-4 text-love shrink-0" />
         <p className="text-sm">
           {missing > 0 ? (
-            <span className="text-love">Add {missing} more photo{missing > 1 ? 's' : ''} to continue</span>
+            <span className="text-love">
+              Add {missing} more photo{missing > 1 ? 's' : ''} to continue
+            </span>
           ) : (
-            <span className="text-green-400">✓ Minimum photos added! You can add {MAX_PHOTOS - photos.length} more.</span>
+            <span className="text-green-400">
+              ✓ Minimum photos added! You can add {MAX_PHOTOS - photos.length} more.
+            </span>
           )}
         </p>
       </div>
@@ -100,9 +110,7 @@ export const OnboardingPhotos = ({ onNext, onBack, isSubmitting }: OnboardingPho
             >
               <Trash2 className="h-4 w-4" />
             </button>
-            {index === 0 && (
-              <div className="absolute top-2 left-2 bg-love/90 text-xs px-2 py-0.5 rounded">Main</div>
-            )}
+            {index === 0 && <div className="absolute top-2 left-2 bg-love/90 text-xs px-2 py-0.5 rounded">Main</div>}
           </div>
         ))}
 
@@ -145,7 +153,9 @@ export const OnboardingPhotos = ({ onNext, onBack, isSubmitting }: OnboardingPho
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Saving...
             </>
-          ) : "Continue"}
+          ) : (
+            'Continue'
+          )}
         </Button>
       </div>
     </div>

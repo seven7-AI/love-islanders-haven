@@ -41,11 +41,15 @@ describe('AICompanion', () => {
     render(<AICompanion />);
     await screen.findByText(/Welcome to Isla/);
     send('Hello?');
-    await waitFor(() => expect(toastError).toHaveBeenCalledWith('Isla is not available right now. Please try again later.'));
+    await waitFor(() =>
+      expect(toastError).toHaveBeenCalledWith('Isla is not available right now. Please try again later.'),
+    );
     expect(screen.queryByText('Hello?')).not.toBeInTheDocument();
   });
 
   it('explains rate limits', () => {
-    expect(companionErrorMessage(new ApiError(429, "You've reached the hourly limit", 'rate_limited'))).toMatch('hourly limit');
+    expect(companionErrorMessage(new ApiError(429, "You've reached the hourly limit", 'rate_limited'))).toMatch(
+      'hourly limit',
+    );
   });
 });

@@ -13,7 +13,15 @@ import { getMyProfile, setOnboardingStep, updateMyProfile, type OnboardingStep }
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 
-const steps: OnboardingStep[] = ['basics', 'photos', 'interests', 'lifestyle', 'personality', 'preferences', 'completed'];
+const steps: OnboardingStep[] = [
+  'basics',
+  'photos',
+  'interests',
+  'lifestyle',
+  'personality',
+  'preferences',
+  'completed',
+];
 
 const stepLabels: Record<OnboardingStep, string> = {
   basics: 'Basics',
@@ -22,7 +30,7 @@ const stepLabels: Record<OnboardingStep, string> = {
   lifestyle: 'Lifestyle',
   personality: 'Personality',
   preferences: 'Preferences',
-  completed: 'Done'
+  completed: 'Done',
 };
 
 export const Onboarding = () => {
@@ -40,7 +48,7 @@ export const Onboarding = () => {
         navigate('/login', { replace: true });
         return;
       }
-      
+
       try {
         const profile = await getMyProfile();
         if (profile.onboarding_completed) {
@@ -53,25 +61,25 @@ export const Onboarding = () => {
         setProfileData(profile);
       } catch (error: any) {
         toast({
-          title: "Could not load your profile",
-          description: error.message || "Please try again.",
-          variant: "destructive"
+          title: 'Could not load your profile',
+          description: error.message || 'Please try again.',
+          variant: 'destructive',
         });
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     checkAuth();
   }, [navigate]);
-  
+
   const handleNext = async (stepData: any) => {
     setIsSaving(true);
-    
+
     try {
       const updatedProfileData = { ...profileData, ...stepData };
       setProfileData(updatedProfileData);
-      
+
       const currentIndex = steps.indexOf(currentStep);
       const nextStep = steps[currentIndex + 1] as OnboardingStep;
 
@@ -81,36 +89,36 @@ export const Onboarding = () => {
       await setOnboardingStep(nextStep);
 
       setCurrentStep(nextStep);
-      
+
       if (nextStep === 'completed') {
         toast({
-          title: "Profile Completed! 🎉",
+          title: 'Profile Completed! 🎉',
           description: "You're ready to start meeting people.",
         });
-        
+
         // Redirect immediately after showing toast
         setTimeout(() => {
           navigate('/discover', { replace: true });
         }, 2000);
       }
     } catch (error: any) {
-      console.error("Error saving onboarding data:", error);
+      console.error('Error saving onboarding data:', error);
       toast({
-        title: "Error Saving Data",
-        description: error.message || "Failed to save your information. Please try again.",
-        variant: "destructive"
+        title: 'Error Saving Data',
+        description: error.message || 'Failed to save your information. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsSaving(false);
     }
   };
-  
+
   const handleBack = async () => {
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex > 0) {
       const previousStep = steps[currentIndex - 1] as OnboardingStep;
       setCurrentStep(previousStep);
-      
+
       try {
         await setOnboardingStep(previousStep);
       } catch (error) {
@@ -118,7 +126,7 @@ export const Onboarding = () => {
       }
     }
   };
-  
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-island-dark">
@@ -126,63 +134,69 @@ export const Onboarding = () => {
       </div>
     );
   }
-  
+
   const renderStep = () => {
     switch (currentStep) {
       case 'basics':
-        return <OnboardingBasics 
-          initialData={profileData} 
-          onNext={handleNext} 
-          isSubmitting={isSaving}
-        />;
+        return <OnboardingBasics initialData={profileData} onNext={handleNext} isSubmitting={isSaving} />;
       case 'photos':
-        return <OnboardingPhotos 
-          profileId={profileData.id} 
-          onNext={handleNext} 
-          onBack={handleBack}
-          isSubmitting={isSaving}
-        />;
+        return (
+          <OnboardingPhotos
+            profileId={profileData.id}
+            onNext={handleNext}
+            onBack={handleBack}
+            isSubmitting={isSaving}
+          />
+        );
       case 'interests':
-        return <OnboardingInterests
-          initialData={profileData}
-          onNext={handleNext}
-          onBack={handleBack}
-          isSubmitting={isSaving}
-        />;
+        return (
+          <OnboardingInterests
+            initialData={profileData}
+            onNext={handleNext}
+            onBack={handleBack}
+            isSubmitting={isSaving}
+          />
+        );
       case 'lifestyle':
-        return <OnboardingLifestyle 
-          initialData={profileData} 
-          onNext={handleNext} 
-          onBack={handleBack}
-          isSubmitting={isSaving}
-        />;
+        return (
+          <OnboardingLifestyle
+            initialData={profileData}
+            onNext={handleNext}
+            onBack={handleBack}
+            isSubmitting={isSaving}
+          />
+        );
       case 'personality':
-        return <OnboardingPersonality 
-          initialData={profileData} 
-          onNext={handleNext} 
-          onBack={handleBack}
-          isSubmitting={isSaving}
-        />;
+        return (
+          <OnboardingPersonality
+            initialData={profileData}
+            onNext={handleNext}
+            onBack={handleBack}
+            isSubmitting={isSaving}
+          />
+        );
       case 'preferences':
-        return <OnboardingPreferences 
-          initialData={profileData} 
-          onNext={handleNext} 
-          onBack={handleBack}
-          isSubmitting={isSaving}
-        />;
+        return (
+          <OnboardingPreferences
+            initialData={profileData}
+            onNext={handleNext}
+            onBack={handleBack}
+            isSubmitting={isSaving}
+          />
+        );
       case 'completed':
         return <OnboardingCompletion />;
       default:
         return null;
     }
   };
-  
+
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-island-dark via-island to-island-dark overflow-y-auto z-50">
       <div className="container max-w-md mx-auto px-4 py-8 pb-16">
-        <OnboardingProgress 
-          currentStep={currentStep} 
-          steps={steps.filter(step => step !== 'completed')}
+        <OnboardingProgress
+          currentStep={currentStep}
+          steps={steps.filter((step) => step !== 'completed')}
           stepLabels={stepLabels}
         />
         {renderStep()}

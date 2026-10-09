@@ -8,7 +8,10 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
   networkError: boolean;
-  signIn: (email: string, password: string) => Promise<{
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{
     error?: Error;
   }>;
   signOut: () => Promise<void>;
@@ -50,13 +53,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const getSession = async () => {
       try {
         setLoading(true);
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
         setUser(session?.user ?? null);
         setSession(session ?? null);
         setIsAuthenticated(!!session);
       } catch (error) {
-        console.error("Network error:", error);
+        console.error('Network error:', error);
         setNetworkError(true);
       } finally {
         setLoading(false);
@@ -66,20 +71,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     getSession();
 
     // Subscribe to auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: AuthChangeEvent, session: Session | null) => {
-        setUser(session?.user ?? null);
-        setSession(session ?? null);
-        setIsAuthenticated(!!session);
-        setLoading(false);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
+      setUser(session?.user ?? null);
+      setSession(session ?? null);
+      setIsAuthenticated(!!session);
+      setLoading(false);
 
-        if (event === 'PASSWORD_RECOVERY') {
-          setPasswordRecovery(true);
-        } else if (event === 'SIGNED_OUT') {
-          setPasswordRecovery(false);
-        }
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecovery(true);
+      } else if (event === 'SIGNED_OUT') {
+        setPasswordRecovery(false);
       }
-    );
+    });
 
     // Unsubscribe from the subscription when the component unmounts
     return () => {
@@ -145,7 +150,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await supabase.auth.signOut();
       // Remove flags written by earlier versions of the app; they no longer affect anything.
-      for (const key of ['emailVerificationCompleted', 'isAuthenticated', 'authMethod', 'authContact', 'verificationCode']) {
+      for (const key of [
+        'emailVerificationCompleted',
+        'isAuthenticated',
+        'authMethod',
+        'authContact',
+        'verificationCode',
+      ]) {
         localStorage.removeItem(key);
       }
     } finally {
@@ -166,7 +177,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         passwordRecovery,
         resetPassword,
         updatePassword,
-        signInWithGoogle
+        signInWithGoogle,
       }}
     >
       {children}

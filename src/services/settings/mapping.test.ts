@@ -11,8 +11,19 @@ const api: ApiSettings = {
   theme: 'light',
   preferences: {
     accessibility_settings: { textSize: 120, highContrast: true, colorBlindness: 'tritanopia' },
-    app_customization: { autoTheme: true, language: 'fr', soundEffects: false, hapticFeedback: true, animations: false },
-    ai_companion_settings: { conversationStyle: 'flirty', voiceTone: 'soft', allowProactiveMessages: false, messageFrequency: 7 },
+    app_customization: {
+      autoTheme: true,
+      language: 'fr',
+      soundEffects: false,
+      hapticFeedback: true,
+      animations: false,
+    },
+    ai_companion_settings: {
+      conversationStyle: 'flirty',
+      voiceTone: 'soft',
+      allowProactiveMessages: false,
+      messageFrequency: 7,
+    },
     match_preferences: { distanceUnit: 'mi' },
   },
 };
@@ -42,7 +53,9 @@ describe('settings mapping', () => {
   });
 
   it('builds a PATCH for one category, sending the whole preference group', () => {
-    expect(toApiPatch('communication_settings', { notifications_enabled: true })).toEqual({ notifications_enabled: true });
+    expect(toApiPatch('communication_settings', { notifications_enabled: true })).toEqual({
+      notifications_enabled: true,
+    });
     expect(toApiPatch('app_customization', { theme: 'dark', language: 'de' })).toEqual({
       theme: 'dark',
       preferences: { app_customization: { language: 'de' } },
@@ -58,9 +71,14 @@ describe('settings mapping', () => {
       screenReader: true,
       voiceCommands: true,
     } as unknown as UserSettings['accessibility_settings'];
-    expect(toApiPatch('accessibility_settings', legacy)).toEqual({ preferences: { accessibility_settings: { textSize: 100 } } });
+    expect(toApiPatch('accessibility_settings', legacy)).toEqual({
+      preferences: { accessibility_settings: { textSize: 100 } },
+    });
 
-    const privacy = { location_sharing: true, profileVisibility: 'matches' } as unknown as UserSettings['privacy_settings'];
+    const privacy = {
+      location_sharing: true,
+      profileVisibility: 'matches',
+    } as unknown as UserSettings['privacy_settings'];
     expect(toApiPatch('privacy_settings', privacy)).toEqual({ location_sharing: true });
   });
 });

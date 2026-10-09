@@ -15,7 +15,9 @@ vi.mock('@/lib/api/settings', () => ({
   updateMySettings: (u: unknown) => updateMySettings(u),
 }));
 vi.mock('sonner', () => ({ toast: { success: (m: string) => toastSuccess(m), error: (m: string) => toastError(m) } }));
-vi.mock('@/context/auth', () => ({ useAuth: () => ({ isAuthenticated: true, user: { id: 'me', email: 'me@example.com' } }) }));
+vi.mock('@/context/auth', () => ({
+  useAuth: () => ({ isAuthenticated: true, user: { id: 'me', email: 'me@example.com' } }),
+}));
 vi.mock('@/hooks/use-mobile', () => ({ useIsMobile: () => false }));
 // The individual sections have their own API calls; this test is about the page-level save.
 vi.mock('@/components/settings/AccountSettings', () => ({ default: () => null }));
@@ -57,7 +59,9 @@ describe('Settings page', () => {
     renderPage();
     fireEvent.click(await screen.findByRole('button', { name: 'Save All Changes' }));
 
-    await waitFor(() => expect(toastError).toHaveBeenCalledWith('preferences.accessibility_settings.textSize: too large'));
+    await waitFor(() =>
+      expect(toastError).toHaveBeenCalledWith('preferences.accessibility_settings.textSize: too large'),
+    );
     expect(toastSuccess).not.toHaveBeenCalled();
   });
 
@@ -67,7 +71,9 @@ describe('Settings page', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Save All Changes' }));
 
     await waitFor(() => expect(toastSuccess).toHaveBeenCalledWith('Settings saved'));
-    expect(updateMySettings).toHaveBeenCalledWith(expect.objectContaining({ theme: 'dark', notifications_enabled: true }));
+    expect(updateMySettings).toHaveBeenCalledWith(
+      expect.objectContaining({ theme: 'dark', notifications_enabled: true }),
+    );
     expect(toastError).not.toHaveBeenCalled();
   });
 
