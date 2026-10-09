@@ -80,9 +80,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("ai_chat_history_pkey")),
     )
-    op.create_index(
-        "ai_chat_history_user_created_idx", "ai_chat_history", ["user_id", "created_at"], unique=False
-    )
+    op.create_index("ai_chat_history_user_created_idx", "ai_chat_history", ["user_id", "created_at"], unique=False)
     op.create_table(
         "blocked_users",
         sa.Column("id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False),
@@ -99,9 +97,7 @@ def upgrade() -> None:
             ["user_id"], ["profiles.id"], name=op.f("blocked_users_user_id_fkey"), ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("blocked_users_pkey")),
-        sa.UniqueConstraint(
-            "user_id", "blocked_user_id", name=op.f("blocked_users_user_id_blocked_user_id_key")
-        ),
+        sa.UniqueConstraint("user_id", "blocked_user_id", name=op.f("blocked_users_user_id_blocked_user_id_key")),
     )
     op.create_index("blocked_users_blocked_idx", "blocked_users", ["blocked_user_id"], unique=False)
     op.create_table(
@@ -117,9 +113,7 @@ def upgrade() -> None:
             name=op.f("matches_matched_user_id_fkey"),
             ondelete="CASCADE",
         ),
-        sa.ForeignKeyConstraint(
-            ["user_id"], ["profiles.id"], name=op.f("matches_user_id_fkey"), ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["user_id"], ["profiles.id"], name=op.f("matches_user_id_fkey"), ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id", name=op.f("matches_pkey")),
         sa.UniqueConstraint("user_id", "matched_user_id", name=op.f("matches_user_id_matched_user_id_key")),
     )
@@ -192,9 +186,7 @@ def upgrade() -> None:
         sa.Column("comments_count", sa.Integer(), server_default=sa.text("0"), nullable=True),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["user_id"], ["profiles.id"], name=op.f("streaks_user_id_fkey"), ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["user_id"], ["profiles.id"], name=op.f("streaks_user_id_fkey"), ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id", name=op.f("streaks_pkey")),
     )
     op.create_index("streaks_user_created_idx", "streaks", ["user_id", "created_at"], unique=False)
@@ -213,9 +205,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["swiped_user_id"], ["profiles.id"], name=op.f("swipes_swiped_user_id_fkey"), ondelete="CASCADE"
         ),
-        sa.ForeignKeyConstraint(
-            ["user_id"], ["profiles.id"], name=op.f("swipes_user_id_fkey"), ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["user_id"], ["profiles.id"], name=op.f("swipes_user_id_fkey"), ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id", name=op.f("swipes_pkey")),
         sa.UniqueConstraint("user_id", "swiped_user_id", name=op.f("swipes_user_id_swiped_user_id_key")),
     )
@@ -264,12 +254,8 @@ def upgrade() -> None:
         sa.Column("notes", sa.Text(), nullable=True),
         sa.Column("contact_id", sa.UUID(), nullable=True),
         sa.Column("location_sharing_enabled", sa.Boolean(), server_default=sa.text("false"), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["contact_id"], ["safety_contacts.id"], name=op.f("date_plans_contact_id_fkey")
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_id"], ["profiles.id"], name=op.f("date_plans_user_id_fkey"), ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["contact_id"], ["safety_contacts.id"], name=op.f("date_plans_contact_id_fkey")),
+        sa.ForeignKeyConstraint(["user_id"], ["profiles.id"], name=op.f("date_plans_user_id_fkey"), ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id", name=op.f("date_plans_pkey")),
     )
     op.create_index("date_plans_user_idx", "date_plans", ["user_id"], unique=False)
@@ -283,9 +269,7 @@ def upgrade() -> None:
         sa.Column("media_url", sa.Text(), nullable=True),
         sa.Column("is_read", sa.Boolean(), server_default=sa.text("false"), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["match_id"], ["matches.id"], name=op.f("messages_match_id_fkey"), ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["match_id"], ["matches.id"], name=op.f("messages_match_id_fkey"), ondelete="CASCADE"),
         sa.ForeignKeyConstraint(
             ["sender_id"], ["profiles.id"], name=op.f("messages_sender_id_fkey"), ondelete="CASCADE"
         ),

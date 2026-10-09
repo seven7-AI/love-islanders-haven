@@ -22,9 +22,7 @@ async def test_readiness_checks_the_database(client: AsyncClient) -> None:
 
 async def test_readiness_fails_when_database_is_unreachable() -> None:
     app = create_app(
-        make_settings(
-            database_url="postgresql+asyncpg://postgres:postgres@127.0.0.1:1/none", db_pool_timeout_seconds=1
-        )
+        make_settings(database_url="postgresql+asyncpg://postgres:postgres@127.0.0.1:1/none", db_pool_timeout_seconds=1)
     )
     async with app.router.lifespan_context(app):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:

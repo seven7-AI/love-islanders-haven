@@ -18,7 +18,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 9 | 3 Database | Scaffold FastAPI backend, config, logging, health, local Postgres | ✅ |
 | 10 | 3 Database | Alembic baseline migration with indexes | ✅ |
 | 11 | 3 Database | Data migration, backup and restore runbooks | ✅ (production run needs credentials, #36) |
-| 12 | 4 Features | Backend authentication (Supabase JWT verification) | ⏳ |
+| 12 | 4 Features | Backend authentication (Supabase JWT verification) | ✅ |
 | 13 | 4 Features | Profiles, images, onboarding via API | ⏳ |
 | 14 | 4 Features | Discover, swipes, matches via API | ⏳ |
 | 15 | 4 Features | Messaging via API | ⏳ |

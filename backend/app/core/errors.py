@@ -35,7 +35,10 @@ def problem(status: int, detail: str | None = None, **extra: Any) -> JSONRespons
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def handle_app_error(_: Request, exc: AppError) -> JSONResponse:
-        return problem(exc.status, exc.detail, code=exc.code)
+        response = problem(exc.status, exc.detail, code=exc.code)
+        if exc.status == 401:
+            response.headers["WWW-Authenticate"] = "Bearer"
+        return response
 
     @app.exception_handler(StarletteHTTPException)
     async def handle_http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:
