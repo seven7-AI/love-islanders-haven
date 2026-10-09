@@ -13,7 +13,7 @@ const ProfileBottomInfo = ({ profile }: ProfileBottomInfoProps) => {
       <div className="flex items-center gap-2">
         <h2 className="text-2xl font-bold text-white">
           {profile.name}
-          <span className="ml-2">{profile.age}</span>
+          {profile.age ? <span className="ml-2">{' '}{profile.age}</span> : null}
         </h2>
         
         {profile.verified && (

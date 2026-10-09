@@ -31,7 +31,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 22 | 4 Features | Retire direct Supabase data access and edge functions | ✅ (production action pending) |
 | 23 | 5 Hardening | Rate limiting, CORS, headers, dependency scanning | ✅ (Spotify secret rotation pending) |
 | 24 | 5 Hardening | Observability | ✅ |
-| 25 | 6 Testing | Playwright E2E | ⏳ |
+| 25 | 6 Testing | Playwright E2E | ✅ |
 | 26 | 6 Testing | Complete CI pipeline | ⏳ |
 | 27 | 7 Docs | Documentation and deployment artifacts | ⏳ |
 | 28 | 7 Docs | Clean-clone verification and upstream PR | ⏳ |
