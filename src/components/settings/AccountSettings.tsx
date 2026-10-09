@@ -32,17 +32,9 @@ const AccountSettings = () => {
     if (user?.email) {
       userEmail = user.email;
       console.log("User email set from auth context:", userEmail);
-    } 
-    // 2. Try from localStorage
-    else {
-      const authContact = localStorage.getItem('authContact');
-      if (authContact) {
-        userEmail = authContact;
-        console.log("User email set from localStorage:", userEmail);
-      }
     }
-    
-    // 3. Try from Supabase directly
+
+    // 2. Try from Supabase directly
     if (!userEmail) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -55,7 +47,7 @@ const AccountSettings = () => {
       }
     }
     
-    // 4. If we found an email, update state and settings
+    // 3. If we found an email, update state and settings
     if (userEmail) {
       setEmail(userEmail);
       
@@ -66,9 +58,6 @@ const AccountSettings = () => {
         updateSettings('account_settings', newSettings).catch(error => {
           console.error('Error updating email in settings:', error);
         });
-        
-        // Also ensure it's in localStorage
-        localStorage.setItem('authContact', userEmail);
       }
     }
     
@@ -107,10 +96,8 @@ const AccountSettings = () => {
         
         // Update settings in context/database
         await updateSettings('account_settings', newSettings);
-        
-        // Also update localStorage
-        localStorage.setItem('authContact', newEmail);
-        
+ 
+
         toast.success("Email updated successfully");
       } catch (error) {
         console.error('Error updating email:', error);

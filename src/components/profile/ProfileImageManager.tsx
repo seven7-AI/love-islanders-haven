@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/auth';
-import VerificationPopup from '../verification/VerificationPopup';
 import ProfileImageGrid from './image-controls/ProfileImageGrid';
 import ImageUrlInput from './image-controls/ImageUrlInput';
 import VerificationSection from './verification/VerificationSection';
@@ -12,17 +11,14 @@ interface ProfileImageManagerProps {
   images: string[];
   verified: boolean;
   onImagesChange: (images: string[]) => void;
-  onVerificationRequest: () => void;
 }
 
 const ProfileImageManager = ({ 
   images, 
   verified, 
-  onImagesChange, 
-  onVerificationRequest 
+  onImagesChange,
 }: ProfileImageManagerProps) => {
   const { user } = useAuth();
-  const [verificationOpen, setVerificationOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageInput, setImageInput] = useState('');
   const minImages = 1;
@@ -95,20 +91,6 @@ const ProfileImageManager = ({
     }
   };
 
-  const handleVerificationRequest = () => {
-    setVerificationOpen(true);
-  };
-  
-  const handleVerificationSuccess = async () => {
-    setVerificationOpen(false);
-    onVerificationRequest();
-    
-    // Refresh page to show verified status
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -143,21 +125,8 @@ const ProfileImageManager = ({
       </div>
       
       <div className="pt-4 border-t border-island-light">
-        <VerificationSection
-          verified={verified}
-          onVerificationRequest={handleVerificationRequest}
-        />
+        <VerificationSection verified={verified} />
       </div>
-      
-      {/* Verification Popup */}
-      {user && (
-        <VerificationPopup
-          open={verificationOpen}
-          onClose={() => setVerificationOpen(false)}
-          onVerified={handleVerificationSuccess}
-          userId={user.id}
-        />
-      )}
     </div>
   );
 };

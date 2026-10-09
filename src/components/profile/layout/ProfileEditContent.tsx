@@ -38,7 +38,6 @@ const ProfileEditContent = ({
                 images={profile.images || []}
                 verified={profile.verified || false}
                 onImagesChange={onImagesChange}
-                onVerificationRequest={onVerificationSuccess}
               />
               
               <ProfileDisplayPreferences 

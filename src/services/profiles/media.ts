@@ -12,10 +12,7 @@ export const saveProfileImage = async (
 ) => {
   try {
     const { data, error: authError } = await supabase.auth.getSession();
-    
-    // For development or when auth is not fully available
-    const userId = data?.session?.user?.id || 
-                  (localStorage.getItem('isAuthenticated') === 'true' ? 'dev-user-123' : null);
+    const userId = data?.session?.user?.id ?? null;
     
     if (!userId) throw new Error('User not authenticated');
     
@@ -46,8 +43,7 @@ export const deleteProfileImage = async (imageUrl: string) => {
   try {
     const { data, error: authError } = await supabase.auth.getSession();
     
-    const userId = data?.session?.user?.id || 
-                  (localStorage.getItem('isAuthenticated') === 'true' ? 'dev-user-123' : null);
+    const userId = data?.session?.user?.id ?? null;
     
     if (!userId) throw new Error('User not authenticated');
 
@@ -102,8 +98,7 @@ export const uploadProfileImage = async (file: File): Promise<string> => {
   try {
     const { data, error: authError } = await supabase.auth.getSession();
     
-    const userId = data?.session?.user?.id || 
-                  (localStorage.getItem('isAuthenticated') === 'true' ? 'dev-user-123' : null);
+    const userId = data?.session?.user?.id ?? null;
     
     if (!userId) throw new Error('User not authenticated');
     
@@ -202,8 +197,7 @@ export const updateProfileImagePosition = async (
   try {
     const { data, error: authError } = await supabase.auth.getSession();
     
-    const userId = data?.session?.user?.id || 
-                  (localStorage.getItem('isAuthenticated') === 'true' ? 'dev-user-123' : null);
+    const userId = data?.session?.user?.id ?? null;
     
     if (!userId) throw new Error('User not authenticated');
 
@@ -235,8 +229,7 @@ export const updateProfileImageVisibility = async (
   try {
     const { data, error: authError } = await supabase.auth.getSession();
     
-    const userId = data?.session?.user?.id || 
-                  (localStorage.getItem('isAuthenticated') === 'true' ? 'dev-user-123' : null);
+    const userId = data?.session?.user?.id ?? null;
     
     if (!userId) throw new Error('User not authenticated');
 

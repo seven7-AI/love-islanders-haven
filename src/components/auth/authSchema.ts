@@ -17,11 +17,6 @@ export const authSchema = z.object({
   path: ["confirmPassword"],
 });
 
-// Verification schema
-export const verificationSchema = z.object({
-  code: z.string().length(4, { message: "Verification code must be 4 digits" })
-});
-
 // New password form (password recovery)
 export const newPasswordSchema = z.object({
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),

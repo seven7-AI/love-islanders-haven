@@ -35,24 +35,11 @@ export const updateUserProfile = async (profileData: Partial<SupabaseProfile>) =
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    // For development or when Supabase auth is not fully available
     const userId = user?.id;
-    const devMode = !userId && (localStorage.getItem('isAuthenticated') === 'true' || import.meta.env.MODE === 'development');
-    
-    if (!userId && !devMode) {
+
+    if (!userId) {
       toast.error("Authentication required to update profile");
       throw new Error('Authentication required to update profile');
-    }
-
-    // Handle development mode or mobile testing without auth
-    if (devMode) {
-      console.log('Development mode: Simulating profile update with data:', profileData);
-      // For development: return mock data without using UUID in DB operations
-      return { 
-        ...profileData, 
-        id: 'development-user',  // Use string that isn't a UUID format
-        updated_at: new Date().toISOString() 
-      };
     }
     
     console.log('Updating profile with data:', profileData);
@@ -95,20 +82,6 @@ export const updateUserProfile = async (profileData: Partial<SupabaseProfile>) =
 export const updateDisplayPreferences = async (name: string, showAge: boolean) => {
   try {
     console.log('Updating display preferences:', { name, showAge });
-    
-    // Check if in development mode
-    const { data: { user } } = await supabase.auth.getUser();
-    const devMode = !user?.id && (localStorage.getItem('isAuthenticated') === 'true' || import.meta.env.MODE === 'development');
-    
-    if (devMode) {
-      console.log('Development mode: Simulating display preferences update');
-      toast.success("Display preferences updated");
-      return { 
-        name, 
-        show_age: showAge, 
-        id: 'development-user' // Use string that isn't a UUID format
-      };
-    }
     
     const result = await updateUserProfile({
       name,

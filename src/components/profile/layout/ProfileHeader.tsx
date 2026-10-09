@@ -13,7 +13,7 @@ interface ProfileHeaderProps {
 const ProfileHeader = ({ isEditing, onEditToggle }: ProfileHeaderProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const email = user?.email || localStorage.getItem('authContact') || 'User';
+  const email = user?.email || 'User';
 
   const handleLogout = async () => {
     try {

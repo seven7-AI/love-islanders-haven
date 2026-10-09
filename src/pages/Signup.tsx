@@ -26,7 +26,7 @@ const Signup = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: { name },
         },
       });
@@ -39,12 +39,10 @@ const Signup = () => {
       if (data.user) {
         // Profile and onboarding rows are created by the database when the auth user is created.
         if (data.session) {
-          localStorage.setItem('isAuthenticated', 'true');
           toast.success('Account created! Let\'s set up your profile.');
           navigate('/onboarding', { replace: true });
         } else {
-          toast.success('Check your email to verify your account.');
-          navigate('/login', { replace: true });
+          navigate(`/verify?email=${encodeURIComponent(email)}`, { replace: true });
         }
       }
     } catch (err: any) {

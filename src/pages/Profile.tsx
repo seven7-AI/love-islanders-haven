@@ -12,7 +12,7 @@ import ProfileAuthRequired from '@/components/profile/layout/ProfileAuthRequired
 
 const createFallbackProfile = () => ({
   id: 'profile-fallback',
-  name: localStorage.getItem('authContact')?.split('@')[0] || 'My Profile',
+  name: 'My Profile',
   age: 0,
   bio: '',
   distance: 0,

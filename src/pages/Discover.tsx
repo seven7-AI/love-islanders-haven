@@ -25,7 +25,7 @@ const Discover: React.FC = () => {
     gender: filters.gender === 'any' ? undefined : filters.gender,
   });
 
-  const { showVerificationPopup, handleVerificationComplete } = useEmailVerification();
+  const { showVerificationPopup, email: unconfirmedEmail, handleVerificationComplete } = useEmailVerification();
 
   const apply = (next: SimpleFilters) => {
     setFilters(next);
@@ -76,7 +76,7 @@ const Discover: React.FC = () => {
             onApply={apply}
           />
 
-          <EmailVerificationPopup isOpen={showVerificationPopup} onClose={handleVerificationComplete} />
+          <EmailVerificationPopup isOpen={showVerificationPopup} email={unconfirmedEmail} onClose={handleVerificationComplete} />
 
           <div className="fixed bottom-20 left-6 z-10">
             <Button

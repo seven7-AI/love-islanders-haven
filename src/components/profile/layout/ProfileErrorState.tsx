@@ -36,11 +36,6 @@ const ProfileErrorState = ({ onRetry, errorMessage }: ProfileErrorStateProps) =>
   
   // Attempt auth refresh - this is a non-blocking action
   const attemptAuthRefresh = () => {
-    // Try to refresh auth state from localStorage
-    if (localStorage.getItem('isAuthenticated') === 'true') {
-      console.log('Attempting auth refresh from localStorage');
-    }
-    
     // Set retry attempt count
     setRetryAttempt(prev => prev + 1);
     
