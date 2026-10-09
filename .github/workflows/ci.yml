@@ -80,5 +80,10 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy .
       - run: uv run pytest
+      - name: Backup/restore and Supabase→Alembic copy drills
+        working-directory: .
+        run: |
+          scripts/db/restore-drill.sh postgresql://postgres:postgres@localhost:5432/postgres
+          scripts/db/copy-drill.sh postgresql://postgres:postgres@localhost:5432/postgres
       - name: Docker image builds
         run: docker build -t love-islander-api .

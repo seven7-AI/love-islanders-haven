@@ -3,7 +3,7 @@
 # Local compose database unless overridden (e.g. DATABASE_URL=... make migrate).
 DATABASE_URL ?= postgresql+asyncpg://postgres:postgres@localhost:$(or $(DB_PORT),5433)/love_islander
 export DATABASE_URL
-.PHONY: help up down db api-test api-lint api-typecheck api-check web-check check migrate migration
+.PHONY: help up down db api-test api-lint api-typecheck api-check web-check check migrate migration db-backup db-restore-drill
 
 help:
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -38,3 +38,10 @@ migrate: db ## Apply Alembic migrations to the local database
 
 migration: ## Autogenerate an Alembic revision: make migration m="description"
 	cd backend && uv run alembic revision --autogenerate -m "$(m)"
+
+db-backup: ## Back up the local database to backups/
+	scripts/db/backup.sh postgresql://postgres:postgres@localhost:$(or $(DB_PORT),5433)/love_islander backups
+
+db-restore-drill: db ## Backup/restore drill + Supabase→Alembic copy drill on disposable databases
+	scripts/db/restore-drill.sh postgresql://postgres:postgres@localhost:$(or $(DB_PORT),5433)/postgres
+	scripts/db/copy-drill.sh postgresql://postgres:postgres@localhost:$(or $(DB_PORT),5433)/postgres
