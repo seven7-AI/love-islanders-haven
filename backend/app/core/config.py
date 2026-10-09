@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     # Server-side Supabase key for Storage (signed uploads, deletes). Never sent to browsers.
     supabase_service_role_key: str | None = None
     profile_images_bucket: str = "profile-images"
+    chat_media_bucket: str = "chat-media"
     db_pool_size: int = 5
     db_pool_timeout_seconds: float = 5.0
 

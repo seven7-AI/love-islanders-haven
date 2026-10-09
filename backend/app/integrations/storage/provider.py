@@ -29,6 +29,8 @@ class StorageProvider(Protocol):
 
     def public_url(self, bucket: str, path: str) -> str: ...
 
+    async def signed_download_url(self, bucket: str, path: str, expires_in: int) -> str: ...
+
     def path_from_public_url(self, bucket: str, url: str) -> str | None: ...
 
 
@@ -45,6 +47,9 @@ class UnconfiguredStorage:
         raise StorageNotConfigured("Image storage is not configured")
 
     def public_url(self, bucket: str, path: str) -> str:
+        raise StorageNotConfigured("Image storage is not configured")
+
+    async def signed_download_url(self, bucket: str, path: str, expires_in: int) -> str:
         raise StorageNotConfigured("Image storage is not configured")
 
     def path_from_public_url(self, bucket: str, url: str) -> str | None:

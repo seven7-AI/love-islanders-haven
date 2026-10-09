@@ -29,6 +29,9 @@ class FakeStorage:
     def public_url(self, bucket: str, path: str) -> str:
         return f"{BASE}/{bucket}/{path}"
 
+    async def signed_download_url(self, bucket: str, path: str, expires_in: int) -> str:
+        return f"https://storage.test/signed/{bucket}/{path}?expires={expires_in}"
+
     def path_from_public_url(self, bucket: str, url: str) -> str | None:
         prefix = f"{BASE}/{bucket}/"
         return url[len(prefix) :] if url.startswith(prefix) else None

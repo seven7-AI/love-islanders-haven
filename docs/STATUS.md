@@ -21,7 +21,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 12 | 4 Features | Backend authentication (Supabase JWT verification) | ✅ |
 | 13 | 4 Features | Profiles, images, onboarding via API | ✅ (deployment pending) |
 | 14 | 4 Features | Discover, swipes, matches via API | ✅ |
-| 15 | 4 Features | Messaging via API | ⏳ |
+| 15 | 4 Features | Messaging via API | ✅ (production action pending) |
 | 16 | 4 Features | Streaks via API | ⏳ |
 | 17 | 4 Features | Settings, privacy, blocking, reports, safety | ⏳ |
 | 18 | 4 Features | Notifications | ⏳ |

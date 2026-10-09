@@ -16,7 +16,7 @@ const MessageItem = ({ message, isCurrentUser }: MessageItemProps) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
   
-  const formattedTime = useMemo(() => formatTime(message.sent_at), [message.sent_at]);
+  const formattedTime = useMemo(() => formatTime(message.created_at), [message.created_at]);
   
   const renderMessageContent = () => {
     switch (message.content_type) {
