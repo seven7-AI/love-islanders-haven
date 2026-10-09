@@ -25,7 +25,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 16 | 4 Features | Streaks via API | ✅ (job scheduling pending) |
 | 17 | 4 Features | Settings, privacy, blocking, reports, safety | ✅ (alert provider ⛔) |
 | 18 | 4 Features | Notifications | ✅ |
-| 19 | 4 Features | AI companion on LLM provider interface | ⏳ (live check ⛔ OpenAI key) |
+| 19 | 4 Features | AI companion on LLM provider interface | ✅ (live check ⛔ API key) |
 | 20 | 4 Features | Google Calendar integration | ⏳ (live check ⛔ Google OAuth client) |
 | 21 | 4 Features | Location and distance filtering | ⏳ |
 | 22 | 4 Features | Retire direct Supabase data access and edge functions | ⏳ |

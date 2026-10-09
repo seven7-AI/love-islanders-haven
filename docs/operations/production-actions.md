@@ -18,8 +18,10 @@ Changes merged to the repository that only take effect once someone with access 
 | #17 | Apply migration `20261009150000_settings_preferences_and_reports.sql`; decide who reviews `reports` (service-role access, e.g. Supabase dashboard) | `supabase db push` | Pending |
 | #17 | Choose and configure an emergency-alert delivery provider (SMS/email); until then the API answers 503 `alerts_not_configured` and the app tells users to call emergency services | implement `AlertSender` in `backend/app/integrations/alerts` | Blocked (provider) |
 | #18 | Apply migration `20261009160000_notifications.sql` | `supabase db push` | Pending |
+| #19 | Set `LLM_API_KEY` (and optionally `LLM_MODEL`/`LLM_BASE_URL`) on the API; schedule `python -m app.jobs.companion_checkins`; delete the `ai-companion` edge function | `supabase functions delete ai-companion --project-ref <project-ref>` | Blocked (API key) |
 
 ## Known residual risks
 - Signed-in users can read other users' `dob` (and other profile columns) through the `profiles` table until profile reads move behind the API (#13).
 - Unblocking someone leaves the match closed (status `blocked`); because a pair can only have one match row, they cannot match again. This is deliberate (an unblock should not silently reopen a conversation).
+- Until direct table access is revoked (#22), clients can still insert rows into `ai_chat_history` through the Supabase API (RLS only checks the user id), so a user could add fake assistant messages to their own history.
 - Profile images are stored in a public bucket, so an image URL remains viewable by anyone who has it, even if the image is hidden.
