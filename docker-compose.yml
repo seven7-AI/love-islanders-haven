@@ -23,6 +23,9 @@ services:
       ENVIRONMENT: development
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/love_islander
       LOG_JSON: "false"
+      # One of these is required: the Supabase project URL (JWKS) or the legacy JWT secret.
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-}
     ports:
       - "127.0.0.1:${API_PORT:-8000}:8000"
     depends_on:

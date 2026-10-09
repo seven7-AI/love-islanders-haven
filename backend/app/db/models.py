@@ -236,9 +236,7 @@ class Swipe(Base):
     __tablename__ = "swipes"
     __table_args__ = (
         UniqueConstraint("user_id", "swiped_user_id"),
-        CheckConstraint(
-            "direction = ANY (ARRAY['left'::text, 'right'::text, 'super'::text])", name="direction_check"
-        ),
+        CheckConstraint("direction = ANY (ARRAY['left'::text, 'right'::text, 'super'::text])", name="direction_check"),
         CheckConstraint("user_id <> swiped_user_id", name="not_self"),
         Index("swipes_swiped_idx", "swiped_user_id"),
     )

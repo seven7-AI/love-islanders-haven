@@ -177,6 +177,5 @@ async def test_alembic_schema_matches_supabase_migrations(make_database) -> None
         only_supabase = sorted(supabase_schema[part] - alembic_schema[part], key=str)
         only_alembic = sorted(alembic_schema[part] - supabase_schema[part], key=str)
         assert not only_supabase and not only_alembic, (
-            f"{part} differ\n  only in Supabase migrations: {only_supabase}"
-            f"\n  only in Alembic: {only_alembic}"
+            f"{part} differ\n  only in Supabase migrations: {only_supabase}\n  only in Alembic: {only_alembic}"
         )

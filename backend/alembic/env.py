@@ -1,4 +1,5 @@
 import asyncio
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -13,9 +14,10 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# An explicit sqlalchemy.url (e.g. set by tests) wins; otherwise use the application's DATABASE_URL.
+# An explicit sqlalchemy.url (e.g. set by tests) wins, then DATABASE_URL. Migrations need only the database, not the
+# rest of the application configuration.
 if not config.get_main_option("sqlalchemy.url"):
-    config.set_main_option("sqlalchemy.url", str(get_settings().database_url))
+    config.set_main_option("sqlalchemy.url", os.environ.get("DATABASE_URL") or str(get_settings().database_url))
 
 target_metadata = Base.metadata
 
