@@ -40,3 +40,7 @@ __pycache__/
 
 # Database backups
 backups/
+
+# Playwright
+test-results/
+playwright-report/

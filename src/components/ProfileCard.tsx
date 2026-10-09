@@ -1,8 +1,7 @@
 
 import { useState, useRef } from 'react';
 import { Profile } from '../utils/dummyData';
-import { Info, MessageCircle, Heart, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { Info, MessageCircle } from 'lucide-react';
 import ProfileImageCarousel from './profile/ProfileImageCarousel';
 import ProfileInfoPanel from './profile/ProfileInfoPanel';
 import ProfileCommentInput from './profile/ProfileCommentInput';
@@ -48,18 +47,11 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
     if (!isSwiping) return;
     
     const threshold = 100;
+    // The Discover page reports the saved result (errors, matches); no optimistic toast here.
     if (offsetX > threshold) {
       onSwipe('right');
-      toast("Liked!", { 
-        icon: <Heart className="h-5 w-5 text-green-500" />,
-        description: `You liked ${profile.name}'s profile!`
-      });
     } else if (offsetX < -threshold) {
       onSwipe('left');
-      toast("Passed", { 
-        icon: <X className="h-5 w-5 text-rose-500" />,
-        description: `You passed on ${profile.name}'s profile.`
-      });
     }
     
     setIsSwiping(false);

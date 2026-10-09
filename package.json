@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "preview": "vite preview",
     "android:deploy": "node scripts/android-deploy.cjs",
-    "test:db": "supabase/test/run.sh"
+    "test:db": "supabase/test/run.sh",
+    "test:e2e": "scripts/e2e.sh"
   },
   "dependencies": {
     "@capacitor/android": "^7.1.0",
@@ -73,6 +74,7 @@
   "devDependencies": {
     "@capacitor/cli": "^7.6.9",
     "@eslint/js": "^9.9.0",
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/typography": "^0.5.15",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^6.9.1",
