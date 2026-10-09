@@ -23,7 +23,7 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 NAMING_CONVENTION = {
@@ -261,6 +261,7 @@ class UserSettings(Base):
     theme: Mapped[str | None] = mapped_column(Text, server_default=text("'system'::text"))
     created_at: Mapped[datetime] = _created_at()
     updated_at: Mapped[datetime] = _updated_at()
+    preferences: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
 
 
 class Streak(Base):
@@ -290,6 +291,32 @@ class StreakLike(Base):
     streak_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("streaks.id", ondelete="CASCADE"), nullable=False
     )
+    created_at: Mapped[datetime] = _created_at()
+
+
+class Report(Base):
+    __tablename__ = "reports"
+    __table_args__ = (
+        CheckConstraint(
+            "reason = ANY (ARRAY['harassment'::text, 'spam'::text, 'fake_profile'::text, "
+            "'inappropriate_content'::text, 'underage'::text, 'other'::text])",
+            name="reason_check",
+        ),
+        CheckConstraint(
+            "status = ANY (ARRAY['open'::text, 'reviewing'::text, 'resolved'::text, 'dismissed'::text])",
+            name="status_check",
+        ),
+        CheckConstraint("reporter_id <> reported_user_id", name="not_self"),
+        Index("reports_reported_user_idx", "reported_user_id", "created_at"),
+        Index("reports_reporter_idx", "reporter_id"),
+    )
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    reporter_id: Mapped[uuid.UUID] = _profile_fk()
+    reported_user_id: Mapped[uuid.UUID] = _profile_fk()
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    details: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'open'::text"))
     created_at: Mapped[datetime] = _created_at()
 
 

@@ -41,15 +41,18 @@ const AccessibilitySettings = () => {
           <h4 className="text-sm font-medium text-love">Text Size</h4>
           <div className="py-4 px-2">
             <Slider 
-              value={[localSettings.textSize ?? 2]} 
-              min={1} 
-              max={5} 
-              step={1}
-              onValueChange={(values) => handleChange('textSize', values[0])}
+              value={[localSettings.textSize ?? 100]} 
+              min={80} 
+              max={150} 
+              step={10}
+              aria-label="Text size"
+              onValueChange={(values) => setLocalSettings((prev) => ({ ...prev, textSize: values[0] }))}
+              onValueCommit={(values) => handleChange('textSize', values[0])}
               className="mt-6"
             />
             <div className="flex justify-between mt-2">
               <span className="text-xs text-muted-foreground">A</span>
+              <span className="text-xs text-muted-foreground">{localSettings.textSize ?? 100}%</span>
               <span className="text-lg text-muted-foreground">A</span>
             </div>
           </div>
@@ -87,28 +90,9 @@ const AccessibilitySettings = () => {
           </div>
         </div>
 
-        <div className="space-y-4 pt-4 border-t border-island-light/30">
-          <h4 className="text-sm font-medium text-love">Voice Assistance</h4>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="screen-reader">Screen reader optimization</Label>
-              <Switch 
-                id="screen-reader" 
-                checked={localSettings.screenReader ?? false}
-                onCheckedChange={(checked) => handleChange('screenReader', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="voice-commands">Voice commands</Label>
-              <Switch 
-                id="voice-commands" 
-                checked={localSettings.voiceCommands ?? false}
-                onCheckedChange={(checked) => handleChange('voiceCommands', checked)}
-              />
-            </div>
-          </div>
-        </div>
+        <p className="pt-4 border-t border-island-light/30 text-xs text-muted-foreground">
+          Screen reader optimisation and voice commands aren't available yet.
+        </p>
       </div>
     </SettingsSection>
   );

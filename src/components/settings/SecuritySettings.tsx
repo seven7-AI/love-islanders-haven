@@ -1,62 +1,51 @@
-
-import { useState, useEffect } from 'react';
-import { KeyRound } from 'lucide-react';
+import { useState } from 'react';
+import { KeyRound, Loader2 } from 'lucide-react';
 import SettingsSection from './SettingsSection';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useSettings } from '@/context/SettingsContext';
-import { SecuritySettings as SecuritySettingsType } from '@/services/settings';
+import { useAuth } from '@/context/auth';
 
 const SecuritySettings = () => {
-  const { settings, updateSettings } = useSettings();
-  const [localSettings, setLocalSettings] = useState<SecuritySettingsType>(
-    settings.security_settings
-  );
+  const { user, resetPassword } = useAuth();
+  const [isSending, setIsSending] = useState(false);
 
-  useEffect(() => {
-    setLocalSettings(settings.security_settings);
-  }, [settings.security_settings]);
-
-  const handleChange = <K extends keyof SecuritySettingsType>(
-    key: K, 
-    value: SecuritySettingsType[K]
-  ) => {
-    const newSettings = { ...localSettings, [key]: value };
-    setLocalSettings(newSettings);
-    updateSettings('security_settings', newSettings);
+  const handleChangePassword = async () => {
+    if (!user?.email) {
+      toast.error('Your account has no email address to send a reset link to.');
+      return;
+    }
+    setIsSending(true);
+    try {
+      const { error } = await resetPassword(user.email);
+      if (error) {
+        toast.error(error.message || 'Could not send the password reset email');
+      } else {
+        toast.success(`We sent a password reset link to ${user.email}`);
+      }
+    } finally {
+      setIsSending(false);
+    }
   };
-  
+
   return (
     <SettingsSection title="Security Settings" icon={<KeyRound size={20} />}>
       <div className="space-y-6">
-        <div className="space-y-4 pt-4 border-t border-island-light/30">
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-love">Password</h4>
+          <p className="text-xs text-muted-foreground">
+            We'll email you a link to choose a new password.
+          </p>
+          <Button variant="outline" className="w-full" onClick={handleChangePassword} disabled={isSending}>
+            {isSending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Change password
+          </Button>
+        </div>
+
+        <div className="space-y-2 pt-4 border-t border-island-light/30">
           <h4 className="text-sm font-medium text-love">Login Security</h4>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <Label htmlFor="biometric" className="cursor-pointer">Biometric login</Label>
-                <span className="text-xs text-muted-foreground">Use fingerprint or face recognition</span>
-              </div>
-              <Switch 
-                id="biometric" 
-                checked={localSettings.biometric ?? false}
-                onCheckedChange={(checked) => handleChange('biometric', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <Label htmlFor="login-notification" className="cursor-pointer">Login notifications</Label>
-                <span className="text-xs text-muted-foreground">Get notified of new login attempts</span>
-              </div>
-              <Switch 
-                id="login-notification" 
-                checked={localSettings.loginNotification ?? true}
-                onCheckedChange={(checked) => handleChange('loginNotification', checked)}
-              />
-            </div>
-          </div>
+          <p className="text-xs text-muted-foreground">Two-factor authentication isn't available yet.</p>
+          <p className="text-xs text-muted-foreground">Biometric login isn't available yet.</p>
+          <p className="text-xs text-muted-foreground">Login notifications aren't available yet.</p>
         </div>
       </div>
     </SettingsSection>

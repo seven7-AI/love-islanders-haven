@@ -8,10 +8,14 @@ import InlineChatContent from './InlineChatContent';
 interface InlineChatOverlayProps {
   matchId: string;
   matchName: string;
+  /** The other person's user id, for blocking and reporting. */
+  partnerId?: string;
   onClose: () => void;
+  /** Called after the partner was blocked; the chat should be closed and the match removed. */
+  onBlocked?: () => void;
 }
 
-const InlineChatOverlay: React.FC<InlineChatOverlayProps> = ({ matchId, matchName, onClose }) => {
+const InlineChatOverlay: React.FC<InlineChatOverlayProps> = ({ matchId, matchName, partnerId, onClose, onBlocked }) => {
   const { messages, isLoading, error, currentUserId, handleSendMessage, loadOlder, hasOlder } = useInlineChat(matchId);
 
   return (
@@ -19,8 +23,10 @@ const InlineChatOverlay: React.FC<InlineChatOverlayProps> = ({ matchId, matchNam
       <AudioPlayerProvider>
         <div className="bg-island-dark border border-island-light/20 rounded-lg w-full max-w-md h-[80vh] flex flex-col overflow-hidden animate-fade-in chat-container">
           <InlineChatHeader 
-            matchName={matchName} 
+            matchName={matchName}
+            partnerId={partnerId}
             onClose={onClose}
+            onBlocked={onBlocked}
           />
 
           <InlineChatContent 

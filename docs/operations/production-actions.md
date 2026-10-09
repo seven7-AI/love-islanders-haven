@@ -15,8 +15,10 @@ Changes merged to the repository that only take effect once someone with access 
 | #13 | Deploy the API with `DATABASE_URL` (Supabase direct connection), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CORS_ORIGINS`; run `alembic stamp 0001` (after #36); build the web app with `VITE_API_URL` | see `backend/README.md`, `docs/database/migrations.md` | Pending |
 | #15 | Apply migration `20261009140000_chat_media_bucket.sql` (private `chat-media` bucket) | `supabase db push` | Pending |
 | #16 | Schedule `python -m app.jobs.expire_streaks` hourly with the API's environment | hosting platform scheduler / cron | Pending |
+| #17 | Apply migration `20261009150000_settings_preferences_and_reports.sql`; decide who reviews `reports` (service-role access, e.g. Supabase dashboard) | `supabase db push` | Pending |
+| #17 | Choose and configure an emergency-alert delivery provider (SMS/email); until then the API answers 503 `alerts_not_configured` and the app tells users to call emergency services | implement `AlertSender` in `backend/app/integrations/alerts` | Blocked (provider) |
 
 ## Known residual risks
 - Signed-in users can read other users' `dob` (and other profile columns) through the `profiles` table until profile reads move behind the API (#13).
-- Unblocking someone leaves the match closed (status `blocked`); they need to match again, which the unique pair index currently prevents. Revisit in #17.
+- Unblocking someone leaves the match closed (status `blocked`); because a pair can only have one match row, they cannot match again. This is deliberate (an unblock should not silently reopen a conversation).
 - Profile images are stored in a public bucket, so an image URL remains viewable by anyone who has it, even if the image is hidden.

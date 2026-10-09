@@ -1,91 +1,42 @@
-
-import { useState, useEffect } from "react";
-import { useAuth } from "@/context/auth";
-import { Button } from "@/components/ui/button";
-import { TrashIcon } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-
-interface BlockedUserType {
-  blocked_user_id: string;
-  profiles: {
-    id: string;
-    name: string;
-  };
-}
+import { useCallback, useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Loader2, TrashIcon } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
+import { BlockedUser, fetchBlockedUsers, unblockUser } from '@/lib/api/safety';
 
 const BlockReportSection = () => {
-  const { user } = useAuth();
-  const [blockedUsers, setBlockedUsers] = useState<BlockedUserType[]>([]);
+  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [unblocking, setUnblocking] = useState<string | null>(null);
 
-  // Fetch blocked users on component mount
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      setBlockedUsers(await fetchBlockedUsers());
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not load blocked users');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    if (user?.id) {
-      fetchBlockedUsers(user.id);
-    }
-  }, [user?.id]);
+    load();
+  }, [load]);
 
-  const fetchBlockedUsers = async (userId: string) => {
+  const handleUnblock = async (blocked: BlockedUser) => {
+    setUnblocking(blocked.user_id);
     try {
-      // Updated query to use a simpler approach without requiring a direct relation
-      const { data: blockedUserIds, error: blockedError } = await supabase
-        .from('blocked_users')
-        .select('blocked_user_id')
-        .eq('user_id', userId);
-
-      if (blockedError) throw blockedError;
-      
-      // If no blocked users, set empty array
-      if (!blockedUserIds || blockedUserIds.length === 0) {
-        setBlockedUsers([]);
-        return;
-      }
-      
-      // Get profile details for each blocked user
-      const blockedUserList: BlockedUserType[] = [];
-      
-      for (const item of blockedUserIds) {
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, name')
-          .eq('id', item.blocked_user_id)
-          .single();
-          
-        if (!profileError && profileData) {
-          blockedUserList.push({
-            blocked_user_id: item.blocked_user_id,
-            profiles: {
-              id: profileData.id,
-              name: profileData.name
-            }
-          });
-        }
-      }
-      
-      setBlockedUsers(blockedUserList);
-    } catch (error) {
-      console.error("Error fetching blocked users:", error);
-    }
-  };
-
-  const unblockUser = async (blockedUserId: string) => {
-    try {
-      if (!user?.id) return;
-      
-      const { error } = await supabase
-        .from('blocked_users')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('blocked_user_id', blockedUserId);
-
-      if (error) throw error;
-      
-      // Refresh blocked users list
-      if (user?.id) {
-        fetchBlockedUsers(user.id);
-      }
-    } catch (error) {
-      console.error("Error unblocking user:", error);
+      await unblockUser(blocked.user_id);
+      setBlockedUsers((prev) => prev.filter((u) => u.user_id !== blocked.user_id));
+      toast.success(`${blocked.name ?? 'User'} has been unblocked`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not unblock this user');
+    } finally {
+      setUnblocking(null);
     }
   };
 
@@ -94,31 +45,44 @@ const BlockReportSection = () => {
       <CardHeader>
         <CardTitle>Blocked Users</CardTitle>
         <CardDescription>
-          Manage the users you've blocked
+          Manage the users you've blocked. To block or report someone, use the menu in your chat with them.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {blockedUsers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">You haven't blocked any users.</p>
-          ) : (
-            <div className="space-y-2">
-              {blockedUsers.map((blockedUser) => (
-                <div key={blockedUser.blocked_user_id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                  <span>{blockedUser.profiles?.name || 'Unknown User'}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => unblockUser(blockedUser.blocked_user_id)}
-                  >
-                    <TrashIcon className="h-4 w-4 mr-1" />
-                    Unblock
-                  </Button>
+        {isLoading ? (
+          <div className="flex justify-center py-2">
+            <Loader2 className="h-5 w-5 animate-spin text-love" />
+          </div>
+        ) : error ? (
+          <div className="space-y-2">
+            <p role="alert" className="text-sm text-destructive">{error}</p>
+            <Button variant="outline" size="sm" onClick={load}>Try again</Button>
+          </div>
+        ) : blockedUsers.length === 0 ? (
+          <p className="text-sm text-muted-foreground">You haven't blocked any users.</p>
+        ) : (
+          <div className="space-y-2">
+            {blockedUsers.map((blocked) => (
+              <div key={blocked.user_id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                <div className="flex items-center gap-2 min-w-0">
+                  {blocked.photo_url && (
+                    <img src={blocked.photo_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                  )}
+                  <span className="truncate">{blocked.name || 'Unknown User'}</span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleUnblock(blocked)}
+                  disabled={unblocking === blocked.user_id}
+                >
+                  <TrashIcon className="h-4 w-4 mr-1" />
+                  Unblock
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

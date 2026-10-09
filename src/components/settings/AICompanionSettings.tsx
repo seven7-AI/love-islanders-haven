@@ -36,7 +36,7 @@ const AICompanionSettings = () => {
     updateSettings('ai_companion_settings', newSettings);
   };
 
-  const handleResetPersonality = () => {
+  const handleResetPersonality = async () => {
     const defaultSettings: AICompanionSettingsType = {
       conversationStyle: 'caring',
       voiceTone: 'warm',
@@ -45,8 +45,9 @@ const AICompanionSettings = () => {
     };
     
     setLocalSettings(defaultSettings);
-    updateSettings('ai_companion_settings', defaultSettings);
-    toast.success('AI personality has been reset to default');
+    if (await updateSettings('ai_companion_settings', defaultSettings)) {
+      toast.success('AI personality has been reset to default');
+    }
   };
   
   return (
@@ -113,7 +114,8 @@ const AICompanionSettings = () => {
                   min={1} 
                   max={10} 
                   step={1}
-                  onValueChange={(values) => handleChange('messageFrequency', values[0])}
+                  onValueChange={(values) => setLocalSettings((prev) => ({ ...prev, messageFrequency: values[0] }))}
+              onValueCommit={(values) => handleChange('messageFrequency', values[0])}
                   className="mt-6"
                 />
                 <div className="flex justify-between mt-2 text-sm text-muted-foreground">

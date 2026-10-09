@@ -15,7 +15,7 @@ const Matches = () => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeChat, setActiveChat] = useState<{ id: string; name: string } | null>(null);
+  const [activeChat, setActiveChat] = useState<{ id: string; name: string; partnerId: string } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -101,7 +101,7 @@ const Matches = () => {
                     variant="ghost"
                     className="bg-love/10 hover:bg-love/20 p-2 rounded-full"
                     aria-label={`Message ${m.partner.name ?? 'match'}`}
-                    onClick={() => setActiveChat({ id: m.id, name: m.partner.name ?? '' })}
+                    onClick={() => setActiveChat({ id: m.id, name: m.partner.name ?? '', partnerId: m.partner.id })}
                   >
                     <MessageCircle size={20} className="text-love" />
                   </Button>
@@ -121,7 +121,13 @@ const Matches = () => {
         <InlineChatOverlay
           matchId={activeChat.id}
           matchName={activeChat.name}
+          partnerId={activeChat.partnerId}
           onClose={() => setActiveChat(null)}
+          onBlocked={() => {
+            const blockedId = activeChat.partnerId;
+            setActiveChat(null);
+            setMatches((prev) => prev.filter((m) => m.partner.id !== blockedId));
+          }}
         />
       )}
     </div>

@@ -1,89 +1,73 @@
-
 import { MapPin } from 'lucide-react';
-import { Label } from '@/components/ui/label';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import PrivacyControlsSection from './PrivacyControlsSection';
-import PrivacyToggle from './PrivacyToggle';
-import { usePrivacy } from './PrivacyContext';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { useState } from 'react';
 import { requestAndUpdateLocation } from '@/services/profiles/location';
-import { toast } from 'sonner';
+import { useSettings } from '@/context/SettingsContext';
 
 const LocationSharingSection = () => {
-  const { settings, updatePrivacySetting } = usePrivacy();
+  const { settings, updateSettings, isLoading } = useSettings();
   const [isUpdatingLocation, setIsUpdatingLocation] = useState(false);
-  
-  const handleUpdateLocation = async () => {
+  const [isToggling, setIsToggling] = useState(false);
+  const privacy = settings.privacy_settings;
+  const sharing = privacy.location_sharing ?? false;
+
+  const setSharing = (value: boolean) => updateSettings('privacy_settings', { ...privacy, location_sharing: value });
+
+  // requestAndUpdateLocation reports its own success or failure to the user.
+  const handleUpdateLocation = async (): Promise<boolean> => {
+    setIsUpdatingLocation(true);
     try {
-      setIsUpdatingLocation(true);
       const success = await requestAndUpdateLocation();
-      
-      if (success) {
-        // If location toggle is off, turn it on since the user is explicitly sharing location
-        if (!settings.shareLocation) {
-          updatePrivacySetting('shareLocation', true);
-        }
-        toast.success('Your location has been updated successfully');
+      if (success && !sharing) {
+        // The user explicitly shared their location, so turn sharing on.
+        await setSharing(true);
       }
-    } catch (error) {
-      console.error('Error updating location:', error);
-      toast.error('Failed to update your location');
+      return success;
     } finally {
       setIsUpdatingLocation(false);
     }
   };
-  
+
+  const handleToggle = async (checked: boolean) => {
+    setIsToggling(true);
+    try {
+      if (checked) {
+        // Only switch sharing on once the location was actually updated.
+        await handleUpdateLocation();
+      } else {
+        await setSharing(false);
+      }
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
   return (
     <PrivacyControlsSection title="Location Sharing" icon={<MapPin size={16} className="text-love" />}>
-      <PrivacyToggle 
-        label="Share your location"
-        settingKey="shareLocation"
-        icon={<MapPin size={16} className="text-muted-foreground" />}
-        description="Allow the app to use your location for distance calculation and matching"
-        onChange={async (checked) => {
-          // If turning on, prompt to update location
-          if (checked) {
-            return handleUpdateLocation();
-          }
-          return Promise.resolve();
-        }}
-      />
-      
-      <PrivacyToggle 
-        label="Show distance to other users"
-        settingKey="showDistance"
-        icon={<MapPin size={16} className="text-muted-foreground" />}
-        description="Display how far away other users are from your location"
-      />
-      
-      <div className="flex items-center justify-between">
-        <Label htmlFor="location-precision" className="cursor-pointer">Location precision</Label>
-        <Select 
-          value={settings.locationPrecision ?? 'approximate'}
-          onValueChange={(value) => updatePrivacySetting('locationPrecision', value as any)}
-        >
-          <SelectTrigger className="w-32 bg-island-light/20 border-island-light">
-            <SelectValue placeholder="Select" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="exact">Exact</SelectItem>
-            <SelectItem value="approximate">Approximate</SelectItem>
-            <SelectItem value="city">City only</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex items-center justify-between py-2">
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <MapPin size={16} className="text-muted-foreground" />
+            <span>Share your location</span>
+          </div>
+          <p className="text-sm text-muted-foreground ml-6 mt-1">
+            Allow the app to use your location for distance calculation and matching
+          </p>
+        </div>
+        <Switch
+          aria-label="Share your location"
+          checked={sharing}
+          onCheckedChange={handleToggle}
+          disabled={isLoading || isToggling || isUpdatingLocation}
+        />
       </div>
-      
-      <Button 
-        onClick={handleUpdateLocation} 
-        variant="outline" 
-        size="sm" 
+
+      <Button
+        onClick={handleUpdateLocation}
+        variant="outline"
+        size="sm"
         className="w-full mt-2"
         disabled={isUpdatingLocation}
       >

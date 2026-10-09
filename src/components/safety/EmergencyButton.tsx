@@ -1,93 +1,100 @@
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { AlertTriangle, Bell } from 'lucide-react';
-import { useDatingSafety } from '@/hooks/use-dating-safety';
+import { AlertTriangle, Bell, Mail, MessageSquare, Phone } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ApiError } from '@/lib/api/client';
+import { ALERTS_NOT_CONFIGURED, SafetyContact, sendEmergencyAlert } from '@/lib/api/safety';
 
 interface EmergencyButtonProps {
+  contacts: SafetyContact[];
   className?: string;
 }
 
-const EmergencyButton = ({ className }: EmergencyButtonProps) => {
+interface Coordinates {
+  latitude: number;
+  longitude: number;
+}
+
+type Result =
+  | { kind: 'sent' }
+  | { kind: 'not_configured' }
+  | { kind: 'failed'; message: string };
+
+/** Emergency number that works across the EU and on most mobile networks worldwide. */
+const EMERGENCY_NUMBER = '112';
+
+const getLocation = (): Promise<Coordinates | null> =>
+  new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve(null);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 },
+    );
+  });
+
+const helpMessage = (location: Coordinates | null) =>
+  location
+    ? `I need help. My location: https://maps.google.com/?q=${location.latitude},${location.longitude}`
+    : 'I need help. Please call me.';
+
+const EmergencyServicesLink = () => (
+  <a
+    href={`tel:${EMERGENCY_NUMBER}`}
+    className="inline-flex items-center gap-2 font-semibold underline"
+  >
+    <Phone className="h-4 w-4" />
+    Call emergency services ({EMERGENCY_NUMBER})
+  </a>
+);
+
+const EmergencyButton = ({ contacts, className }: EmergencyButtonProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
-  const { safetyContacts, sendEmergencyAlert } = useDatingSafety();
+  const [result, setResult] = useState<Result | null>(null);
+  const [location, setLocation] = useState<Coordinates | null>(null);
 
-  const handleEmergencyButtonClick = () => {
-    setIsDialogOpen(true);
+  const manualContact = contacts.find((c) => c.is_primary) ?? contacts[0];
+
+  const handleOpenChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) setResult(null);
   };
 
   const handleConfirmAlert = async () => {
-    if (safetyContacts.length === 0) {
-      setResult({
-        success: false,
-        message: "You haven't added any safety contacts yet."
-      });
-      return;
-    }
-
     setIsSending(true);
     setResult(null);
-    
+    const coords = await getLocation();
+    setLocation(coords);
     try {
-      const location = await getCurrentLocation();
-      const success = await sendEmergencyAlert(location);
-      
-      setResult({
-        success,
-        message: success 
-          ? "Emergency alert sent to your safety contacts." 
-          : "Failed to send emergency alert. Please try again or call emergency services directly."
-      });
-    } catch (error) {
-      setResult({
-        success: false,
-        message: "Unable to determine your location. Alert sent without location data."
-      });
+      await sendEmergencyAlert({ message: helpMessage(coords), ...(coords ?? {}) });
+      setResult({ kind: 'sent' });
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 503 && err.code === ALERTS_NOT_CONFIGURED) {
+        setResult({ kind: 'not_configured' });
+      } else {
+        setResult({ kind: 'failed', message: err instanceof Error ? err.message : 'The alert could not be sent.' });
+      }
     } finally {
       setIsSending(false);
     }
   };
 
-  const getCurrentLocation = (): Promise<{ latitude: number; longitude: number }> => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error("Geolocation is not supported by this browser."));
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          reject(error);
-        },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-      );
-    });
-  };
+  const text = encodeURIComponent(helpMessage(location));
 
   return (
     <>
-      <Button 
-        variant="destructive" 
-        className={`gap-2 ${className}`} 
-        onClick={handleEmergencyButtonClick}
-      >
+      <Button variant="destructive" className={`gap-2 ${className ?? ''}`} onClick={() => setIsDialogOpen(true)}>
         <Bell className="h-4 w-4" />
         Emergency Alert
       </Button>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
@@ -95,46 +102,87 @@ const EmergencyButton = ({ className }: EmergencyButtonProps) => {
               Send Emergency Alert
             </DialogTitle>
             <DialogDescription>
-              This will send an emergency alert with your current location to all your safety contacts.
+              Asks Love Islander to alert your safety contacts, with your current location if you allow it.
             </DialogDescription>
           </DialogHeader>
 
-          {result && (
-            <Alert variant={result.success ? "default" : "destructive"}>
-              <AlertDescription>{result.message}</AlertDescription>
+          {result?.kind === 'sent' && (
+            <Alert>
+              <AlertDescription>Alert sent to your safety contacts.</AlertDescription>
             </Alert>
           )}
 
-          {safetyContacts.length === 0 && !result && (
-            <Alert variant="destructive">
-              <AlertDescription>
-                You haven't added any safety contacts yet. Add contacts in the "Create Plan" tab first.
+          {(result?.kind === 'not_configured' || result?.kind === 'failed') && (
+            <Alert variant="destructive" role="alert">
+              <AlertTitle>
+                {result.kind === 'not_configured'
+                  ? "Emergency alerts aren't set up yet"
+                  : 'The alert could not be sent'}
+              </AlertTitle>
+              <AlertDescription className="space-y-3">
+                <p>
+                  {result.kind === 'failed' && `${result.message} `}
+                  Your safety contacts have not received an alert from us.
+                </p>
+                <p>If you are in danger, call your local emergency number.</p>
+                <EmergencyServicesLink />
+                {manualContact && (manualContact.phone || manualContact.email) && (
+                  <div className="space-y-1">
+                    <p>Or contact {manualContact.name} yourself:</p>
+                    <div className="flex flex-wrap gap-3">
+                      {manualContact.phone && (
+                        <a href={`sms:${manualContact.phone}?body=${text}`} className="inline-flex items-center gap-1 underline">
+                          <MessageSquare className="h-4 w-4" /> Text {manualContact.name}
+                        </a>
+                      )}
+                      {manualContact.phone && (
+                        <a href={`tel:${manualContact.phone}`} className="inline-flex items-center gap-1 underline">
+                          <Phone className="h-4 w-4" /> Call {manualContact.name}
+                        </a>
+                      )}
+                      {manualContact.email && (
+                        <a
+                          href={`mailto:${manualContact.email}?subject=${encodeURIComponent('I need help')}&body=${text}`}
+                          className="inline-flex items-center gap-1 underline"
+                        >
+                          <Mail className="h-4 w-4" /> Email {manualContact.name}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
               </AlertDescription>
             </Alert>
           )}
 
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button 
-              variant="outline" 
-              onClick={() => setIsDialogOpen(false)}
-              disabled={isSending}
-            >
-              Cancel
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={handleConfirmAlert}
-              disabled={isSending || safetyContacts.length === 0}
-            >
-              {isSending ? (
-                <>
-                  <Spinner className="mr-2 h-4 w-4" />
-                  Sending...
-                </>
-              ) : (
-                "Send Alert"
+          {!result && (
+            <div className="space-y-2 text-sm">
+              {contacts.length === 0 && (
+                <Alert variant="destructive">
+                  <AlertDescription>You haven't added any safety contacts yet.</AlertDescription>
+                </Alert>
               )}
+              <p className="text-muted-foreground">In immediate danger? Don't wait for an alert:</p>
+              <EmergencyServicesLink />
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={isSending}>
+              Close
             </Button>
+            {!result && (
+              <Button variant="destructive" onClick={handleConfirmAlert} disabled={isSending || contacts.length === 0}>
+                {isSending ? (
+                  <>
+                    <Spinner className="mr-2 h-4 w-4" />
+                    Sending...
+                  </>
+                ) : (
+                  'Send Alert'
+                )}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

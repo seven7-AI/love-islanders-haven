@@ -1,89 +1,86 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useDatingSafety } from '@/hooks/use-dating-safety';
+import { Checkbox } from '@/components/ui/checkbox';
+import type { SafetyContact, SafetyContactInput } from '@/lib/api/safety';
 
 interface SafetyContactFormProps {
+  initial?: SafetyContact;
+  isSaving?: boolean;
+  submitLabel?: string;
+  /** Resolves true when the contact was saved. */
+  onSubmit: (input: SafetyContactInput) => Promise<boolean>;
   onCancel: () => void;
-  onSuccess: () => void;
 }
 
-const SafetyContactForm = ({ onCancel, onSuccess }: SafetyContactFormProps) => {
-  const { addSafetyContact, isLoading } = useDatingSafety();
-  
-  const [newContact, setNewContact] = useState({
-    name: '',
-    phone_number: '',
-    email: ''
-  });
-  
-  const handleAddContact = async (e: React.FormEvent) => {
+const SafetyContactForm = ({ initial, isSaving, submitLabel = 'Save Contact', onSubmit, onCancel }: SafetyContactFormProps) => {
+  const [name, setName] = useState(initial?.name ?? '');
+  const [phone, setPhone] = useState(initial?.phone ?? '');
+  const [email, setEmail] = useState(initial?.email ?? '');
+  const [isPrimary, setIsPrimary] = useState(initial?.is_primary ?? false);
+  const idPrefix = initial ? `contact-${initial.id}` : 'contact-new';
+
+  const hasReachableDetail = phone.trim() !== '' || email.trim() !== '';
+  const canSubmit = name.trim() !== '' && hasReachableDetail && !isSaving;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!newContact.name || !newContact.phone_number) {
-      return;
-    }
-    
-    const result = await addSafetyContact({
-      name: newContact.name,
-      phone_number: newContact.phone_number,
-      email: newContact.email || undefined
-    });
-    
-    if (result) {
-      setNewContact({ name: '', phone_number: '', email: '' });
-      onSuccess();
+    if (!canSubmit) return;
+    const input: SafetyContactInput = { name: name.trim(), is_primary: isPrimary };
+    if (phone.trim()) input.phone = phone.trim();
+    if (email.trim()) input.email = email.trim();
+    const saved = await onSubmit(input);
+    if (saved && !initial) {
+      setName('');
+      setPhone('');
+      setEmail('');
+      setIsPrimary(false);
     }
   };
-  
+
   return (
-    <div className="space-y-2 p-2 border rounded-md">
+    <form onSubmit={handleSubmit} className="space-y-2 p-3 border rounded-md">
       <div>
-        <Label htmlFor="contact-name">Name</Label>
-        <Input 
-          id="contact-name"
-          value={newContact.name}
-          onChange={(e) => setNewContact(prev => ({ ...prev, name: e.target.value }))}
-          placeholder="Contact name"
-        />
+        <Label htmlFor={`${idPrefix}-name`}>Name</Label>
+        <Input id={`${idPrefix}-name`} value={name} onChange={(e) => setName(e.target.value)} placeholder="Contact name" />
       </div>
       <div>
-        <Label htmlFor="contact-phone">Phone number</Label>
-        <Input 
-          id="contact-phone"
-          value={newContact.phone_number}
-          onChange={(e) => setNewContact(prev => ({ ...prev, phone_number: e.target.value }))}
+        <Label htmlFor={`${idPrefix}-phone`}>Phone number</Label>
+        <Input
+          id={`${idPrefix}-phone`}
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
           placeholder="Phone number"
         />
       </div>
       <div>
-        <Label htmlFor="contact-email">Email (optional)</Label>
-        <Input 
-          id="contact-email"
-          value={newContact.email}
-          onChange={(e) => setNewContact(prev => ({ ...prev, email: e.target.value }))}
+        <Label htmlFor={`${idPrefix}-email`}>Email</Label>
+        <Input
+          id={`${idPrefix}-email`}
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="Email address"
         />
       </div>
+      {!hasReachableDetail && (
+        <p className="text-xs text-muted-foreground">Add a phone number or an email address.</p>
+      )}
+      <div className="flex items-center space-x-2">
+        <Checkbox id={`${idPrefix}-primary`} checked={isPrimary} onCheckedChange={(checked) => setIsPrimary(checked === true)} />
+        <Label htmlFor={`${idPrefix}-primary`}>Primary contact</Label>
+      </div>
       <div className="flex gap-2">
-        <Button 
-          type="button"
-          onClick={handleAddContact}
-          disabled={!newContact.name || !newContact.phone_number || isLoading}
-        >
-          Save Contact
+        <Button type="submit" disabled={!canSubmit}>
+          {submitLabel}
         </Button>
-        <Button 
-          type="button"
-          variant="ghost"
-          onClick={onCancel}
-        >
+        <Button type="button" variant="ghost" onClick={onCancel}>
           Cancel
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

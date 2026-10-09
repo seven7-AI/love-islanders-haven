@@ -1,161 +1,91 @@
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import { toast } from 'sonner';
-import { 
-  UserSettings, 
-  defaultSettings, 
-  fetchUserSettings, 
-  updateSettingsCategory,
-  saveUserSettings
-} from '@/services/settings';
+import { UserSettings, defaultSettings, fromApiSettings, toApiPatch, toApiSettings } from '@/services/settings';
+import { getMySettings, updateMySettings } from '@/lib/api/settings';
 import { useAuth } from '@/context/auth';
 
 interface SettingsContextType {
   settings: UserSettings;
   isLoading: boolean;
   error: string | null;
+  /** Saves one category. Reports the API error to the user and restores the previous value on failure. */
   updateSettings: <T extends keyof UserSettings>(category: T, newSettings: UserSettings[T]) => Promise<boolean>;
-  saveAllSettings: () => Promise<boolean>;
-  resetAllSettings: () => Promise<boolean>;
+  /** Saves every category. Rejects with the API error on failure. */
+  saveAllSettings: () => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+
+const errorMessage = (err: unknown, fallback: string) => (err instanceof Error && err.message ? err.message : fallback);
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, user } = useAuth();
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
 
-  // Load settings when authenticated
   useEffect(() => {
-    const loadSettings = async () => {
-      if (!isAuthenticated) {
-        console.log('User not authenticated, using default settings');
-        setSettings(defaultSettings);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        console.log('User authenticated, loading settings');
-        setIsLoading(true);
-        const userSettings = await fetchUserSettings();
-        setSettings(userSettings);
-        setError(null);
-      } catch (err) {
-        console.error('Failed to load settings:', err);
-        setError('Failed to load settings');
-        toast.error('Failed to load settings');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadSettings();
-  }, [isAuthenticated, user]);
-
-  // Update a specific settings category
-  const updateSettings = async <T extends keyof UserSettings>(
-    category: T, 
-    newSettings: UserSettings[T]
-  ): Promise<boolean> => {
     if (!isAuthenticated) {
-      console.error('User must be logged in to save settings');
-      toast.error('You must be logged in to save settings');
-      return false;
-    }
-
-    try {
-      console.log(`Updating ${category}:`, newSettings);
-      
-      // Update local state immediately for responsive UI
-      setSettings(prev => ({
-        ...prev,
-        [category]: {
-          ...prev[category],
-          ...newSettings
-        }
-      }));
-
-      // Update in database
-      const success = await updateSettingsCategory(category, newSettings);
-      
-      if (success) {
-        console.log(`${category} updated successfully`);
-        return true;
-      } else {
-        console.error(`Failed to update ${category} in database`);
-        // Revert on failure
-        try {
-          const revertedSettings = await fetchUserSettings();
-          setSettings(revertedSettings);
-        } catch (fetchErr) {
-          console.error('Failed to fetch settings after update failure:', fetchErr);
-        }
-        return false;
-      }
-    } catch (err) {
-      console.error(`Error updating ${category}:`, err);
-      return false;
-    }
-  };
-
-  // Save all settings at once
-  const saveAllSettings = async (): Promise<boolean> => {
-    if (!isAuthenticated) {
-      console.error('User must be logged in to save settings');
-      toast.error('You must be logged in to save settings');
-      return false;
-    }
-
-    try {
-      const success = await saveUserSettings(settings);
-      return success;
-    } catch (err) {
-      console.error('Error saving all settings:', err);
-      return false;
-    }
-  };
-
-  // Reset all settings to default
-  const resetAllSettings = async (): Promise<boolean> => {
-    if (!isAuthenticated) {
-      console.error('User must be logged in to reset settings');
-      toast.error('You must be logged in to reset settings');
-      return false;
-    }
-
-    try {
       setSettings(defaultSettings);
-      const success = await saveUserSettings(defaultSettings);
-      
-      if (success) {
-        toast.success('All settings reset to default');
-        return true;
-      } else {
-        // Revert on failure
-        const revertedSettings = await fetchUserSettings();
-        setSettings(revertedSettings);
-        toast.error('Failed to reset settings');
+      setError(null);
+      setIsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+    getMySettings()
+      .then((api) => {
+        if (cancelled) return;
+        setSettings(fromApiSettings(api));
+        setError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(errorMessage(err, 'Failed to load settings'));
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated, user?.id]);
+
+  const updateSettings = useCallback(
+    async <T extends keyof UserSettings>(category: T, newSettings: UserSettings[T]): Promise<boolean> => {
+      if (!isAuthenticated) {
+        toast.error('You must be logged in to save settings');
         return false;
       }
-    } catch (err) {
-      console.error('Error resetting settings:', err);
-      toast.error('Failed to reset settings');
-      return false;
+
+      const previous = settingsRef.current[category];
+      setSettings((prev) => ({ ...prev, [category]: newSettings }));
+      try {
+        const saved = fromApiSettings(await updateMySettings(toApiPatch(category, newSettings)));
+        setSettings((prev) => ({ ...prev, [category]: saved[category] }));
+        return true;
+      } catch (err) {
+        setSettings((prev) => ({ ...prev, [category]: previous }));
+        toast.error(errorMessage(err, 'Could not save your settings'));
+        return false;
+      }
+    },
+    [isAuthenticated],
+  );
+
+  const saveAllSettings = useCallback(async () => {
+    if (!isAuthenticated) {
+      throw new Error('You must be logged in to save settings');
     }
-  };
+    const saved = await updateMySettings(toApiSettings(settingsRef.current));
+    setSettings(fromApiSettings(saved));
+  }, [isAuthenticated]);
 
   return (
-    <SettingsContext.Provider value={{ 
-      settings, 
-      isLoading, 
-      error, 
-      updateSettings, 
-      saveAllSettings,
-      resetAllSettings 
-    }}>
+    <SettingsContext.Provider value={{ settings, isLoading, error, updateSettings, saveAllSettings }}>
       {children}
     </SettingsContext.Provider>
   );

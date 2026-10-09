@@ -1,22 +1,30 @@
-
-import { useState, useEffect } from 'react';
-import { useDatingSafety, DatePlan } from '@/hooks/use-dating-safety';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect, useCallback } from 'react';
+import { useDatePlans } from '@/hooks/safety/use-date-plans';
 import { useAuth } from '@/context/auth';
 import { useGoogleCalendar, CalendarEvent } from '@/hooks/use-google-calendar';
 
 export function useProfileCalendar() {
-  const [datePlans, setDatePlans] = useState<DatePlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { fetchDatePlans } = useDatingSafety();
+  const { datePlans, fetchDatePlans } = useDatePlans({ autoLoad: false });
   const { isAuthenticated } = useAuth();
-  const { 
-    googleEvents, 
-    isLoading: isLoadingGoogle, 
+  const {
+    googleEvents,
+    isLoading: isLoadingGoogle,
     isAuthorized: isGoogleAuthorized,
     initiateGoogleAuth,
     fetchGoogleEvents
   } = useGoogleCalendar();
+
+  const loadDatePlans = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await fetchDatePlans();
+    } catch (error) {
+      console.error('Error loading date plans:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchDatePlans]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -24,64 +32,34 @@ export function useProfileCalendar() {
     } else {
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, loadDatePlans]);
 
-  const loadDatePlans = async () => {
-    setIsLoading(true);
-    try {
-      const plans = await fetchDatePlans();
-      setDatePlans(plans);
-    } catch (error) {
-      console.error('Error loading date plans:', error);
-      setDatePlans([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // App dates (not cancelled) with a time, in the same shape as Google Calendar events.
+  const appEvents: CalendarEvent[] = datePlans
+    .filter((plan) => plan.date_time && plan.status !== 'cancelled')
+    .map((plan) => ({
+      id: plan.id,
+      title: plan.title,
+      location: plan.location ?? plan.title,
+      notes: plan.notes ?? undefined,
+      date_time: plan.date_time as string,
+      source: 'app' as const,
+    }));
 
-  // Get current user ID for Google events
-  const { user } = useAuth();
-  const currentUserId = user?.id || 'unknown-user';
+  const allEvents = [...appEvents, ...googleEvents];
 
-  // Transform Google events to be compatible with our date plans format
-  const transformedGoogleEvents: DatePlan[] = googleEvents.map(event => ({
-    id: `google-${event.id}`,
-    user_id: currentUserId, // Add required user_id
-    location: event.location || 'No location specified',
-    date_time: event.date_time,
-    notes: event.notes,
-    location_sharing_enabled: false,
-    created_at: new Date().toISOString(), // Add required created_at
-    source: 'google'
-  }));
-
-  // Combine app date plans with Google Calendar events
-  const allEvents = [...datePlans, ...transformedGoogleEvents];
-
-  const getUpcomingDates = () => {
-    const now = new Date();
-    return allEvents.filter(plan => {
-      const planDate = new Date(plan.date_time);
-      return planDate > now;
-    }).sort((a, b) => {
-      return new Date(a.date_time).getTime() - new Date(b.date_time).getTime();
-    });
-  };
-
-  const getPastDates = () => {
-    const now = new Date();
-    return allEvents.filter(plan => {
-      const planDate = new Date(plan.date_time);
-      return planDate <= now;
-    }).sort((a, b) => {
-      return new Date(b.date_time).getTime() - new Date(a.date_time).getTime();
-    });
-  };
+  const now = new Date();
+  const upcomingDates = allEvents
+    .filter((event) => new Date(event.date_time) > now)
+    .sort((a, b) => new Date(a.date_time).getTime() - new Date(b.date_time).getTime());
+  const pastDates = allEvents
+    .filter((event) => new Date(event.date_time) <= now)
+    .sort((a, b) => new Date(b.date_time).getTime() - new Date(a.date_time).getTime());
 
   return {
     datePlans,
-    upcomingDates: getUpcomingDates(),
-    pastDates: getPastDates(),
+    upcomingDates,
+    pastDates,
     isLoading: isLoading || isLoadingGoogle,
     refresh: async () => {
       await loadDatePlans();
