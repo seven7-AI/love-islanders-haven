@@ -1,1 +1,20 @@
-project_id = "brbknkqlxjvhyxhuwxty"
+# Supabase CLI configuration for local development (`supabase start`).
+# project_id names the local stack only; the remote project is selected with `supabase link --project-ref <ref>`.
+project_id = "love-islander"
+
+[db]
+major_version = 15
+
+[auth]
+site_url = "http://localhost:8080"
+additional_redirect_urls = [
+  "http://localhost:8080/auth/callback",
+  "http://localhost:8080/reset-password",
+]
+
+[auth.email]
+enable_confirmations = true
+
+# Google redirects the browser here without a Supabase JWT.
+[functions.google-calendar-callback]
+verify_jwt = false
