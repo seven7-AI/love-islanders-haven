@@ -1,5 +1,9 @@
 # Common development commands. Run `make help` for the list.
-.PHONY: help up down db api-test api-lint api-typecheck api-check web-check check
+
+# Local compose database unless overridden (e.g. DATABASE_URL=... make migrate).
+DATABASE_URL ?= postgresql+asyncpg://postgres:postgres@localhost:$(or $(DB_PORT),5433)/love_islander
+export DATABASE_URL
+.PHONY: help up down db api-test api-lint api-typecheck api-check web-check check migrate migration
 
 help:
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -28,3 +32,9 @@ web-check: ## Frontend lint, typecheck, tests, build
 	npm run lint && npm run typecheck && npm test && npm run build
 
 check: web-check api-check ## Everything CI runs (except the Supabase policy tests: npm run test:db)
+
+migrate: db ## Apply Alembic migrations to the local database
+	cd backend && uv run alembic upgrade head
+
+migration: ## Autogenerate an Alembic revision: make migration m="description"
+	cd backend && uv run alembic revision --autogenerate -m "$(m)"
