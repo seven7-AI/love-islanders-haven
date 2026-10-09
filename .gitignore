@@ -30,3 +30,10 @@ dist-ssr
 
 # Test output
 coverage
+
+# Python
+__pycache__/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
