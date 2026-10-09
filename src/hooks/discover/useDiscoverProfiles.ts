@@ -1,122 +1,112 @@
-
-import { useState, useEffect } from "react";
-import { fetchDiscoverProfiles, recordSwipeAction, DiscoverFilters } from "@/services/discover";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { fetchDiscoverPage, PublicProfile, swipe, SwipeDirection, SwipeResult } from "@/lib/api/discovery";
+import {
+  DEFAULT_DISCOVER_PREFERENCES,
+  DiscoverPreferences,
+  getDiscoverFilters,
+  saveDiscoverFilters,
+} from "@/services/profiles/profile-preferences";
 import { useAuth } from "@/context/auth";
-import { saveDiscoverFilters, getDiscoverFilters } from "@/services/profiles/profile-preferences"; // Updated import path
 import { useToast } from "@/hooks/use-toast";
 
-export const useDiscoverProfiles = (initialFilters: DiscoverFilters = {}) => {
-  const [profiles, setProfiles] = useState<any[]>([]);
-  const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<DiscoverFilters>(initialFilters);
-  const { user, isAuthenticated } = useAuth();
+// Fetch the next page when this many unseen profiles remain.
+const PREFETCH_THRESHOLD = 3;
+
+export const useDiscoverProfiles = () => {
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [filtersLoaded, setFiltersLoaded] = useState(false);
+  const [profiles, setProfiles] = useState<PublicProfile[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [swiping, setSwiping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFiltersState] = useState<DiscoverPreferences>(DEFAULT_DISCOVER_PREFERENCES);
+  const loadingMore = useRef(false);
 
-  // Load saved filters once per authenticated user (not on every auth heartbeat)
-  useEffect(() => {
-    if (!user?.id) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const savedFilters = await getDiscoverFilters();
-        if (cancelled) return;
-        if (savedFilters) {
-          setFilters(savedFilters);
-        }
-      } catch (error) {
-        console.error('Error loading saved filters:', error);
-      } finally {
-        if (!cancelled) setFiltersLoaded(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id]);
-
-  // Fetch profiles when filters change (after initial load) — serialize for stable dep
-  const filtersKey = JSON.stringify(filters);
-  useEffect(() => {
-    if (filtersLoaded) {
-      fetchProfiles();
-    }
-  }, [filtersKey, filtersLoaded]);
-
-  const fetchProfiles = async () => {
+  const loadFirstPage = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchDiscoverProfiles(filters);
-      setProfiles(data);
-      setCurrentProfileIndex(0); // Reset to first profile when loading new profiles
+      const page = await fetchDiscoverPage();
+      setProfiles(page.profiles);
+      setCursor(page.next_cursor);
+      setHasMore(page.next_cursor !== null);
       setError(null);
     } catch (err) {
-      setError("Failed to load profiles");
-      console.error(err);
+      setError(err instanceof Error ? err.message : "Failed to load profiles");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // Handle filter changes with option to save preferences
-  const updateFilters = async (newFilters: DiscoverFilters, savePreference: boolean = false) => {
-    setFilters(newFilters);
-    
-    // If savePreference is true and user is authenticated, save filters to Supabase
-    if (savePreference && isAuthenticated) {
-      try {
-        await saveDiscoverFilters(newFilters);
-        toast({
-          title: "Preferences Saved",
-          description: "Your discovery preferences have been saved."
-        });
-      } catch (error) {
-        console.error('Error saving filter preferences:', error);
-        toast({
-          title: "Save Failed",
-          description: "There was an error saving your preferences.",
-          variant: "destructive"
-        });
-      }
-    }
-  };
-
-  const handleSwipe = async (profileId: string, direction: 'like' | 'pass') => {
-    if (!user?.id) return;
-
+  const loadMore = useCallback(async () => {
+    if (!hasMore || !cursor || loadingMore.current) return;
+    loadingMore.current = true;
     try {
-      await recordSwipeAction(user.id, profileId, direction);
-      
-      // Move to next profile
-      if (currentProfileIndex < profiles.length - 1) {
-        setCurrentProfileIndex(prev => prev + 1);
-      } else {
-        // We've swiped through all profiles
-        // Could fetch more or show an empty state
-        setProfiles([]);
-      }
+      const page = await fetchDiscoverPage(cursor);
+      setProfiles((prev) => [...prev, ...page.profiles.filter((p) => !prev.some((q) => q.id === p.id))]);
+      setCursor(page.next_cursor);
+      setHasMore(page.next_cursor !== null);
     } catch (err) {
-      console.error("Error recording swipe:", err);
+      console.error("Error loading more profiles:", err);
+    } finally {
+      loadingMore.current = false;
+    }
+  }, [cursor, hasMore]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    getDiscoverFilters().then(setFiltersState).catch((err) => console.error("Error loading preferences:", err));
+    loadFirstPage();
+  }, [user?.id, loadFirstPage]);
+
+  useEffect(() => {
+    if (profiles.length <= PREFETCH_THRESHOLD) loadMore();
+  }, [profiles.length, loadMore]);
+
+  /** Saves the preferences to the profile (the server applies them) and reloads the feed. */
+  const setFilters = async (next: DiscoverPreferences) => {
+    try {
+      await saveDiscoverFilters(next);
+      setFiltersState(next);
+      await loadFirstPage();
+    } catch (err) {
+      toast({
+        title: "Could not save your preferences",
+        description: err instanceof Error ? err.message : "Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
-  // Get the current profile based on currentProfileIndex
-  const currentProfile = profiles.length > 0 && currentProfileIndex < profiles.length 
-    ? profiles[currentProfileIndex] 
-    : null;
+  /** Records the swipe; the card only advances once the server has saved it. */
+  const handleSwipe = async (profileId: string, direction: SwipeDirection): Promise<SwipeResult | null> => {
+    setSwiping(true);
+    try {
+      const result = await swipe(profileId, direction);
+      setProfiles((prev) => prev.filter((p) => p.id !== profileId));
+      return result;
+    } catch (err) {
+      toast({
+        title: "Could not save your swipe",
+        description: err instanceof Error ? err.message : "Please try again.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setSwiping(false);
+    }
+  };
 
   return {
-    profiles,
-    currentProfile,
-    loading,
+    currentProfile: profiles[0] ?? null,
     isLoading: loading,
+    swiping,
     error,
     filters,
-    setFilters: updateFilters,
-    refreshProfiles: fetchProfiles,
-    handleSwipe
+    setFilters,
+    refreshProfiles: loadFirstPage,
+    handleSwipe,
   };
 };
 

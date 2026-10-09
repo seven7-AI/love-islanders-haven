@@ -1,18 +1,11 @@
-
-import React from 'react';
 import SwipeButtonsContainer from './swipe/SwipeButtonsContainer';
 
 interface SwipeButtonsProps {
   onSwipe?: (direction: 'left' | 'right') => void;
   onSuperLike?: () => void;
-  onRewind?: () => void;
-  onBoost?: () => void;
-  matchId?: string;
-  onMessageClick?: () => void;
+  disabled?: boolean;
 }
 
-const SwipeButtons = (props: SwipeButtonsProps) => {
-  return <SwipeButtonsContainer {...props} />;
-};
+const SwipeButtons = (props: SwipeButtonsProps) => <SwipeButtonsContainer {...props} />;
 
 export default SwipeButtons;
