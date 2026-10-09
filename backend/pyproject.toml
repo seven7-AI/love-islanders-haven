@@ -13,6 +13,8 @@ dependencies = [
   "structlog>=24.4",
   "pyjwt[crypto]>=2.10",
   "email-validator>=2.2",
+  "prometheus-client>=0.21",
+  "sentry-sdk[fastapi]>=2.19",
 ]
 
 [dependency-groups]

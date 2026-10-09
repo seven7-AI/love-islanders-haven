@@ -21,6 +21,7 @@ from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import BodySizeLimitMiddleware, RequestContextMiddleware, SecurityHeadersMiddleware
+from app.core.observability import init_error_tracking, install_metrics
 from app.core.rate_limit import SlidingWindowLimiter
 from app.db.session import Database, create_engine
 from app.integrations.alerts import AlertSender, UnconfiguredAlertSender
@@ -43,6 +44,7 @@ def create_app(
 ) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings.log_level, settings.log_json)
+    init_error_tracking(settings)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -77,6 +79,7 @@ def create_app(
     )
     app.add_middleware(SecurityHeadersMiddleware, hsts=settings.environment == "production")
     app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_bytes)
+    install_metrics(app, settings)
     app.add_middleware(RequestContextMiddleware)
     app.state.rate_limiter = SlidingWindowLimiter()
     register_error_handlers(app)

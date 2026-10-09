@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     token_encryption_key: str | None = None
     # Secret for signing OAuth state values; falls back to the token key.
     oauth_state_secret: str | None = None
+    # Observability. /metrics is open unless METRICS_TOKEN is set (then it needs "Authorization: Bearer <token>").
+    metrics_token: str | None = None
+    sentry_dsn: str | None = None
+    sentry_traces_sample_rate: float = 0.0
     rate_limit_enabled: bool = True
     max_request_bytes: int = 1_000_000  # JSON bodies only; files go straight to storage
     db_pool_size: int = 5
