@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query, Response
 
 from app.api.deps import CurrentUser, SessionDep
+from app.core.rate_limit import limited
 from app.schemas.discovery import DiscoverPage, MatchPage, SwipeRequest, SwipeResult
 from app.services import discovery
 
@@ -19,7 +20,7 @@ async def discover(
     return await discovery.discover(session, user.id, limit, cursor)
 
 
-@router.post("/swipes", status_code=201)
+@router.post("/swipes", status_code=201, dependencies=limited("swipes", 120))
 async def swipe(body: SwipeRequest, user: CurrentUser, session: SessionDep) -> SwipeResult:
     return await discovery.swipe(session, user.id, body.target_id, body.direction)
 

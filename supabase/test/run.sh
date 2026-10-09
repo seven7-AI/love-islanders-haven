@@ -15,7 +15,7 @@ trap cleanup EXIT
 
 if [[ -z "${PGHOST:-}" ]]; then
   container="love-islander-policy-tests-$$"
-  docker run -d --name "$container" -e POSTGRES_PASSWORD=postgres -p 127.0.0.1::5432 postgres:15-alpine >/dev/null
+  docker run -d --name "$container" -e POSTGRES_PASSWORD=postgres -p 127.0.0.1::5432 "${POSTGRES_IMAGE:-postgres:15-alpine}" >/dev/null
   export PGHOST=127.0.0.1 PGUSER=postgres PGPASSWORD=postgres PGDATABASE=postgres
   PGPORT="$(docker port "$container" 5432/tcp | head -1 | cut -d: -f2)"
   export PGPORT

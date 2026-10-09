@@ -22,15 +22,11 @@ export default defineConfig(() => ({
     chunkSizeWarningLimit: 1000, // Increase chunk size warning limit
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-label',
-            '@radix-ui/react-select',
-            '@radix-ui/react-slider',
-            '@radix-ui/react-switch',
-          ],
+        // Long-lived vendor chunks so app releases do not invalidate the framework/UI code in browser caches.
+        manualChunks(id: string) {
+          if (/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) return 'vendor';
+          if (id.includes('node_modules/@radix-ui/')) return 'ui';
+          return undefined;
         },
       },
     },

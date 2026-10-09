@@ -41,8 +41,18 @@ class Settings(BaseSettings):
     token_encryption_key: str | None = None
     # Secret for signing OAuth state values; falls back to the token key.
     oauth_state_secret: str | None = None
+    rate_limit_enabled: bool = True
+    max_request_bytes: int = 1_000_000  # JSON bodies only; files go straight to storage
     db_pool_size: int = 5
     db_pool_timeout_seconds: float = 5.0
+
+    @model_validator(mode="after")
+    def _production_cors(self) -> "Settings":
+        if self.environment == "production" and any(
+            "*" in o or not o.startswith("https://") for o in self.cors_origins
+        ):
+            raise ValueError("In production CORS_ORIGINS must list explicit https:// origins")
+        return self
 
     @model_validator(mode="after")
     def _require_auth_settings(self) -> "Settings":

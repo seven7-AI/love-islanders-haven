@@ -1,0 +1,5 @@
+# Known historical findings (see docs/security.md): the Supabase publishable key (public by design) and a
+# Spotify credential removed in b1aa612 that must be rotated by the owner. New findings fail CI.
+c48c185ff112c06943b577d2798fdef3fbf8be1a:.env:jwt:2
+370a20d242ed1a93694d1231c4a1d7a8ef69af36:src/hooks/use-song-search.ts:generic-api-key:7
+51d3d08b68b71d333561475de12e83f1dd0a1b96:src/integrations/supabase/client.ts:jwt:6

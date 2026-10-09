@@ -3,6 +3,7 @@ import uuid
 from fastapi import APIRouter, Request, Response
 
 from app.api.deps import CurrentUser, SessionDep
+from app.core.rate_limit import limited
 from app.integrations.alerts import AlertSender
 from app.schemas.safety import (
     AlertRequest,
@@ -39,7 +40,7 @@ async def list_blocks(user: CurrentUser, session: SessionDep) -> list[BlockedUse
     return await safety.list_blocks(session, user.id)
 
 
-@router.post("/blocks", status_code=201)
+@router.post("/blocks", status_code=201, dependencies=limited("blocks", 30))
 async def block(body: BlockCreate, user: CurrentUser, session: SessionDep) -> Response:
     await safety.block(session, user.id, body.user_id)
     return Response(status_code=201)
@@ -51,7 +52,7 @@ async def unblock(user_id: uuid.UUID, user: CurrentUser, session: SessionDep) ->
     return Response(status_code=204)
 
 
-@router.post("/reports", status_code=201)
+@router.post("/reports", status_code=201, dependencies=limited("reports", 10))
 async def report(body: ReportCreate, user: CurrentUser, session: SessionDep) -> ReportCreated:
     return ReportCreated(id=await safety.report(session, user.id, body))
 
@@ -61,7 +62,7 @@ async def list_contacts(user: CurrentUser, session: SessionDep) -> list[Contact]
     return await safety.list_contacts(session, user.id)
 
 
-@router.post("/safety-contacts", status_code=201)
+@router.post("/safety-contacts", status_code=201, dependencies=limited("contacts", 20))
 async def add_contact(body: ContactCreate, user: CurrentUser, session: SessionDep) -> Contact:
     return await safety.add_contact(session, user.id, body)
 
@@ -98,7 +99,7 @@ async def delete_plan(plan_id: uuid.UUID, user: CurrentUser, session: SessionDep
     return Response(status_code=204)
 
 
-@router.post("/safety/alerts")
+@router.post("/safety/alerts", dependencies=limited("alerts", 3))
 async def send_alert(body: AlertRequest, request: Request, user: CurrentUser, session: SessionDep) -> dict[str, int]:
     sender: AlertSender = request.app.state.alert_sender
     return {"sent_to": await safety.send_alert(session, sender, user.id, body)}

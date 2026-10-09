@@ -3,6 +3,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Query
 
 from app.api.deps import CurrentUser, SessionDep
+from app.core.rate_limit import limited
 from app.schemas.insights import FeedbackCreate, FeedbackItem, Insights
 from app.services import insights
 
@@ -16,7 +17,7 @@ async def read_insights(
     return await insights.insights(session, user.id, range)
 
 
-@router.post("/feedback", status_code=201)
+@router.post("/feedback", status_code=201, dependencies=limited("feedback", 5))
 async def send_feedback(body: FeedbackCreate, user: CurrentUser, session: SessionDep) -> FeedbackItem:
     return await insights.add_feedback(session, user.id, body.category, body.content)
 
