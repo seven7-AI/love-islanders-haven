@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/fixtures';
 import { api, onboardedUser, PASSWORD } from './support/stack';
 
 test('discover someone, match, exchange messages, see read receipts, and unmatch', async ({ page }) => {
@@ -27,7 +27,7 @@ test('discover someone, match, exchange messages, see read receipts, and unmatch
   // Other test users may also be in the feed: wait for each card, pass until Cleo's comes up.
   const pass = page.getByRole('button', { name: 'Pass' });
   const cleoCard = page.getByRole('heading', { name: new RegExp(`^${cleoName}\\b`) });
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 40; i++) {
     await expect(pass).toBeVisible();
     // Give each card time to render before deciding to pass it, or Cleo's card could be passed unseen.
     const isCleo = await cleoCard.waitFor({ timeout: 2_000 }).then(

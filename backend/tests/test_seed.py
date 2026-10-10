@@ -3,7 +3,9 @@
 Running the seed against a real stack is covered by `SEED=1 scripts/e2e.sh` (run, re-run, verify, then the E2E suite).
 """
 
+import asyncio
 from datetime import date
+from pathlib import Path
 
 import pytest
 
@@ -60,3 +62,18 @@ def test_moderator_persona_can_review_every_seeded_report() -> None:
     involved = {key for reporter, reported, _, _ in P.REPORTS for key in (reporter, reported)}
     assert not involved & {p.key for p in staff}  # moderators cannot review reports that involve them
     assert involved <= set(P.BY_KEY)
+
+
+async def test_placeholder_photos_only_when_asked(tmp_path: Path) -> None:
+    from app.services.uploads import sniff
+    from seed.photos import PhotoSource
+
+    strict = PhotoSource(None, tmp_path)
+    with pytest.raises(RuntimeError, match="SEED_PLACEHOLDER_PHOTOS"):
+        await strict.get(123, "portrait")
+
+    lenient = PhotoSource(None, tmp_path, placeholders=True)
+    data, content_type = await lenient.get(123, "portrait")
+    assert content_type == "image/png" and sniff(data[:16]) == "image/png"
+    assert lenient.placeholders_used == 1
+    assert not any(await asyncio.to_thread(lambda: list(tmp_path.iterdir())))  # never cached as Pexels photos

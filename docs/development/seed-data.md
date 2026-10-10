@@ -65,6 +65,10 @@ DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5433/love_islander uv run 
 - **Pexels key:** read from `PEXELS_API_KEY` (or `PEXEL_API_KEY`) in `backend/.env`. It is used only to download
   pinned photo ids once. The downloads are cached in `backend/.seed-cache/` (git-ignored), so later runs work offline
   and do not use the Pexels quota.
+- **Without a key (CI):** `SEED_PLACEHOLDER_PHOTOS=true` replaces photos that are neither cached nor downloadable with
+  generated plain-colour PNGs. They go through the same upload flow and server checks, the seed run says how many were
+  used, and they are never cached. CI seeds this way unless the repository has a `PEXELS_API_KEY` secret. Never take
+  the README screenshots with placeholders (the screenshot run does not set the flag, so it fails instead).
 - **Not in the API image:** `backend/seed` is excluded from it (`backend/.dockerignore`).
 
 ## Photo credits
