@@ -72,10 +72,10 @@ Last updated: 2026-10-10 (#87).
 ## Cross-cutting
 | Feature | Tests | Result | Issue |
 |---|---|---|---|
-| Navigation, one bar on every viewport | U `AppNavigation.test.tsx` | pass (fixed in #80) | #88 checks it visually at 3 viewports |
-| Responsive layout at mobile, tablet and desktop | E (mobile only) | partial | #88 |
-| No console errors or 5xx responses during journeys | none | – | #88 |
+| Navigation, one bar on every viewport | U `AppNavigation.test.tsx`; E every spec at mobile, tablet and desktop | pass (fixed in #80; 3 viewports since #88) | #89 adds page-level checks |
+| Responsive layout at mobile, tablet and desktop | E all specs in projects `mobile`, `tablet`, `desktop` | pass (#88) | #89 adds every page |
+| No console errors, page errors or 5xx responses during journeys | E guard fixture on every test (`support/fixtures.ts`), self-checked by `guard.spec.ts` | pass (#88) | – |
 | Image loading and fallbacks; ads only when configured | U `SafeImage.test.tsx`, `MessageItem.test.tsx`, `AdSense.test.tsx`; built `index.html` and bundle checked for AdSense code with it unset (none) | pass (#83, #100) | – |
 | Security headers, CORS, rate limits, body size; configuration errors never echo values | A `test_hardening.py` | pass | – |
-| Seed accounts: run, verify, reset | A `test_seed.py` (persona rules, production/remote refusal); `SEED=1 scripts/e2e.sh` (run twice, verify, E2E on top); reset checked on a kept stack (0 seed profiles, files, auth users left) | pass (#87) | #88 runs it in CI |
+| Seed accounts: run, verify, reset | A `test_seed.py` (persona rules, production/remote refusal); `SEED=1 scripts/e2e.sh` (run twice, verify, E2E on top); reset checked on a kept stack (0 seed profiles, files, auth users left) | pass (#87; CI runs E2E seeded since #88, with placeholder photos unless a `PEXELS_API_KEY` secret is set) | – |
 | Pexels key stays on the server | A `test_pexels.py` (key only in the API header, never in errors or settings repr); build and repository grep | pass (#86) | – |

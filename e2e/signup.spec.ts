@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/fixtures';
 import { latestEmail, uniqueEmail } from './support/stack';
 
 test('sign up, confirm the email from the real confirmation message, and land in onboarding', async ({ page }) => {

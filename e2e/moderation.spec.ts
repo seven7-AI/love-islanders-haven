@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/fixtures';
 import { api, createConfirmedUser, grantRole, onboardedUser, PASSWORD, signIn, uniqueEmail } from './support/stack';
 
 test('a moderator reviews a report; regular users cannot reach the queue', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/fixtures';
 import { api, createConfirmedUser, PASSWORD, PHOTO_PATH, signIn, uniqueEmail } from './support/stack';
 
 test('upload profile photos during onboarding (real Storage via API-signed uploads)', async ({ page }) => {

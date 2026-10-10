@@ -139,6 +139,11 @@ jobs:
         env:
           CI: 'true'
           POSTGRES_IMAGE: public.ecr.aws/docker/library/postgres:16-alpine
+          # Seed the stack with the seed accounts first (run twice, then verify). With a PEXELS_API_KEY repository
+          # secret the seed uses the pinned Pexels photos; without it, generated placeholder images.
+          SEED: '1'
+          SEED_PLACEHOLDER_PHOTOS: 'true'
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

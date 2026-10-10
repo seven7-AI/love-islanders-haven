@@ -29,6 +29,8 @@ class SeedSettings(BaseSettings):
     database_url: str | None = None
     # Shared password of every seed account. Only for local and test stacks; never a real credential.
     seed_password: str = "LoveIsland-Seed-2026!"  # noqa: S105 - documented local-only test password
+    # Without a Pexels key, generate plain placeholder images instead of failing (CI without the secret).
+    seed_placeholder_photos: bool = False
     pexels_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("pexels_api_key", "PEXELS_API_KEY", "PEXEL_API_KEY")
     )
@@ -65,7 +67,10 @@ async def main(argv: list[str]) -> int:
         settings.supabase_anon_key,
         settings.supabase_service_role_key.get_secret_value(),
     )
-    photos = PhotoSource(settings.pexels_api_key.get_secret_value() if settings.pexels_api_key else None)
+    photos = PhotoSource(
+        settings.pexels_api_key.get_secret_value() if settings.pexels_api_key else None,
+        placeholders=settings.seed_placeholder_photos,
+    )
     try:
         if args.command == "reset":
             if not settings.database_url:
@@ -76,6 +81,8 @@ async def main(argv: list[str]) -> int:
         seeder = Seeder(stack, photos, settings.seed_password, database_url=settings.database_url)
         if args.command == "run":
             await seeder.run()
+            if photos.placeholders_used:
+                print(f"note: {photos.placeholders_used} photos are generated placeholders, not Pexels photos")
             return 0
         problems = await seeder.verify()
         for problem in problems:

@@ -16,5 +16,10 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Pixel 7'] } }],
+  // Every spec runs at three sizes; all in Chromium (the browser CI installs).
+  projects: [
+    { name: 'mobile', use: { ...devices['Pixel 7'] } },
+    { name: 'tablet', use: { ...devices['iPad (gen 7)'], browserName: 'chromium' } },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 900 } } },
+  ],
 });
