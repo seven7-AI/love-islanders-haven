@@ -1,9 +1,9 @@
 import React from 'react';
-import { Profile } from '@/utils/dummyData';
+import { relationshipGoalLabel, type ProfileView } from '@/lib/profile-view';
 import { Check, MapPin, Briefcase, GraduationCap } from 'lucide-react';
 
 interface ProfileInfoPanelProps {
-  profile: Profile;
+  profile: ProfileView;
   onClose: (e: React.MouseEvent) => void;
 }
 
@@ -49,7 +49,7 @@ const ProfileInfoPanel = ({ profile, onClose }: ProfileInfoPanelProps) => {
           </div>
         )}
 
-        {profile.interests && profile.interests.length > 0 && (
+        {profile.interests.length > 0 && (
           <div>
             <h3 className="text-sm uppercase text-white/60 mb-1">Interests</h3>
             <div className="flex flex-wrap gap-2">
@@ -66,39 +66,21 @@ const ProfileInfoPanel = ({ profile, onClose }: ProfileInfoPanelProps) => {
           {profile.relationshipGoal && (
             <div>
               <h3 className="text-xs uppercase text-white/60 mb-1">Looking for</h3>
-              <p className="text-white/90 capitalize">{profile.relationshipGoal.replace('-', ' ')}</p>
+              <p className="text-white/90">{relationshipGoalLabel(profile.relationshipGoal)}</p>
             </div>
           )}
 
           {profile.heightCm && (
             <div>
               <h3 className="text-xs uppercase text-white/60 mb-1">Height</h3>
-              <p className="text-white/90">
-                {profile.heightCm} cm
-                {profile.height ? ` (${profile.height} ${profile.heightUnit || 'ft'})` : ''}
-              </p>
+              <p className="text-white/90">{profile.heightCm} cm</p>
             </div>
           )}
 
-          {profile.hasChildren !== undefined && (
+          {profile.pronouns && (
             <div>
-              <h3 className="text-xs uppercase text-white/60 mb-1">Children</h3>
-              <p className="text-white/90">
-                {profile.hasChildren
-                  ? profile.childrenCount
-                    ? `${profile.childrenCount} children`
-                    : 'Has children'
-                  : 'No children'}
-              </p>
-            </div>
-          )}
-
-          {profile.hasPets !== undefined && (
-            <div>
-              <h3 className="text-xs uppercase text-white/60 mb-1">Pets</h3>
-              <p className="text-white/90">
-                {profile.hasPets ? (profile.petType ? `Has ${profile.petType}` : 'Has pets') : 'No pets'}
-              </p>
+              <h3 className="text-xs uppercase text-white/60 mb-1">Pronouns</h3>
+              <p className="text-white/90">{profile.pronouns}</p>
             </div>
           )}
         </div>

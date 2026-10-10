@@ -1,9 +1,9 @@
 import React from 'react';
 import { Check, MapPin } from 'lucide-react';
-import { Profile } from '@/utils/dummyData';
+import type { ProfileView } from '@/lib/profile-view';
 
 interface ProfileBottomInfoProps {
-  profile: Profile;
+  profile: ProfileView;
 }
 
 const ProfileBottomInfo = ({ profile }: ProfileBottomInfoProps) => {
@@ -29,17 +29,18 @@ const ProfileBottomInfo = ({ profile }: ProfileBottomInfoProps) => {
         </div>
       )}
 
-      <div className="mt-2">
-        <h3 className="text-white/80 text-sm">Interests</h3>
-        <div className="flex flex-wrap mt-1 gap-2">
-          {profile.interests &&
-            profile.interests.slice(0, 5).map((interest, i) => (
-              <span key={i} className="bg-black/30 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full">
+      {profile.interests.length > 0 && (
+        <div className="mt-2">
+          <h3 className="text-white/80 text-sm">Interests</h3>
+          <div className="flex flex-wrap mt-1 gap-2">
+            {profile.interests.slice(0, 5).map((interest) => (
+              <span key={interest} className="bg-black/30 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full">
                 {interest}
               </span>
             ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

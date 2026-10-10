@@ -2,11 +2,11 @@ import { Button } from '@/components/ui/button';
 import ProfileImageManager from '@/components/profile/ProfileImageManager';
 import ProfileDisplayPreferences from '@/components/profile/ProfileDisplayPreferences';
 import ProfileFilterPreferences from '@/components/profile/ProfileFilterPreferences';
-import { Profile } from '@/utils/dummyData';
+import type { ProfileView } from '@/lib/profile-view';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProfileEditContentProps {
-  profile: Profile;
+  profile: ProfileView;
   onDoneEditing: () => void;
   onImagesChange: (images: string[]) => void;
   onVerificationSuccess: () => void;
@@ -45,7 +45,7 @@ const ProfileEditContent = ({
 
               <ProfileDisplayPreferences
                 initialDisplayName={profile.name}
-                initialShowAge={profile.showAge !== undefined ? profile.showAge : true}
+                initialShowAge={profile.showAge}
                 onPreferencesUpdated={onPreferencesUpdated}
               />
             </div>

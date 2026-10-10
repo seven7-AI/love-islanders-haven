@@ -3,12 +3,12 @@ import { User, Info, Calendar } from 'lucide-react';
 import ProfileViewContent from './ProfileViewContent';
 import ProfileInsightsContent from './ProfileInsightsContent';
 import ProfileCalendarContent from './ProfileCalendarContent';
-import { Profile } from '@/utils/dummyData';
+import type { ProfileView } from '@/lib/profile-view';
 
 interface ProfileTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  profile: Profile;
+  profile: ProfileView;
   onEdit: () => void;
 }
 

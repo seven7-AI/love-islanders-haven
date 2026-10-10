@@ -3,10 +3,10 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import ProfileMedia from '@/components/profile/ProfileMedia';
 import ProfileDetails from '@/components/profile/ProfileDetails';
 import ProfileActionBar from '@/components/profile/ProfileActionBar';
-import { Profile } from '@/utils/dummyData';
+import type { ProfileView } from '@/lib/profile-view';
 
 interface ProfileViewContentProps {
-  profile: Profile;
+  profile: ProfileView;
   onEdit: () => void;
 }
 

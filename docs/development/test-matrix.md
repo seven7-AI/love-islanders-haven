@@ -14,7 +14,7 @@ Roles:
 - **mod:** a moderator
 - **anon:** signed out
 
-Last updated: 2026-10-10 (#77).
+Last updated: 2026-10-10 (#78).
 
 ## Authentication
 | Feature | Roles | Tests | Result | Issue |
@@ -30,11 +30,11 @@ Last updated: 2026-10-10 (#77).
 ## Onboarding and profile
 | Feature | Roles | Tests | Result | Issue |
 |---|---|---|---|---|
-| Onboarding steps, 18+, completion rules | new | A `test_profiles.py`; E `signup.spec.ts` (start only) | pass | #89 adds a full E2E walk-through |
+| Onboarding steps, 18+, completion rules | new | A `test_profiles.py`; U `OnboardingPersonality.test.tsx`; E `signup.spec.ts` (start only) | pass (relationship goal values fixed in #78) | #89 adds a full E2E walk-through |
 | Photo upload, remove, reorder, visibility | user | A `test_profiles.py`; E `photos.spec.ts` | pass | #80 makes controls touch-usable; #89 adds E2E |
-| Profile details display | user | none | – | #78 fixes mapping and adds tests |
-| Display preferences (name, show age) | user | none | – | #78 fixes the hidden-age reset and adds tests |
-| Discovery preferences (age, distance, gender) | user | A `test_discovery.py` | pass | #78 fixes the gender reset and adds tests |
+| Profile details display | user | U `profile-view.test.ts`, `ProfileDetails.test.tsx` | pass (fixed in #78) | #89 adds E2E |
+| Display preferences (name, show age) | user | U `profile-view.test.ts` | pass (hidden-age reset fixed in #78) | #89 adds E2E |
+| Discovery preferences (age, distance, gender) | user | A `test_discovery.py`; U `ProfileFilterPreferences.test.tsx`, `useDiscoverProfiles.test.ts` | pass (gender reset fixed in #78) | #89 adds E2E |
 | Insights (week, month, year) | user | A `test_insights.py` | pass | #79 fixes the tabs, removes hardcoded figures, adds tests |
 | Calendar: date plans, Google connect and disconnect | user | A `test_calendar.py`, `test_safety.py`; U `CalendarCallback.test.tsx` | pass | #82 adds the disconnect UI; #89 adds E2E (unconfigured state) |
 | Avatar respects photo visibility | user | none | – | #81 |
@@ -44,7 +44,7 @@ Last updated: 2026-10-10 (#77).
 |---|---|---|---|---|
 | Feed filters, paging, blocks, distance | user | A `test_discovery.py`; U `useDiscoverProfiles.test.ts` | pass | #89 adds E2E with seeded users |
 | Swipe and mutual match (including concurrency) | user | A `test_discovery.py`; E `match-and-chat.spec.ts`; DB `supabase/test` | pass | – |
-| Info panel fields | user | none | – | #78 |
+| Info panel fields | user | U `profile-view.test.ts` | pass (fixed in #78) | #89 adds E2E |
 | Matches list, unmatch | user | A `test_discovery.py` | pass (API only) | #82 adds the UI; #89 adds E2E |
 | Chat send, receive, paging, media, read receipts | user | A `test_messages.py`; U `useInlineChat.test.ts`; E `match-and-chat.spec.ts` | pass (no read-receipt UI) | #82, #83, #89 |
 | Block and report from chat | user | A `test_safety.py`; U `ReportUserDialog.test.tsx` | pass | #89 adds E2E |
