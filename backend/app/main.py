@@ -12,6 +12,7 @@ from app.api import (
     insights,
     me,
     messages,
+    moderation,
     notifications,
     profiles,
     safety,
@@ -94,6 +95,7 @@ def create_app(
     app.include_router(companion.router)
     app.include_router(calendar.router)
     app.include_router(insights.router)
+    app.include_router(moderation.router)
     return app
 
 

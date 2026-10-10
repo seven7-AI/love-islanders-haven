@@ -320,6 +320,7 @@ class Report(Base):
         CheckConstraint("reporter_id <> reported_user_id", name="not_self"),
         Index("reports_reported_user_idx", "reported_user_id", "created_at"),
         Index("reports_reporter_idx", "reporter_id"),
+        Index("reports_status_created_idx", "status", "created_at"),
     )
 
     id: Mapped[uuid.UUID] = _uuid_pk()
@@ -329,6 +330,27 @@ class Report(Base):
     details: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'open'::text"))
     created_at: Mapped[datetime] = _created_at()
+    # Set by the moderator who last changed the status.
+    reviewed_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="SET NULL")
+    )
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    resolution_note: Mapped[str | None] = mapped_column(Text)
+
+
+class UserRole(Base):
+    """Extra permissions. Granted only by an operator (`python -m app.admin roles`), never through the API."""
+
+    __tablename__ = "user_roles"
+    __table_args__ = (CheckConstraint("role = 'moderator'::text", name="role_check"),)
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), primary_key=True
+    )
+    role: Mapped[str] = mapped_column(Text, primary_key=True)
+    granted_at: Mapped[datetime] = _created_at()
+    # Who granted it (the operator's name or email, as given to the CLI).
+    granted_by: Mapped[str | None] = mapped_column(Text)
 
 
 class Notification(Base):

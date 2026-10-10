@@ -26,6 +26,7 @@ Changes merged to the repository that only take effect once someone with access 
 | #99 | Ads: if ads should run, build the web app with `VITE_ADSENSE_CLIENT` (the publisher id previously hardcoded in `index.html`) and `VITE_ADSENSE_SLOT` (an ad unit created in AdSense; none existed). Without them no ads or AdSense script load | web build args (`deploy/web/Dockerfile`) | Pending (owner decision) |
 | #81 | Set Storage bucket limits: `profile-images` 5 MB, JPEG/PNG/WebP; `chat-media` 10 MB, those image types plus `audio/webm`, `audio/mpeg`, `audio/mp4`, `audio/ogg` (the values in `supabase/config.toml`). The API already rejects other files when they are attached, but without the limits Storage still accepts and keeps them | Supabase dashboard → Storage → bucket → Edit bucket, or `supabase seed buckets --linked` | Pending |
 | #81 | Apply Alembic revision `0006` (moves avatars off hidden photos; data only) | `alembic upgrade head` (part of every API deploy) | Pending |
+| #84 | Apply Alembic revision `0007` (roles, report review columns); grant the moderator role to the people who will review reports. This replaces the #17 note about reviewing through the Supabase dashboard | `python -m app.admin roles grant --email <email> --by <you>` ([moderation](moderation.md)) | Pending (owner decision: who moderates) |
 | #23 | **Rotate the Spotify client secret** committed in old commit `370a20d` (public history); set `ENVIRONMENT=production` and explicit https `CORS_ORIGINS` on the API | Spotify developer dashboard | **Urgent** |
 
 ## Known residual risks

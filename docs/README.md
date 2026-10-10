@@ -20,6 +20,7 @@
 - [Security](security.md): controls, scans, accepted risks, required owner actions
 - [Database operations](operations/database.md): backup, restore, data copy
 - [Observability](operations/observability.md): logs, metrics, error tracking
+- [Moderation](operations/moderation.md): granting the moderator role, reviewing reports
 - [Pending production actions](operations/production-actions.md)
 - [Mobile (Android)](mobile/android-checklist.md), [icons](mobile/icon-requirements.md), [icon setup](mobile/android-icon-setup.md)
 

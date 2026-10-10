@@ -21,11 +21,14 @@ committed document is out of date, so CI catches a forgotten regeneration.
 | ai companion | `/v1/companion/messages` | AI dating companion chat |
 | google calendar | `/v1/integrations/google-calendar…` | Connect, authorize, callback, events |
 | insights & feedback | `/v1/me/insights`, `/v1/feedback` | Activity insights and feedback |
+| moderation | `/v1/moderation/reports`, `/v1/moderation/reports/{id}` | Report queue and review; moderators only (`403 forbidden` otherwise). See [moderation](../operations/moderation.md) |
 
 ## Conventions
 - **Authentication:** `Authorization: Bearer <Supabase access token>` on every `/v1` endpoint. The API verifies the
   token and takes the user from its `sub`; request bodies never carry user ids. A missing or invalid token gives
   `401` with `WWW-Authenticate: Bearer`.
+- **Roles:** `GET /v1/me` returns `roles` (for example `["moderator"]`). Roles are granted only by an operator with
+  `python -m app.admin roles grant`; no endpoint changes them.
 - **Errors:** every error is an RFC 9457 problem document (`application/problem+json`) with `type`, `title`,
   `status`, an optional `detail` and, for expected failures, a stable `code` (for example `rate_limited`,
   `storage_not_configured`, `ai_not_configured`, `calendar_not_configured`, `alerts_not_configured`).

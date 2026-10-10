@@ -18,14 +18,15 @@ local-only test credential, and the emails use the reserved `.test` domain.
 | `brian@seed.loveislander.test` | onboarded | Matched with Amani; sent a chat image; liked Amani's streak |
 | `daniel@seed.loveislander.test` | onboarded | Matched with Amani; his messages are unread; streak post |
 | `kevin@seed.loveislander.test` | onboarded | Matched with Grace (conversation); has liked Amani |
-| `juma@seed.loveislander.test` | onboarded | Has liked Amani (appears in her Discover) |
+| `juma@seed.loveislander.test` | onboarded | Has liked Amani (appears in her Discover); reported for spam by Grace |
 | `eric@seed.loveislander.test` | onboarded | Blocked by Amani; reported for harassment by Lydia |
-| `grace@seed.loveislander.test` | onboarded | Matched with Kevin; streak post liked by Amani and Kevin |
+| `grace@seed.loveislander.test` | onboarded | Matched with Kevin; streak post liked by Amani and Kevin; reported and blocked Juma |
 | `lydia@seed.loveislander.test` | onboarded | Reporter: reported and blocked Eric |
 | `faith@seed.loveislander.test` | onboarded, minimal profile | Only the fields onboarding requires and 4 photos; no location |
 | `sam@seed.loveislander.test` | onboarded, no location | Distance filtering for a user who never shared a location |
 | `wanjiku@seed.loveislander.test` | onboarding stopped at photos | 2 of the 4 required photos; redirected to onboarding |
 | `newcomer@seed.loveislander.test` | signed up only | Profile created on first sign-in, onboarding not started |
+| `mercy@seed.loveislander.test` | moderator, no dating profile | Reviews reports: the two open reports (Lydia → Eric, Grace → Juma) are in her queue. The role is granted in the database with the operator CLI's code, so `run` needs `DATABASE_URL` |
 
 The personas live in Nairobi: city "Nairobi, Kenya" and nearby coordinates. The definitions are in
 `backend/seed/personas.py`.
