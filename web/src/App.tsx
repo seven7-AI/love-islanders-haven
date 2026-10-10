@@ -19,6 +19,7 @@ import AuthCallback from '@/pages/AuthCallback';
 import CalendarCallback from '@/pages/CalendarCallback';
 import NotFound from '@/pages/NotFound';
 import { Toaster as ToastContainer } from 'sonner';
+import { Toaster } from '@/components/ui/toaster';
 import AppNavigation from '@/components/AppNavigation';
 import useOnline from '@/hooks/useOnline';
 import OfflinePlaceholder from '@/components/OfflinePlaceholder';
@@ -216,6 +217,8 @@ function App() {
       ) : (
         <OfflinePlaceholder />
       )}
+      {/* Messages from useToast(); sonner's toast() uses ToastContainer above. Both are in use across the app. */}
+      <Toaster />
     </>
   );
 }

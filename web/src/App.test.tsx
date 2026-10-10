@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { ReactNode } from 'react';
 import App from './App';
 import AppProviders from './AppProviders';
 import { supabase } from '@/integrations/supabase/client';
 import { resetRolesCache } from '@/hooks/use-roles';
+import { toast } from '@/hooks/use-toast';
 
 // Renders the real route tree and providers (AppProviders, as in main.tsx); only the auth session and the HTTP API
 // are substituted.
@@ -133,6 +134,16 @@ describe('App routes', () => {
     getMe.mockResolvedValue({ id: 'me', onboarding_completed: false, roles: [] });
     renderAt('/');
     expect(await screen.findByRole('heading', { name: "Let's get to know you" })).toBeInTheDocument();
+  });
+
+  it('shows messages raised with useToast', async () => {
+    renderAt('/settings');
+    await screen.findByRole('heading', { name: 'Settings' });
+    act(() => {
+      toast({ title: 'Posted!', description: 'Your streak is now 3 days.' });
+    });
+    expect(await screen.findByText('Posted!')).toBeInTheDocument();
+    expect(screen.getByText('Your streak is now 3 days.')).toBeInTheDocument();
   });
 
   it('shows the not-found page for unknown paths', async () => {
