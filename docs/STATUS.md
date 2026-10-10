@@ -85,24 +85,32 @@ The code is complete and tested. These need the owner (credentials, providers, d
 - **Optional:** a `PEXELS_API_KEY` repository secret, so CI seeds with the real stock photos instead of placeholders.
 
 ## Clean-clone verification
-`scripts/clean-clone-check.sh` (2026-10-10, fork `main` at `0aed16d`, after the reorganization):
+`scripts/clean-clone-check.sh` (2026-10-10, branch `90-readiness-review` at `0e18363`, merged as the #90 PR; no local
+Supabase stack or E2E database running beforehand):
 - fresh `git clone`, no Lovable tooling referenced
 - tracked root entries equal the documented layout, with one lockfile
 - `npm ci` (workspaces `web`, `e2e`) and `uv sync`
 - Postgres via compose, `alembic upgrade head` (0007)
 - `make check`:
   - Prettier
-  - ESLint (0 errors)
+  - ESLint (0 errors, 41 warnings)
   - typecheck (web and e2e)
-  - 23 test files / 88 web tests
+  - 44 test files / 165 web tests
   - build
-  - 22 Markdown files with 0 broken references
+  - 25 Markdown files with 0 broken references
   - ruff, mypy
-  - 170 API tests
+  - 237 API tests
 - restore and copy drills
 - web and API images built
 - 12 database policy suites
-- 3/3 end-to-end tests: the API on its own Alembic Postgres, local Supabase Auth and Storage, and the web app served
-  from `web/`
+- seed run twice and verified (46 generated placeholder photos: a clone has no Pexels key or cache)
+- end-to-end: 79 passed, 8 skipped (the guard self-checks run only in the mobile project), across mobile, tablet and
+  desktop on the API's own Alembic Postgres, local Supabase Auth and Storage, and the web app
 
-Previous run: 2026-10-09 at `e380da3`, before the reorganization.
+Earlier runs the same day from `main` at `af23d96`:
+1. Passed, but reused a local stack that was still running; the script now refuses that.
+2. One E2E failure (mobile password reset). Its output was lost with the clone; the script now keeps it. The test
+   passed in every later run (12/12 auth and sign-up specs on a fresh stack, then 79/79 and 76/76 full suites).
+3. Passed from scratch.
+
+Previous runs: 2026-10-10 at `0aed16d` (after the reorganization), 2026-10-09 at `e380da3`.
