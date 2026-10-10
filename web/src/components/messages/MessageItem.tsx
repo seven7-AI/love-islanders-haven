@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Music, Image as ImageIcon } from 'lucide-react';
+import { Check, CheckCheck, Music } from 'lucide-react';
 import { Message } from '@/services/messages';
 import { useAudioPlayer } from '@/hooks/use-audio-player';
 
@@ -62,7 +62,17 @@ const MessageItem = ({ message, isCurrentUser }: MessageItemProps) => {
         }`}
       >
         {renderMessageContent()}
-        <p className={`text-xs mt-1 ${isCurrentUser ? 'text-white/70' : 'text-white/50'}`}>{formattedTime}</p>
+        <p
+          className={`text-xs mt-1 flex items-center gap-1 ${isCurrentUser ? 'justify-end text-white/70' : 'text-white/50'}`}
+        >
+          {formattedTime}
+          {isCurrentUser &&
+            (message.is_read ? (
+              <CheckCheck size={14} aria-label="Read" role="img" />
+            ) : (
+              <Check size={14} aria-label="Sent" role="img" />
+            ))}
+        </p>
       </div>
     </div>
   );

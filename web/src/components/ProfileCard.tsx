@@ -1,9 +1,8 @@
 import { useState, useRef } from 'react';
 import type { ProfileView } from '@/lib/profile-view';
-import { Info, MessageCircle } from 'lucide-react';
+import { Info } from 'lucide-react';
 import ProfileImageCarousel from './profile/ProfileImageCarousel';
 import ProfileInfoPanel from './profile/ProfileInfoPanel';
-import ProfileCommentInput from './profile/ProfileCommentInput';
 import ProfileBottomInfo from './profile/ProfileBottomInfo';
 import SwipeIndicator from './profile/SwipeIndicator';
 
@@ -17,7 +16,6 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
   const [offsetX, setOffsetX] = useState(0);
   const [isSwiping, setIsSwiping] = useState(false);
   const [showMoreInfo, setShowMoreInfo] = useState(false);
-  const [showCommentInput, setShowCommentInput] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Never show someone else's photo in place of a missing one.
@@ -57,11 +55,6 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
     setShowMoreInfo(!showMoreInfo);
   };
 
-  const toggleCommentInput = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowCommentInput(!showCommentInput);
-  };
-
   const cardStyle = {
     transform: isSwiping ? `translateX(${offsetX}px) rotate(${offsetX * 0.03}deg)` : 'translateX(0) rotate(0)',
   };
@@ -96,12 +89,6 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
             <Info size={18} className="text-white" />
           </button>
         </div>
-
-        {/* Comment button */}
-        {/* Removed the comment button here */}
-
-        {/* Comment input overlay */}
-        {showCommentInput && <ProfileCommentInput onClose={() => setShowCommentInput(false)} />}
 
         {/* More info panel */}
         {showMoreInfo && <ProfileInfoPanel profile={profile} onClose={toggleMoreInfo} />}

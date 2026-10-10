@@ -3,10 +3,18 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Camera, X, Upload, Loader2, Plus } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
 import MultiImagePreview from './MultiImagePreview';
+
+// The API's limits for one post (backend/app/schemas/streaks.py and services/uploads.py).
+const MAX_IMAGES = 5;
+const MAX_CAPTION = 300;
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_BYTES = 5 * 1024 * 1024;
 
 const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
   const [content, setContent] = useState<string[]>([]);
+  const [caption, setCaption] = useState('');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [duration, setDuration] = useState(24);
   const [isUploading, setIsUploading] = useState(false);
@@ -18,10 +26,10 @@ const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
     if (!files || files.length === 0) return;
 
     // Check if adding new files would exceed the limit
-    if (previewUrls.length + files.length > 10) {
+    if (previewUrls.length + files.length > MAX_IMAGES) {
       toast({
         title: 'Too many images',
-        description: 'You can only upload up to 10 images for a streak post.',
+        description: `You can add up to ${MAX_IMAGES} photos to a streak post.`,
         variant: 'destructive',
       });
       return;
@@ -33,7 +41,12 @@ const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
 
     Array.from(files).forEach((file) => {
       // Type guard to check if file is really a File object with type property
-      if (!file.type || !file.type.startsWith('image/')) {
+      if (!ACCEPTED_TYPES.includes(file.type) || file.size > MAX_BYTES) {
+        toast({
+          title: `${file.name} was not added`,
+          description: 'Photos must be JPEG, PNG or WebP and smaller than 5 MB.',
+          variant: 'destructive',
+        });
         processed++;
         checkAllProcessed();
         return;
@@ -99,7 +112,7 @@ const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
 
     try {
       const contentCopy = [...content];
-      await onSubmit({ content: contentCopy, duration });
+      await onSubmit({ content: contentCopy, duration, caption: caption.trim() || undefined });
     } catch (error) {
       console.error('Error submitting post:', error);
     }
@@ -113,9 +126,11 @@ const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
           <div className="relative">
             <MultiImagePreview images={previewUrls} onRemoveImage={removeImage} isUploading={isUploading} />
 
-            {previewUrls.length < 10 && (
+            {previewUrls.length < MAX_IMAGES && (
               <div className="p-2 flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">{previewUrls.length} of 10 images</p>
+                <p className="text-sm text-muted-foreground">
+                  {previewUrls.length} of {MAX_IMAGES} photos
+                </p>
                 <Button
                   type="button"
                   variant="outline"
@@ -127,7 +142,7 @@ const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
                   <span>Add More</span>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept={ACCEPTED_TYPES.join(',')}
                     onChange={handleImageSelect}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                     disabled={isUploading || isSubmitting}
@@ -153,7 +168,7 @@ const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
         ) : (
           <div className="flex flex-col items-center justify-center p-8">
             <Camera className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-center text-muted-foreground mb-2">Select photos for your streak (up to 10)</p>
+            <p className="text-center text-muted-foreground mb-2">Select photos for your streak (up to {MAX_IMAGES})</p>
             <Button
               type="button"
               variant="outline"
@@ -173,7 +188,7 @@ const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
               )}
               <input
                 type="file"
-                accept="image/*"
+                accept={ACCEPTED_TYPES.join(',')}
                 onChange={handleImageSelect}
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 disabled={isUploading || isSubmitting}
@@ -182,6 +197,24 @@ const StreakPostForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
             </Button>
           </div>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="streak-caption" className="text-sm font-medium">
+          Caption (optional)
+        </label>
+        <Textarea
+          id="streak-caption"
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          maxLength={MAX_CAPTION}
+          placeholder="What are you up to today?"
+          disabled={isSubmitting}
+          rows={2}
+        />
+        <p className="text-xs text-muted-foreground text-right">
+          {caption.length}/{MAX_CAPTION}
+        </p>
       </div>
 
       {/* Duration Selector */}

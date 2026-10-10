@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { api, onboardedUser, PASSWORD } from './support/stack';
 
-test('discover someone, match, and exchange messages', async ({ page }) => {
+test('discover someone, match, exchange messages, see read receipts, and unmatch', async ({ page }) => {
   const cleoName = `Cleo${Date.now().toString(36)}`;
   const cleo = await onboardedUser('cleo', {
     name: cleoName,
@@ -42,12 +42,25 @@ test('discover someone, match, and exchange messages', async ({ page }) => {
   await page.getByRole('textbox').fill('Hi Cleo! Coffee this week?');
   await page.keyboard.press('Enter');
   await expect(page.getByText('Hi Cleo! Coffee this week?')).toBeVisible();
+  await expect(page.getByRole('img', { name: 'Sent' })).toBeVisible();
 
   // Cleo sees it through the API and replies; Dan's open chat picks the reply up by polling.
   const matches = await api<{ matches: { id: string }[] }>(cleo.token, '/v1/matches');
   const matchId = matches.matches[0].id;
   const history = await api<{ messages: { content: string }[] }>(cleo.token, `/v1/matches/${matchId}/messages`);
   expect(history.messages.map((m) => m.content)).toContain('Hi Cleo! Coffee this week?');
+  await api(cleo.token, `/v1/matches/${matchId}/read`, { method: 'POST' });
   await api(cleo.token, `/v1/matches/${matchId}/messages`, { method: 'POST', body: { content: 'Yes! Saturday?' } });
   await expect(page.getByText('Yes! Saturday?')).toBeVisible({ timeout: 15_000 });
+  // Cleo read Dan's message; his open chat shows it by polling.
+  await expect(page.getByRole('img', { name: 'Read' })).toBeVisible({ timeout: 15_000 });
+
+  // Dan ends the match: the chat closes, the match leaves his list, and Cleo can no longer message.
+  await page.getByRole('button', { name: 'Chat options' }).click();
+  await page.getByRole('menuitem', { name: 'Unmatch' }).click();
+  await page.getByRole('button', { name: 'Unmatch' }).click();
+  await expect(page.getByText(`You unmatched ${cleoName}`)).toBeVisible();
+  await expect(page.getByRole('button', { name: `Message ${cleoName}` })).toHaveCount(0);
+  const after = await api<{ matches: unknown[] }>(cleo.token, '/v1/matches');
+  expect(after.matches).toHaveLength(0);
 });
