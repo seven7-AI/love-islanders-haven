@@ -9,6 +9,9 @@ import {
 } from '@/lib/api/messages';
 
 const POLL_INTERVAL_MS = 4000;
+const POLL_LIMIT = 100;
+/** At most this many already-loaded messages are re-read per poll, so new ones always fit in the page. */
+const RECHECK_WINDOW = 50;
 
 const merge = (current: ChatMessage[], incoming: ChatMessage[]) => {
   const byId = new Map(current.map((m) => [m.id, m]));
@@ -17,7 +20,20 @@ const merge = (current: ChatMessage[], incoming: ChatMessage[]) => {
 };
 
 /**
- * Loads a conversation, polls for new messages while the page is visible, and marks incoming messages read.
+ * Where the next poll starts. Normally after the newest message; while some of my messages are still unread, from
+ * just before the oldest of them, so the poll also returns them with their current read state.
+ */
+export const pollAnchor = (messages: ChatMessage[], me: string | null): string | null => {
+  const firstUnread = messages.findIndex((m) => m.sender_id === me && !m.is_read);
+  if (firstUnread === -1) return messages.length ? messages[messages.length - 1].created_at : null;
+  // Reading marks the whole conversation, so the newest unread messages are the ones worth re-checking.
+  const start = Math.max(firstUnread, messages.length - RECHECK_WINDOW);
+  return start > 0 ? messages[start - 1].created_at : null;
+};
+
+/**
+ * Loads a conversation, polls for new messages and read receipts while the page is visible, and marks incoming
+ * messages read.
  * Sent messages appear once the server has stored them.
  */
 export const useInlineChat = (matchId: string) => {
@@ -27,11 +43,11 @@ export const useInlineChat = (matchId: string) => {
   const [olderCursor, setOlderCursor] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const latest = useRef<string | null>(null);
+  const anchor = useRef<string | null>(null);
 
   useEffect(() => {
-    latest.current = messages.length ? messages[messages.length - 1].created_at : latest.current;
-  }, [messages]);
+    anchor.current = pollAnchor(messages, currentUserId);
+  }, [messages, currentUserId]);
 
   const markRead = useCallback(
     (incoming: ChatMessage[]) => {
@@ -45,7 +61,7 @@ export const useInlineChat = (matchId: string) => {
   useEffect(() => {
     let cancelled = false;
     setMessages([]);
-    latest.current = null;
+    anchor.current = null;
     setIsLoading(true);
     listMessages(matchId)
       .then((page) => {
@@ -61,8 +77,8 @@ export const useInlineChat = (matchId: string) => {
     const timer = window.setInterval(async () => {
       if (document.visibilityState !== 'visible') return;
       try {
-        // Until there is a message to anchor on, re-read the (empty or tiny) latest page.
-        const page = await listMessages(matchId, latest.current ? { after: latest.current } : {});
+        // Without an anchor (no messages yet, or my oldest loaded message is unread), re-read the latest page.
+        const page = await listMessages(matchId, anchor.current ? { after: anchor.current, limit: POLL_LIMIT } : {});
         if (!cancelled && page.messages.length) {
           setMessages((prev) => merge(prev, page.messages));
           markRead(page.messages);

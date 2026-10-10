@@ -7,7 +7,7 @@ const fetchCompanionHistory = vi.fn();
 const sendCompanionMessage = vi.fn();
 const toastError = vi.fn();
 vi.mock('@/lib/api/companion', () => ({
-  fetchCompanionHistory: () => fetchCompanionHistory(),
+  fetchCompanionHistory: (before?: string) => fetchCompanionHistory(before),
   sendCompanionMessage: (c: string) => sendCompanionMessage(c),
 }));
 vi.mock('sonner', () => ({ toast: { error: (m: string) => toastError(m) } }));
@@ -45,6 +45,30 @@ describe('AICompanion', () => {
       expect(toastError).toHaveBeenCalledWith('Isla is not available right now. Please try again later.'),
     );
     expect(screen.queryByText('Hello?')).not.toBeInTheDocument();
+  });
+
+  it('loads earlier messages above the current ones', async () => {
+    const message = (id: string, content: string, at: string) => ({ id, role: 'user', content, created_at: at });
+    fetchCompanionHistory
+      .mockResolvedValueOnce({ messages: [message('m2', 'Newer', '2026-10-09T10:00:00Z')], older_cursor: 'c1' })
+      .mockResolvedValueOnce({ messages: [message('m1', 'Older', '2026-10-08T10:00:00Z')], older_cursor: null });
+    render(<AICompanion />);
+    await screen.findByText('Newer');
+    fireEvent.click(screen.getByRole('button', { name: 'Load earlier messages' }));
+    await screen.findByText('Older');
+    expect(fetchCompanionHistory).toHaveBeenLastCalledWith('c1');
+    const texts = screen.getAllByText(/Newer|Older/).map((el) => el.textContent);
+    expect(texts).toEqual(['Older', 'Newer']);
+    expect(screen.queryByRole('button', { name: 'Load earlier messages' })).not.toBeInTheDocument();
+  });
+
+  it('says so when earlier messages cannot be loaded', async () => {
+    fetchCompanionHistory
+      .mockResolvedValueOnce({ messages: [], older_cursor: 'c1' })
+      .mockRejectedValueOnce(new Error('offline'));
+    render(<AICompanion />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Load earlier messages' }));
+    await waitFor(() => expect(toastError).toHaveBeenCalledWith('Could not load earlier messages: offline'));
   });
 
   it('explains rate limits', () => {

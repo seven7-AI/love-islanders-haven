@@ -46,16 +46,16 @@ Last updated: 2026-10-10 (#87).
 | Feed filters, paging, blocks, distance | user | A `test_discovery.py`; U `useDiscoverProfiles.test.ts` | pass | #89 adds E2E with seeded users |
 | Swipe and mutual match (including concurrency) | user | A `test_discovery.py`; E `match-and-chat.spec.ts`; DB `supabase/test` | pass | – |
 | Info panel fields | user | U `profile-view.test.ts` | pass (fixed in #78) | #89 adds E2E |
-| Matches list, unmatch | user | A `test_discovery.py` | pass (API only) | #82 adds the UI; #89 adds E2E |
-| Chat send, receive, paging, media, read receipts | user | A `test_messages.py`; U `useInlineChat.test.ts`; E `match-and-chat.spec.ts` | pass (no read-receipt UI) | #82, #83, #89 |
+| Matches list, unmatch | user | A `test_discovery.py`; U `InlineChatHeader.test.tsx`; E `match-and-chat.spec.ts` | pass (unmatch UI added in #82) | #89 adds the matches list states |
+| Chat send, receive, paging, media, read receipts | user | A `test_messages.py`; U `useInlineChat.test.ts`, `MessageItem.test.tsx`; E `match-and-chat.spec.ts` | pass (read receipts added in #82) | #83 (media URL refresh), #89 |
 | Block and report from chat | user | A `test_safety.py`; U `ReportUserDialog.test.tsx` | pass | #89 adds E2E |
 | Notifications | user | A `test_notifications.py`; U `NotificationBell.test.tsx` | pass | #89 adds E2E |
 
 ## Streaks, companion, safety, settings, feedback
 | Feature | Roles | Tests | Result | Issue |
 |---|---|---|---|---|
-| Streak post, like, leaderboard, expiry job | user | A `test_streaks.py`; U `StreakPost.test.tsx`, `use-streaks-actions.test.ts`, `Streaks.test.tsx` | pass (load error state added in #79) | #82 adds the caption; #89 adds E2E |
-| AI companion | user | A `test_companion.py`; U `AICompanion.test.tsx` | pass (mocked LLM; live provider not verified) | #82 adds older history; #89 adds E2E of the unavailable state |
+| Streak post, like, leaderboard, expiry job | user | A `test_streaks.py`; U `StreakPost.test.tsx`, `use-streaks-actions.test.ts`, `Streaks.test.tsx` | pass (load error state added in #79; caption and the 5-photo limit in #82, `StreakPostForm.test.tsx`) | #89 adds E2E |
+| AI companion | user | A `test_companion.py`; U `AICompanion.test.tsx` | pass (mocked LLM; live provider not verified; older history added in #82) | #89 adds E2E of the unavailable state |
 | Safety contacts, date plans | user | A `test_safety.py`; U `use-safety-contacts.test.ts` | pass | #89 adds E2E |
 | Emergency alert (no provider) | user | A `test_safety.py`; U `EmergencyButton.test.tsx` | pass (honest 503) | – |
 | Settings page | user | U `App.test.tsx` (real providers), `Settings.test.tsx` | pass (fixed in #77) | #89 adds E2E |

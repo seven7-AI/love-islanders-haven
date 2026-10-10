@@ -34,16 +34,38 @@ export const companionErrorMessage = (error: unknown): string => {
 const AICompanion: React.FC = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [olderCursor, setOlderCursor] = useState<string | null>(null);
+  const [loadingOlder, setLoadingOlder] = useState(false);
 
   useEffect(() => {
     fetchCompanionHistory()
-      .then((page) => setMessages(page.messages.length ? page.messages.map(toMessage) : [WELCOME]))
+      .then((page) => {
+        setMessages(page.messages.length ? page.messages.map(toMessage) : [WELCOME]);
+        setOlderCursor(page.older_cursor);
+      })
       .catch((error) => {
         setMessages([WELCOME]);
         toast.error(`Could not load your conversation: ${error instanceof Error ? error.message : 'unknown error'}`);
       })
       .finally(() => setIsLoading(false));
   }, []);
+
+  const loadOlder = async () => {
+    if (!olderCursor) return;
+    setLoadingOlder(true);
+    try {
+      const page = await fetchCompanionHistory(olderCursor);
+      setMessages((prev) => {
+        const known = new Set(prev.map((m) => m.id));
+        return [...page.messages.filter((m) => !known.has(m.id)).map(toMessage), ...prev];
+      });
+      setOlderCursor(page.older_cursor);
+    } catch (error) {
+      toast.error(`Could not load earlier messages: ${error instanceof Error ? error.message : 'unknown error'}`);
+    } finally {
+      setLoadingOlder(false);
+    }
+  };
 
   const handleSendMessage = async (content: string) => {
     const text = content.trim();
@@ -78,7 +100,14 @@ const AICompanion: React.FC = () => {
 
   return (
     <div className="h-full w-full">
-      <InlineChatContainer messages={messages} isLoading={isLoading} onSendMessage={handleSendMessage} />
+      <InlineChatContainer
+        messages={messages}
+        isLoading={isLoading}
+        onSendMessage={handleSendMessage}
+        hasOlder={olderCursor !== null}
+        loadingOlder={loadingOlder}
+        onLoadOlder={loadOlder}
+      />
     </div>
   );
 };

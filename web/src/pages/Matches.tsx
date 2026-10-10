@@ -140,6 +140,11 @@ const Matches = () => {
             setActiveChat(null);
             setMatches((prev) => prev.filter((m) => m.partner.id !== blockedId));
           }}
+          onUnmatched={() => {
+            const endedId = activeChat.id;
+            setActiveChat(null);
+            setMatches((prev) => prev.filter((m) => m.id !== endedId));
+          }}
         />
       )}
     </div>
