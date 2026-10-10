@@ -41,12 +41,14 @@ const Streaks = () => {
   const [userStreakCount, setUserStreakCount] = useState(0);
   const [topStreaks, setTopStreaks] = useState<{ id: string; name: string; count: number }[]>([]);
   const [showPostForm, setShowPostForm] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Load data
   const fetchData = async () => {
     if (!isAuthenticated) return;
 
     setLoading(true);
+    setLoadError(null);
     try {
       const [feed, status, leaderboard] = await Promise.all([fetchStreakFeed(), getStreakStatus(), getLeaderboard()]);
       setPosts(feed.posts.map(toPost));
@@ -55,12 +57,7 @@ const Streaks = () => {
       setUserStreakCount(status.streak_count);
       setTopStreaks(leaderboard.map((e) => ({ id: e.user_id, name: e.name ?? 'Anonymous', count: e.streak_count })));
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load streak data. Please try again later.',
-        variant: 'destructive',
-      });
+      setLoadError(error instanceof Error && error.message ? error.message : 'Could not load streaks');
     } finally {
       setLoading(false);
     }
@@ -137,8 +134,17 @@ const Streaks = () => {
 
           <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
 
-          <StreaksList loading={loading} posts={posts} onLike={handleLikePost} />
-          {cursor && !loading && (
+          {loadError ? (
+            <div role="alert" className="text-center py-10 space-y-3">
+              <p className="text-sm text-muted-foreground">{loadError}</p>
+              <Button variant="outline" onClick={() => void fetchData()}>
+                Try again
+              </Button>
+            </div>
+          ) : (
+            <StreaksList loading={loading} posts={posts} onLike={handleLikePost} />
+          )}
+          {cursor && !loading && !loadError && (
             <Button variant="secondary" className="w-full mt-4" onClick={loadMore}>
               Load more
             </Button>

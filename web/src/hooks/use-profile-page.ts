@@ -1,153 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth';
 import { getMyProfile } from '@/lib/api/profile';
 import { fromOwnProfile, type ProfileView } from '@/lib/profile-view';
-import { supabase } from '@/integrations/supabase/client';
 
-const createDefaultProfile = (email?: string | null, id?: string): ProfileView => ({
-  id: id || 'local-profile',
-  name: email?.split('@')[0] || 'New User',
-  age: null,
-  showAge: true,
-  bio: '',
-  verified: false,
-  occupation: null,
-  education: null,
-  location: null,
-  relationshipGoal: null,
-  heightCm: null,
-  pronouns: null,
-  interests: [],
-  images: [],
-});
-
+/** Loads the signed-in user's profile. `profile` stays null until it has loaded; failures are reported in `error`. */
 export function useProfilePage() {
-  const [profile, setProfile] = useState<ProfileView>(() => createDefaultProfile(null));
+  const { user } = useAuth();
+  const userId = user?.id;
+  const [profile, setProfile] = useState<ProfileView | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const [authReady, setAuthReady] = useState(false);
-  const [sessionUser, setSessionUser] = useState<any>(null);
   const { toast } = useToast();
-  const { networkError } = useAuth();
 
-  useEffect(() => {
-    let mounted = true;
-
-    const loadSession = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        if (!mounted) return;
-        setSessionUser(data.session?.user ?? null);
-      } finally {
-        if (mounted) {
-          setAuthReady(true);
-        }
-      }
-    };
-
-    void loadSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted) return;
-      setSessionUser(session?.user ?? null);
-      setAuthReady(true);
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const isAuthenticated = !!sessionUser?.id;
-  const user = sessionUser;
-
-  // Load user profile when component mounts or when auth state changes
-  useEffect(() => {
-    if (!authReady) {
-      return; // Don't do anything while auth is loading
-    }
-
-    if (user?.id) {
-      setProfile((current) => (current?.id === 'local-profile' ? createDefaultProfile(user.email, user.id) : current));
-      void loadUserProfile();
-    } else {
-      toast({
-        title: 'Authentication required',
-        description: 'Please log in to view and edit your profile.',
-        variant: 'destructive',
-      });
-      setIsLoading(false);
-    }
-  }, [authReady, user?.id, retryCount]);
-
-  const loadUserProfile = async () => {
+  const loadUserProfile = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-
     try {
-      if (!user?.id) {
-        throw new Error('Authentication required');
-      }
-
       setProfile(fromOwnProfile(await getMyProfile()));
-    } catch (error: any) {
-      console.error('Error loading profile:', error);
-      setError(error?.message || 'Failed to load profile data');
-
-      if (user?.id) {
-        setProfile(createDefaultProfile(user.email, user.id));
-      }
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : 'Failed to load your profile');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (userId) void loadUserProfile();
+  }, [userId, loadUserProfile]);
 
   const handleEditProfile = () => {
+    if (isEditing) void loadUserProfile(); // show what was saved while editing
     setIsEditing(!isEditing);
-    if (isEditing) {
-      // Reload profile when exiting edit mode to reflect changes
-      loadUserProfile();
-    }
-  };
-
-  const handleRetry = () => {
-    // Initialize Supabase session if needed
-    if (networkError) {
-      supabase.auth.refreshSession();
-    }
-    setRetryCount((prev) => prev + 1);
   };
 
   const handleImagesChange = (newImages: string[]) => {
-    if (profile) {
-      setProfile({
-        ...profile,
-        images: newImages,
-      });
-    }
+    setProfile((current) => (current ? { ...current, images: newImages } : current));
   };
 
   const handleVerificationSuccess = () => {
-    if (profile) {
-      setProfile({
-        ...profile,
-        verified: true,
-      });
-    }
+    setProfile((current) => (current ? { ...current, verified: true } : current));
   };
 
   const handlePreferencesUpdated = () => {
-    loadUserProfile();
-    toast({
-      title: 'Profile updated',
-      description: 'Your profile settings have been saved successfully.',
-    });
+    void loadUserProfile();
+    toast({ title: 'Profile updated', description: 'Your profile settings have been saved.' });
   };
 
   return {
@@ -155,11 +53,8 @@ export function useProfilePage() {
     isLoading,
     isEditing,
     error,
-    loading: !authReady,
-    isAuthenticated,
-    user,
     handleEditProfile,
-    handleRetry,
+    handleRetry: loadUserProfile,
     handleImagesChange,
     handleVerificationSuccess,
     handlePreferencesUpdated,

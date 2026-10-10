@@ -1,35 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useProfilePage } from '@/hooks/use-profile-page';
-import { useAuth } from '@/context/auth';
+import type { ProfileView } from '@/lib/profile-view';
 
 import ProfileHeader from '@/components/profile/layout/ProfileHeader';
 import ProfileTabs from '@/components/profile/layout/ProfileTabs';
 import ProfileEditContent from '@/components/profile/layout/ProfileEditContent';
 import ProfileLoadingState from '@/components/profile/layout/ProfileLoadingState';
 import ProfileErrorState from '@/components/profile/layout/ProfileErrorState';
-import ProfileAuthRequired from '@/components/profile/layout/ProfileAuthRequired';
-
-const createFallbackProfile = () => ({
-  id: 'profile-fallback',
-  name: 'My Profile',
-  age: 0,
-  bio: '',
-  distance: 0,
-  occupation: '',
-  education: '',
-  images: [],
-  interests: [],
-  relationshipGoal: 'both' as const,
-  height: '',
-  lastActive: new Date().toISOString(),
-  verified: false,
-  location: '',
-  genderPreference: 'both' as const,
-  showAge: true,
-});
 
 const Profile = () => {
-  const { user: authUser, isAuthenticated: authIsAuthenticated, loading: authLoading } = useAuth();
   const {
     profile,
     isLoading,
@@ -41,24 +20,18 @@ const Profile = () => {
     handleVerificationSuccess,
     handlePreferencesUpdated,
   } = useProfilePage();
-  const hasAuthenticatedUser = !!authUser?.id || authIsAuthenticated;
-  const resolvedProfile = profile ?? createFallbackProfile();
 
-  if (authLoading && !hasAuthenticatedUser) {
-    return <ProfileLoadingState />;
-  }
-
-  if (!hasAuthenticatedUser) {
-    return <ProfileAuthRequired />;
-  }
-
-  if (error && !hasAuthenticatedUser) {
-    return <ProfileErrorState onRetry={handleRetry} errorMessage={error} />;
+  if (!profile) {
+    return error && !isLoading ? (
+      <ProfileErrorState onRetry={() => void handleRetry()} errorMessage={error} />
+    ) : (
+      <ProfileLoadingState />
+    );
   }
 
   return (
     <ProfileContent
-      profile={resolvedProfile}
+      profile={profile}
       isEditing={isEditing}
       handleEditProfile={handleEditProfile}
       handleImagesChange={handleImagesChange}
@@ -70,7 +43,7 @@ const Profile = () => {
 
 // Extract the content to a separate component to make the main component cleaner
 interface ProfileContentProps {
-  profile: any;
+  profile: ProfileView;
   isEditing: boolean;
   handleEditProfile: () => void;
   handleImagesChange: (newImages: string[]) => void;

@@ -5,6 +5,7 @@ import { useGoogleCalendar, CalendarEvent } from '@/hooks/use-google-calendar';
 
 export function useProfileCalendar() {
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { datePlans, fetchDatePlans } = useDatePlans({ autoLoad: false });
   const { isAuthenticated } = useAuth();
   const {
@@ -14,14 +15,16 @@ export function useProfileCalendar() {
     isAvailable: isGoogleAvailable,
     initiateGoogleAuth,
     fetchGoogleEvents,
+    disconnectGoogleCalendar,
   } = useGoogleCalendar();
 
   const loadDatePlans = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
       await fetchDatePlans();
-    } catch (error) {
-      console.error('Error loading date plans:', error);
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : 'Could not load your dates');
     } finally {
       setIsLoading(false);
     }
@@ -34,6 +37,11 @@ export function useProfileCalendar() {
       setIsLoading(false);
     }
   }, [isAuthenticated, loadDatePlans]);
+
+  // Google events can only be fetched once the connection status is known to be connected.
+  useEffect(() => {
+    if (isGoogleAuthorized) void fetchGoogleEvents();
+  }, [isGoogleAuthorized, fetchGoogleEvents]);
 
   // App dates (not cancelled) with a time, in the same shape as Google Calendar events.
   const appEvents: CalendarEvent[] = datePlans
@@ -62,14 +70,11 @@ export function useProfileCalendar() {
     upcomingDates,
     pastDates,
     isLoading: isLoading || isLoadingGoogle,
-    refresh: async () => {
-      await loadDatePlans();
-      if (isGoogleAuthorized) {
-        await fetchGoogleEvents();
-      }
-    },
+    error,
+    retry: loadDatePlans,
     isGoogleAuthorized,
     isGoogleAvailable,
     initiateGoogleAuth,
+    disconnectGoogleCalendar,
   };
 }

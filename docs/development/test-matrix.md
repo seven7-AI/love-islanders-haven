@@ -14,7 +14,7 @@ Roles:
 - **mod:** a moderator
 - **anon:** signed out
 
-Last updated: 2026-10-10 (#78).
+Last updated: 2026-10-10 (#79).
 
 ## Authentication
 | Feature | Roles | Tests | Result | Issue |
@@ -34,9 +34,10 @@ Last updated: 2026-10-10 (#78).
 | Photo upload, remove, reorder, visibility | user | A `test_profiles.py`; E `photos.spec.ts` | pass | #80 makes controls touch-usable; #89 adds E2E |
 | Profile details display | user | U `profile-view.test.ts`, `ProfileDetails.test.tsx` | pass (fixed in #78) | #89 adds E2E |
 | Display preferences (name, show age) | user | U `profile-view.test.ts` | pass (hidden-age reset fixed in #78) | #89 adds E2E |
+| Profile load failure | user | U `Profile.test.tsx` | pass (error with retry instead of a placeholder profile, #79) | – |
 | Discovery preferences (age, distance, gender) | user | A `test_discovery.py`; U `ProfileFilterPreferences.test.tsx`, `useDiscoverProfiles.test.ts` | pass (gender reset fixed in #78) | #89 adds E2E |
-| Insights (week, month, year) | user | A `test_insights.py` | pass | #79 fixes the tabs, removes hardcoded figures, adds tests |
-| Calendar: date plans, Google connect and disconnect | user | A `test_calendar.py`, `test_safety.py`; U `CalendarCallback.test.tsx` | pass | #82 adds the disconnect UI; #89 adds E2E (unconfigured state) |
+| Insights (week, month, year) | user | A `test_insights.py`; U `ProfileInsights.test.tsx` | pass (tabs and hardcoded figures fixed in #79) | #89 adds E2E |
+| Calendar: date plans, Google connect and disconnect | user | A `test_calendar.py`, `test_safety.py`; U `CalendarCallback.test.tsx`, `ProfileCalendar.test.tsx` | pass (error state and disconnect added in #79) | #89 adds E2E (unconfigured state) |
 | Avatar respects photo visibility | user | none | – | #81 |
 
 ## Discovery, matches and chat
@@ -53,7 +54,7 @@ Last updated: 2026-10-10 (#78).
 ## Streaks, companion, safety, settings, feedback
 | Feature | Roles | Tests | Result | Issue |
 |---|---|---|---|---|
-| Streak post, like, leaderboard, expiry job | user | A `test_streaks.py`; U `StreakPost.test.tsx`, `use-streaks-actions.test.ts` | pass | #82 adds the caption; #89 adds E2E |
+| Streak post, like, leaderboard, expiry job | user | A `test_streaks.py`; U `StreakPost.test.tsx`, `use-streaks-actions.test.ts`, `Streaks.test.tsx` | pass (load error state added in #79) | #82 adds the caption; #89 adds E2E |
 | AI companion | user | A `test_companion.py`; U `AICompanion.test.tsx` | pass (mocked LLM; live provider not verified) | #82 adds older history; #89 adds E2E of the unavailable state |
 | Safety contacts, date plans | user | A `test_safety.py`; U `use-safety-contacts.test.ts` | pass | #89 adds E2E |
 | Emergency alert (no provider) | user | A `test_safety.py`; U `EmergencyButton.test.tsx` | pass (honest 503) | – |
