@@ -15,7 +15,8 @@ export const OnboardingProgress = ({ currentStep, steps, stepLabels = {} }: Onbo
 
   return (
     <div className="mb-8">
-      <div className="flex justify-between items-center">
+      {/* Columns align at the top so the step circles stay on one line when only some steps show a label. */}
+      <div className="flex justify-between items-start">
         {steps.map((step, index) => {
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
