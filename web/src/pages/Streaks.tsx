@@ -8,7 +8,6 @@ import UserStreakCard from '@/components/streaks/UserStreakCard';
 import TopStreaksCard from '@/components/streaks/TopStreaksCard';
 import StreaksList from '@/components/streaks/StreaksList';
 import LoginRequired from '@/components/streaks/LoginRequired';
-import Navbar from '@/components/Navbar';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { fetchStreakFeed, getLeaderboard, getStreakStatus, StreakPostData } from '@/lib/api/streaks';
@@ -151,7 +150,6 @@ const Streaks = () => {
           )}
         </div>
       </ScrollArea>
-      <Navbar />
     </div>
   );
 };

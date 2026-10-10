@@ -105,7 +105,7 @@ export const OnboardingPhotos = ({ onNext, onBack, isSubmitting }: OnboardingPho
             <img src={photo.url} alt={`Profile ${index + 1}`} className="w-full h-full object-cover" />
             <button
               onClick={() => handleDelete(photo)}
-              className="absolute bottom-2 right-2 bg-red-500/80 hover:bg-red-600 p-1.5 rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+              className="absolute bottom-2 right-2 bg-red-500/80 hover:bg-red-600 p-1.5 rounded-full transition-opacity md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"
               aria-label={`Delete photo ${index + 1}`}
             >
               <Trash2 className="h-4 w-4" />

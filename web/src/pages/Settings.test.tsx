@@ -29,7 +29,6 @@ vi.mock('@/components/settings/AccessibilitySettings', () => ({ default: () => n
 vi.mock('@/components/settings/SecuritySettings', () => ({ default: () => null }));
 vi.mock('@/components/settings/AppCustomization', () => ({ default: () => null }));
 vi.mock('@/components/settings/FeedbackSupport', () => ({ default: () => null }));
-vi.mock('@/components/Navbar', () => ({ default: () => null }));
 
 const apiSettings = {
   notifications_enabled: true,

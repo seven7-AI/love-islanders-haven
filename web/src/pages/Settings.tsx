@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AccountSettings from '@/components/settings/AccountSettings';
@@ -140,8 +139,6 @@ const Settings = () => {
           </div>
         </main>
       </div>
-
-      <Navbar />
     </div>
   );
 };

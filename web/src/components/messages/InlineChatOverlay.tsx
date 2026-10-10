@@ -20,7 +20,7 @@ const InlineChatOverlay: React.FC<InlineChatOverlayProps> = ({ matchId, matchNam
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
       <AudioPlayerProvider>
-        <div className="bg-island-dark border border-island-light/20 rounded-lg w-full max-w-md h-[80vh] flex flex-col overflow-hidden animate-fade-in chat-container">
+        <div className="bg-island-dark border border-island-light/20 rounded-lg w-full max-w-md h-[85dvh] flex flex-col overflow-hidden animate-fade-in chat-container">
           <InlineChatHeader matchName={matchName} partnerId={partnerId} onClose={onClose} onBlocked={onBlocked} />
 
           <InlineChatContent

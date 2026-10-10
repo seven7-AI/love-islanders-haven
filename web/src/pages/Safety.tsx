@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Phone, Shield } from 'lucide-react';
-import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import EmergencyButton from '@/components/safety/EmergencyButton';
@@ -105,8 +104,6 @@ const Safety = () => {
           </Card>
         </main>
       </div>
-
-      <Navbar />
     </div>
   );
 };

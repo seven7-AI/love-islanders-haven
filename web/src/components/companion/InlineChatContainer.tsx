@@ -21,7 +21,7 @@ const InlineChatContainer: React.FC<InlineChatContainerProps> = ({ messages, isL
     });
   };
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-[calc(100dvh-4rem)]">
       <ScrollArea className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-4">
           {messages.map((message, index) => (
