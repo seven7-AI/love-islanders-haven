@@ -49,6 +49,7 @@ const OptionButton = ({
   <button
     type="button"
     onClick={onClick}
+    aria-pressed={selected}
     className={cn(
       'px-4 py-2 rounded-full text-sm transition-all',
       selected ? 'bg-love text-white' : 'bg-island-light/20 text-white/80 hover:bg-island-light/30',

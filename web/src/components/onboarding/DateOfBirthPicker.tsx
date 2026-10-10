@@ -70,7 +70,7 @@ export function DateOfBirthPicker({ value, onChange, minAge = 18, maxAge = 100 }
       <Label className="text-white">When were you born?</Label>
       <div className="grid grid-cols-3 gap-3">
         <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-          <SelectTrigger className="bg-island-light/20 border-island-light text-white">
+          <SelectTrigger aria-label="Birth month" className="bg-island-light/20 border-island-light text-white">
             <SelectValue placeholder="Month" />
           </SelectTrigger>
           <SelectContent>
@@ -83,7 +83,7 @@ export function DateOfBirthPicker({ value, onChange, minAge = 18, maxAge = 100 }
         </Select>
 
         <Select value={selectedDay} onValueChange={setSelectedDay}>
-          <SelectTrigger className="bg-island-light/20 border-island-light text-white">
+          <SelectTrigger aria-label="Birth day" className="bg-island-light/20 border-island-light text-white">
             <SelectValue placeholder="Day" />
           </SelectTrigger>
           <SelectContent>
@@ -96,7 +96,7 @@ export function DateOfBirthPicker({ value, onChange, minAge = 18, maxAge = 100 }
         </Select>
 
         <Select value={selectedYear} onValueChange={setSelectedYear}>
-          <SelectTrigger className="bg-island-light/20 border-island-light text-white">
+          <SelectTrigger aria-label="Birth year" className="bg-island-light/20 border-island-light text-white">
             <SelectValue placeholder="Year" />
           </SelectTrigger>
           <SelectContent>

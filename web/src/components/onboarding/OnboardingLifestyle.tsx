@@ -32,6 +32,32 @@ interface OnboardingLifestyleProps {
   isSubmitting: boolean;
 }
 
+// Declared at module level: declared inside the form it was a new component on every render, so a tap right after
+// typing (which re-renders the form on blur) could land on a replaced button and be lost.
+const OptionButton = ({
+  value,
+  label,
+  selected,
+  onClick,
+}: {
+  value: string;
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-pressed={selected}
+    className={cn(
+      'px-4 py-2 rounded-full text-sm transition-all',
+      selected ? 'bg-love text-white' : 'bg-island-light/20 text-white/80 hover:bg-island-light/30',
+    )}
+  >
+    {label}
+  </button>
+);
+
 export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting }: OnboardingLifestyleProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,30 +78,6 @@ export const OnboardingLifestyle = ({ initialData, onNext, onBack, isSubmitting 
       smoking_habit: data.smoking,
     });
   };
-
-  // Option button component for visual selection
-  const OptionButton = ({
-    value,
-    label,
-    selected,
-    onClick,
-  }: {
-    value: string;
-    label: string;
-    selected: boolean;
-    onClick: () => void;
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'px-4 py-2 rounded-full text-sm transition-all',
-        selected ? 'bg-love text-white' : 'bg-island-light/20 text-white/80 hover:bg-island-light/30',
-      )}
-    >
-      {label}
-    </button>
-  );
 
   return (
     <div className="bg-island-dark/80 backdrop-blur-sm rounded-lg p-6 text-white animate-fade-in shadow-lg border border-island-light/30">
