@@ -19,9 +19,14 @@ Some external services are replaced in tests; these tests check our code's handl
 - Language model, Google OAuth/Calendar, emergency-alert delivery: scripted fakes / mocked transports. No live test
   exists until credentials are provided (see docs/operations/production-actions.md).
 
+## README screenshots
+`SEED=1 npm run test:e2e -- --config=playwright.screenshots.config.ts` seeds the stack and captures the README
+screenshots through the real UI (`e2e/screenshots/`, written to `docs/images/screenshots/`). It is not part of the test
+suite; re-run it after visible UI changes.
+
 ## Documentation references
 `scripts/check-doc-references.py` (part of `make check` and the CI web job) fails when a Markdown file links to a
-missing file or names a repository path that does not exist.
+missing file (Markdown links and HTML `src`/`href`, e.g. README images) or names a repository path that does not exist.
 
 ## From a fresh clone
 `scripts/clean-clone-check.sh [repo-url] [ref]` clones into a temporary directory and runs the documented setup and

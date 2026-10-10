@@ -2,7 +2,8 @@
 """Fails if documentation points at files that do not exist.
 
 Checks every tracked (or new, not ignored) Markdown file outside docs/audit/ (a dated historical record):
-- relative links `[text](path)` resolve from the file's directory (anchors are ignored);
+- relative links `[text](path)` and HTML `src`/`href` attributes resolve from the file's directory (anchors are
+  ignored);
 - backticked repository paths such as `scripts/db/backup.sh` or `web/src/lib/api/` exist. A token counts as a
   repository path when it starts with a top-level directory of this repository; tokens with wildcards, placeholders
   (`<...>`, `…`) or spaces are skipped.
@@ -29,6 +30,7 @@ KNOWN_MISSING = {
 FENCE = re.compile(r"^```.*?^```", re.M | re.S)
 HISTORY = re.compile(r"^(#+) .*\(history\)\s*$.*?(?=^#{1,6} |\Z)", re.M | re.S)
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
+HTML_REF = re.compile(r"""(?:src|href)=["']([^"']+)["']""")
 CODE = re.compile(r"`([^`\n]+)`")
 
 
@@ -50,7 +52,7 @@ def ignored_by_git(rel: str) -> bool:
 def broken_references(path: Path) -> list[str]:
     problems = []
     text = HISTORY.sub("", FENCE.sub("", path.read_text(encoding="utf-8")))
-    for target in LINK.findall(text):
+    for target in [*LINK.findall(text), *HTML_REF.findall(text)]:
         if re.match(r"^[a-z]+:", target) or target.startswith("#"):
             continue
         file_part = target.split("#", 1)[0]
