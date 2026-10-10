@@ -1,16 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { getMe, type Me } from '@/lib/api/moderation';
-
-/**
- * Where a signed-in user starts: Discover once onboarded; the moderation queue for staff without a dating profile;
- * otherwise onboarding. If the account cannot be loaded, Discover (whose guard sends unfinished profiles onward).
- */
-export const destinationFor = (me: Me | null) => {
-  if (!me || me.onboarding_completed) return '/discover';
-  return me.roles.includes('moderator') ? '/moderation' : '/onboarding';
-};
+import { getMe } from '@/lib/api/moderation';
+import { destinationFor } from '@/lib/start-page';
 
 /** Sends an already signed-in user to their start page; the only place that decides it. */
 const SignedInRedirect = () => {

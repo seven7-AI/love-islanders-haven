@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getMe } from '@/lib/api/moderation';
-import { destinationFor } from '@/components/SignedInRedirect';
+import { destinationFor } from '@/lib/start-page';
 
 const Login = () => {
   const [email, setEmail] = useState('');

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { destinationFor } from './SignedInRedirect';
+import { destinationFor } from './start-page';
 
 const me = (onboarding_completed: boolean, roles: string[] = []) => ({
   id: 'u',
