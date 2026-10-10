@@ -106,3 +106,14 @@ export function grantRole(userId: string, role = 'moderator') {
     },
   );
 }
+
+/** The HTTP status of an API request (for permission checks, where an error status is the expected answer). */
+export async function apiStatus(token: string | null, path: string, init: { method?: string; body?: unknown } = {}) {
+  const response = await fetch(`${API_URL}${path}`, {
+    method: init.method ?? 'GET',
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), 'Content-Type': 'application/json' },
+    body: init.body === undefined ? undefined : JSON.stringify(init.body),
+  });
+  await response.body?.cancel();
+  return response.status;
+}
