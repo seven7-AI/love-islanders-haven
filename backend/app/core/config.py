@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, PostgresDsn, model_validator
+from pydantic import AliasChoices, Field, PostgresDsn, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     Missing required values fail at startup rather than at first use.
     """
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", populate_by_name=True)
 
     environment: Literal["development", "test", "staging", "production"] = "development"
     database_url: PostgresDsn = Field(description="postgresql+asyncpg://user:password@host:port/database")
@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     token_encryption_key: str | None = None
     # Secret for signing OAuth state values; falls back to the token key.
     oauth_state_secret: str | None = None
+    # Pexels stock photos, used only by the local seed tool (never by the running API). PEXEL_API_KEY is also accepted.
+    pexels_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("pexels_api_key", "PEXELS_API_KEY", "PEXEL_API_KEY")
+    )
     # Observability. /metrics is open unless METRICS_TOKEN is set (then it needs "Authorization: Bearer <token>").
     metrics_token: str | None = None
     sentry_dsn: str | None = None
