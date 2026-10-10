@@ -182,3 +182,29 @@ async def test_cutover_revision_matches_supabase_migrations(make_database) -> No
         assert not only_supabase and not only_alembic, (
             f"{part} differ\n  only in Supabase migrations: {only_supabase}\n  only in Alembic: {only_alembic}"
         )
+
+
+async def test_0006_moves_avatars_off_hidden_photos(make_database) -> None:  # type: ignore[no-untyped-def]
+    db = await make_database()
+    await _alembic(db, "upgrade", "0005")
+    conn = await asyncpg.connect(_dsn(db))
+    try:
+        hidden_first, all_hidden, fine = uuid.uuid4(), uuid.uuid4(), uuid.uuid4()
+        await conn.execute(
+            "INSERT INTO profiles (id, avatar_url) VALUES ($1, 'h0'), ($2, 'x0'), ($3, 'f0')",
+            hidden_first,
+            all_hidden,
+            fine,
+        )
+        await conn.execute(
+            "INSERT INTO profile_images (profile_id, url, position, is_visible) VALUES "
+            "($1, 'h0', 0, false), ($1, 'h1', 1, true), ($2, 'x0', 0, false), ($3, 'f0', 0, true), ($3, 'f1', 1, true)",
+            hidden_first,
+            all_hidden,
+            fine,
+        )
+        await _alembic(db, "upgrade", "head")
+        rows = await conn.fetch("SELECT id, avatar_url FROM profiles")
+    finally:
+        await conn.close()
+    assert {r["id"]: r["avatar_url"] for r in rows} == {hidden_first: "h1", all_hidden: None, fine: "f0"}

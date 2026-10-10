@@ -24,6 +24,8 @@ Changes merged to the repository that only take effect once someone with access 
 | #21 | Apply migration `20261009180000_profile_location.sql` (also replaces table grants on `profiles` with column grants); delete the `location-services` edge function | `supabase db push`; `supabase functions delete location-services` | Pending |
 | #22 | Apply migration `20261009190000_lock_down_client_access.sql` **only after** the web app build that uses the API everywhere is live (older builds query tables directly and would break) | `supabase db push` | Pending |
 | #99 | Ads: if ads should run, build the web app with `VITE_ADSENSE_CLIENT` (the publisher id previously hardcoded in `index.html`) and `VITE_ADSENSE_SLOT` (an ad unit created in AdSense; none existed). Without them no ads or AdSense script load | web build args (`deploy/web/Dockerfile`) | Pending (owner decision) |
+| #81 | Set Storage bucket limits: `profile-images` 5 MB, JPEG/PNG/WebP; `chat-media` 10 MB, those image types plus `audio/webm`, `audio/mpeg`, `audio/mp4`, `audio/ogg` (the values in `supabase/config.toml`). The API already rejects other files when they are attached, but without the limits Storage still accepts and keeps them | Supabase dashboard → Storage → bucket → Edit bucket, or `supabase seed buckets --linked` | Pending |
+| #81 | Apply Alembic revision `0006` (moves avatars off hidden photos; data only) | `alembic upgrade head` (part of every API deploy) | Pending |
 | #23 | **Rotate the Spotify client secret** committed in old commit `370a20d` (public history); set `ENVIRONMENT=production` and explicit https `CORS_ORIGINS` on the API | Spotify developer dashboard | **Urgent** |
 
 ## Known residual risks

@@ -17,7 +17,8 @@ from app.core.pagination import decode_cursor, encode_cursor
 from app.integrations.storage import SignedUpload, StorageError, StorageProvider
 from app.schemas.streaks import LeaderboardEntry, LikeState, StreakCreate, StreakFeed, StreakPost, StreakStatus
 from app.services.notifications import notify_streak_like
-from app.services.profiles import EXTENSIONS, NotFound, _storage_unavailable
+from app.services.profiles import NotFound
+from app.services.uploads import IMAGE_EXTENSIONS, MAX_IMAGE_BYTES, storage_unavailable, verify_upload
 
 # Effective streak (in both queries below): the stored count while the latest post is from today or yesterday (UTC),
 # otherwise 0.
@@ -72,11 +73,11 @@ def _images(content: str) -> list[str]:
 
 
 async def create_upload(storage: StorageProvider, bucket: str, me: uuid.UUID, content_type: str) -> SignedUpload:
-    path = f"{me}/streaks/{uuid.uuid4()}.{EXTENSIONS[content_type]}"
+    path = f"{me}/streaks/{uuid.uuid4()}.{IMAGE_EXTENSIONS[content_type]}"
     try:
         return await storage.create_signed_upload(bucket, path)
     except StorageError as exc:
-        raise _storage_unavailable(exc) from exc
+        raise storage_unavailable(exc) from exc
 
 
 async def create_post(
@@ -86,12 +87,11 @@ async def create_post(
     for path in body.media_paths:
         if not path.startswith(f"{me}/streaks/") or ".." in path:
             raise AppError(403, "You can only post photos you uploaded", code="forbidden_path")
+        await verify_upload(storage, bucket, path, allowed=IMAGE_EXTENSIONS, max_bytes=MAX_IMAGE_BYTES)
         try:
-            if not await storage.exists(bucket, path):
-                raise AppError(422, "An uploaded photo was not found; upload it again", code="upload_missing")
             urls.append(storage.public_url(bucket, path))
         except StorageError as exc:
-            raise _storage_unavailable(exc) from exc
+            raise storage_unavailable(exc) from exc
 
     # One post at a time per user, so the streak is computed from a consistent "last post".
     await session.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"), {"k": f"streak:{me}"})

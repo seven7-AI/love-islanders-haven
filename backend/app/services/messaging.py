@@ -12,18 +12,10 @@ from app.core.pagination import decode_cursor, encode_cursor
 from app.integrations.storage import SignedUpload, StorageError, StorageProvider
 from app.schemas.messages import MessageCreate, MessageOut, MessagePage
 from app.services.notifications import notify_message
-from app.services.profiles import NotFound, _storage_unavailable
+from app.services.profiles import NotFound
+from app.services.uploads import MAX_MEDIA_BYTES, MEDIA_EXTENSIONS, storage_unavailable, verify_upload
 
 MEDIA_URL_TTL_SECONDS = 3600
-MEDIA_EXTENSIONS = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp",
-    "audio/webm": "webm",
-    "audio/mpeg": "mp3",
-    "audio/mp4": "m4a",
-    "audio/ogg": "ogg",
-}
 
 
 async def _require_active_member(session: AsyncSession, me: uuid.UUID, match_id: uuid.UUID) -> None:
@@ -113,7 +105,7 @@ async def create_media_upload(
     try:
         return await storage.create_signed_upload(bucket, path)
     except StorageError as exc:
-        raise _storage_unavailable(exc) from exc
+        raise storage_unavailable(exc) from exc
 
 
 async def send_message(
@@ -128,11 +120,7 @@ async def send_message(
     if body.media_path is not None:
         if not body.media_path.startswith(f"{match_id}/{me}/") or ".." in body.media_path:
             raise AppError(403, "You can only send media you uploaded to this conversation", code="forbidden_path")
-        try:
-            if not await storage.exists(bucket, body.media_path):
-                raise AppError(422, "The uploaded file was not found; upload it again", code="upload_missing")
-        except StorageError as exc:
-            raise _storage_unavailable(exc) from exc
+        await verify_upload(storage, bucket, body.media_path, allowed=MEDIA_EXTENSIONS, max_bytes=MAX_MEDIA_BYTES)
     row = (
         await session.execute(
             text(

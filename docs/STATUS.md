@@ -55,7 +55,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 - fresh `git clone`, no Lovable tooling referenced
 - tracked root entries equal the documented layout, with one lockfile
 - `npm ci` (workspaces `web`, `e2e`) and `uv sync`
-- Postgres via compose, `alembic upgrade head` (0005)
+- Postgres via compose, `alembic upgrade head` (0006)
 - `make check`:
   - Prettier
   - ESLint (0 errors)

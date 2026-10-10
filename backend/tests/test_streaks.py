@@ -71,6 +71,10 @@ async def test_post_validation(client: AsyncClient, app: FastAPI, storage: FakeS
     ).status_code == 403
     missing = {"media_paths": [f"{me}/streaks/missing.jpg"]}
     assert (await client.post("/v1/streaks", headers=auth_headers(me), json=missing)).status_code == 422
+    huge = f"{me}/streaks/huge.jpg"
+    storage.put(BUCKET, huge, size=6 * 1024 * 1024)
+    response = await client.post("/v1/streaks", headers=auth_headers(me), json={"media_paths": [huge]})
+    assert (response.status_code, response.json()["code"]) == (422, "upload_too_large")
     assert (await client.post("/v1/streaks", headers=auth_headers(me), json={"media_paths": []})).status_code == 422
     too_long = {"media_paths": [f"{me}/streaks/a.jpg"], "duration_hours": 100}
     assert (await client.post("/v1/streaks", headers=auth_headers(me), json=too_long)).status_code == 422

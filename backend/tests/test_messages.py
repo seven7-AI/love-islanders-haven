@@ -159,6 +159,12 @@ async def test_media_messages_use_private_signed_urls(
     )
     assert missing.status_code == 422
 
+    storage.put(BUCKET, ticket["path"], data=b"not an image at all")
+    wrong = await client.post(
+        url(match_id), headers=auth_headers(a), json={"content_type": "image", "media_path": ticket["path"]}
+    )
+    assert (wrong.status_code, wrong.json()["code"]) == (422, "upload_invalid_type")
+
     storage.put(BUCKET, ticket["path"])
     sent = await client.post(
         url(match_id), headers=auth_headers(a), json={"content_type": "image", "media_path": ticket["path"]}
