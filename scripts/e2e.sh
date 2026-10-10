@@ -69,4 +69,4 @@ for url in "http://127.0.0.1:$API_PORT/readyz" "http://localhost:$WEB_PORT/"; do
     echo "Not ready: $url"; tail -30 /tmp/love-islander-e2e-api.log /tmp/love-islander-e2e-web.log; exit 1; }
 done
 
-npx playwright test "$@"
+npm test -w e2e -- "$@"

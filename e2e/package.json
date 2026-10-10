@@ -1,0 +1,16 @@
+{
+  "name": "love-islander-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Whole-stack end-to-end tests. Run through scripts/e2e.sh (npm run test:e2e at the repository root).",
+  "scripts": {
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^22.5.5",
+    "typescript": "^5.5.3"
+  }
+}

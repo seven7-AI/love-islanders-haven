@@ -97,7 +97,9 @@ Makefile  README.md  docker-compose.yml  package.json (npm workspaces root)  pac
    directory. Nothing moves in this step. Done.
 3. #64: move the web app into `web/` and turn the root into an npm-workspaces root. Done. `.prettierrc.json` became
    the `prettier` key of the root `package.json`, and `.dockerignore` became `deploy/web/Dockerfile.dockerignore`.
-4. #65: make `e2e/` its own workspace, with its own config and type checking.
+4. #65: make `e2e/` its own workspace, with its own config and type checking. Done; the E2E code is now
+   type-checked (strict) by `npm run typecheck`, and Playwright output goes to `e2e/playwright-report/` and
+   `e2e/test-results/`.
 5. #66: add a docs index and regroup the docs under `docs/development/`, stating each fact once.
 6. #67: add a generated API reference (`docs/api/`).
 7. #68: verify the documented workflow from a clean clone.
