@@ -11,7 +11,10 @@ class Settings(BaseSettings):
     Missing required values fail at startup rather than at first use.
     """
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", populate_by_name=True)
+    # hide_input_in_errors: a configuration error must not echo environment values (keys, passwords) into logs.
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", populate_by_name=True, hide_input_in_errors=True
+    )
 
     environment: Literal["development", "test", "staging", "production"] = "development"
     database_url: PostgresDsn = Field(description="postgresql+asyncpg://user:password@host:port/database")

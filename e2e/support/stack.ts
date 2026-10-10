@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { ANON_KEY, API_URL, MAILPIT_URL, SERVICE_ROLE_KEY, SUPABASE_URL } from './env';
 
@@ -88,4 +89,20 @@ export async function latestEmail(to: string, timeoutMs = 15_000): Promise<strin
     await new Promise((r) => setTimeout(r, 500));
   }
   throw new Error(`No email for ${to}`);
+}
+
+/**
+ * Grants a role with the operator CLI (`python -m app.admin roles grant`), the only way roles are granted. Runs with
+ * the API's environment, as an operator would: its database (DATABASE_URL, exported by scripts/e2e.sh) and Auth URL.
+ */
+export function grantRole(userId: string, role = 'moderator') {
+  execFileSync(
+    'uv',
+    ['run', 'python', '-m', 'app.admin', 'roles', 'grant', '--user-id', userId, '--role', role, '--by', 'e2e'],
+    {
+      cwd: new URL('../../backend', import.meta.url).pathname,
+      env: { ...process.env, SUPABASE_URL },
+      stdio: 'pipe',
+    },
+  );
 }

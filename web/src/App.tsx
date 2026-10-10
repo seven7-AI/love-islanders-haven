@@ -26,6 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import Streaks from '@/pages/Streaks';
 import Matches from '@/pages/Matches';
+import Moderation from '@/pages/Moderation';
 import Onboarding from './pages/Onboarding';
 import AICompanion from '@/components/companion/AICompanion';
 import OnboardingGuard from '@/components/OnboardingGuard';
@@ -178,6 +179,15 @@ function App() {
               element={
                 <PrivateRoute>
                   <Support />
+                </PrivateRoute>
+              }
+            />
+            {/* Staff may have no dating profile, so onboarding is not required; the page checks the role. */}
+            <Route
+              path="/moderation"
+              element={
+                <PrivateRoute guardOnboarding={false}>
+                  <Moderation />
                 </PrivateRoute>
               }
             />

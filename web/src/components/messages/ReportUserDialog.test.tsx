@@ -7,7 +7,10 @@ const reportUser = vi.fn();
 const toastError = vi.fn();
 const toastSuccess = vi.fn();
 
-vi.mock('@/lib/api/safety', () => ({ reportUser: (r: unknown) => reportUser(r) }));
+vi.mock('@/lib/api/safety', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/api/safety')>()),
+  reportUser: (r: unknown) => reportUser(r),
+}));
 vi.mock('sonner', () => ({ toast: { success: (m: string) => toastSuccess(m), error: (m: string) => toastError(m) } }));
 
 const setup = () => {

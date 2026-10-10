@@ -18,6 +18,10 @@ uv run python -m app.admin roles list
 profile exists. `--by` is recorded with the grant; it defaults to your OS user name.
 
 ## Reviewing reports
+Moderators see **Moderation** in the navigation bar and land on `/moderation` after signing in when they have no
+dating profile. The page lists the queue by status (Open by default), and **Review** opens a report to mark it
+reviewing, resolve it or dismiss it with a note. Everyone else gets "Moderators only", and the API answers `403`.
+
 `GET /v1/moderation/reports` lists reports oldest first, optionally filtered by `status` (`open`, `reviewing`,
 `resolved`, `dismissed`). Each report shows the reporter, the reported person and how many reports there are
 against them in total.

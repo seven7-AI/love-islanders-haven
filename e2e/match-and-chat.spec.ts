@@ -29,7 +29,12 @@ test('discover someone, match, exchange messages, see read receipts, and unmatch
   const cleoCard = page.getByRole('heading', { name: new RegExp(`^${cleoName}\\b`) });
   for (let i = 0; i < 20; i++) {
     await expect(pass).toBeVisible();
-    if (await cleoCard.isVisible()) break;
+    // Give each card time to render before deciding to pass it, or Cleo's card could be passed unseen.
+    const isCleo = await cleoCard.waitFor({ timeout: 2_000 }).then(
+      () => true,
+      () => false,
+    );
+    if (isCleo) break;
     await pass.click();
   }
   await expect(cleoCard).toBeVisible();

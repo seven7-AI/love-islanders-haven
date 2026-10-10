@@ -17,7 +17,9 @@ LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "host.docker.internal"}
 
 
 class SeedSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", populate_by_name=True)
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", populate_by_name=True, hide_input_in_errors=True
+    )
 
     environment: Literal["development", "test", "staging", "production"] = "development"
     api_url: str = Field(default="http://127.0.0.1:8001", validation_alias=AliasChoices("api_url", "SEED_API_URL"))

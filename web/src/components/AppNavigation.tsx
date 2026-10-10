@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Compass, Heart, Bot, Flame, User, LogOut, Settings, Shield } from 'lucide-react';
+import { Compass, Heart, Bot, Flame, User, LogOut, Settings, Shield, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/context/auth';
+import { useRoles } from '@/hooks/use-roles';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -14,12 +15,15 @@ const LINKS = [
   { to: '/safety', label: 'Safety', icon: Shield, wideOnly: true },
   { to: '/settings', label: 'Settings', icon: Settings, wideOnly: true },
 ];
+const MODERATION_LINK = { to: '/moderation', label: 'Moderation', icon: ShieldCheck, wideOnly: false };
 
 /** The app's only navigation bar: fixed at the bottom on every screen size. */
 const AppNavigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { isModerator } = useRoles();
+  const links = isModerator ? [...LINKS, MODERATION_LINK] : LINKS;
 
   const handleLogout = async () => {
     try {
@@ -43,7 +47,7 @@ const AppNavigation = () => {
       className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-700 bg-slate-800/90 backdrop-blur-md pb-[env(safe-area-inset-bottom)]"
     >
       <div className="mx-auto flex max-w-3xl items-center justify-around py-1">
-        {LINKS.map(({ to, label, icon: Icon, wideOnly }) => {
+        {links.map(({ to, label, icon: Icon, wideOnly }) => {
           const active = location.pathname === to || location.pathname.startsWith(`${to}/`);
           return (
             <Link
