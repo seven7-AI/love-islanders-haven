@@ -27,13 +27,29 @@ async def test_signed_upload() -> None:
     assert upload.url == "https://proj.supabase.co/storage/v1/object/upload/sign/profile-images/u1/a.jpg?token=abc"
 
 
-async def test_exists() -> None:
+async def test_inspect_reads_info_and_leading_bytes() -> None:
+    """The info response shape and the ranged read match what the local Supabase Storage returns."""
+
     def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200 if request.url.path.endswith("/yes.jpg") else 404)
+        if request.url.path.endswith("/no.jpg"):
+            return httpx.Response(400, json={"error": "not_found"})
+        if request.url.path.startswith("/storage/v1/object/info/b/"):
+            return httpx.Response(200, json={"name": "u1/yes.jpg", "size": 1234, "content_type": "image/jpeg"})
+        assert request.url.path == "/storage/v1/object/authenticated/b/u1/yes.jpg"
+        assert request.headers["Range"] == "bytes=0-15"
+        return httpx.Response(206, content=b"\xff\xd8\xff\xe0" + b"\x00" * 12)
 
     storage = client(handler)
-    assert await storage.exists("b", "u1/yes.jpg")
-    assert not await storage.exists("b", "u1/no.jpg")
+    stored = await storage.inspect("b", "u1/yes.jpg")
+    assert stored is not None
+    assert (stored.size, stored.content_type, stored.head[:3]) == (1234, "image/jpeg", b"\xff\xd8\xff")
+    assert await storage.inspect("b", "u1/no.jpg") is None
+
+
+async def test_inspect_raises_on_service_errors() -> None:
+    storage = client(lambda request: httpx.Response(500))
+    with pytest.raises(StorageError):
+        await storage.inspect("b", "u1/a.jpg")
 
 
 async def test_delete_sends_prefixes_and_raises_on_failure() -> None:

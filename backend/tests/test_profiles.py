@@ -101,6 +101,31 @@ async def test_onboarding_completes(client: AsyncClient, storage: FakeStorage, m
         assert await conn.scalar(text("SELECT completed FROM profile_onboarding WHERE profile_id = :id"), {"id": me})
 
 
+async def test_going_back_after_completion_clears_both_flags(
+    client: AsyncClient, storage: FakeStorage, me: uuid.UUID, app: FastAPI
+) -> None:
+    await onboard(client, storage, me)
+    response = await client.put("/v1/me/onboarding", headers=auth_headers(me), json={"step": "preferences"})
+    assert response.json()["onboarding_completed"] is False
+    async with app.state.db.engine.connect() as conn:
+        flags = (
+            await conn.execute(
+                text(
+                    "SELECT p.onboarding_completed, o.completed FROM profiles p "
+                    "JOIN profile_onboarding o ON o.profile_id = p.id WHERE p.id = :id"
+                ),
+                {"id": me},
+            )
+        ).one()
+    assert tuple(flags) == (False, False)
+    # Out of discovery until completed again.
+    viewer = uuid.uuid4()
+    assert (await client.get(f"/v1/profiles/{me}", headers=auth_headers(viewer))).status_code == 404
+    assert (await client.put("/v1/me/onboarding", headers=auth_headers(me), json={"step": "completed"})).json()[
+        "onboarding_completed"
+    ] is True
+
+
 async def test_onboarding_step_is_recorded(client: AsyncClient, me: uuid.UUID) -> None:
     response = await client.put("/v1/me/onboarding", headers=auth_headers(me), json={"step": "photos"})
     assert response.json()["onboarding_step"] == "photos"
@@ -172,6 +197,32 @@ async def test_cannot_register_another_users_file(client: AsyncClient, storage: 
     assert response.status_code == 403
 
 
+@pytest.mark.parametrize(
+    ("stored", "code"),
+    [
+        ({"size": 6 * 1024 * 1024}, "upload_too_large"),
+        ({"data": b"<html><script>alert(1)</script>", "content_type": "text/html"}, "upload_invalid_type"),
+        ({"data": b"\x89PNG\r\n\x1a\n" + b"\x00" * 8, "content_type": "image/png"}, "upload_invalid_type"),
+        ({"content_type": "text/html"}, "upload_invalid_type"),  # JPEG bytes served as HTML
+    ],
+)
+async def test_register_checks_the_stored_file(
+    client: AsyncClient, storage: FakeStorage, me: uuid.UUID, stored: dict[str, object], code: str
+) -> None:
+    """The ticket was for a .jpg under 5 MB; what was actually uploaded is checked, and rejected files are deleted."""
+    ticket = (
+        await client.post(
+            "/v1/me/images/uploads", headers=auth_headers(me), json={"content_type": "image/jpeg", "size_bytes": 1000}
+        )
+    ).json()
+    storage.put(BUCKET, ticket["path"], **stored)  # type: ignore[arg-type]
+    response = await client.post("/v1/me/images", headers=auth_headers(me), json={"path": ticket["path"]})
+    assert response.status_code == 422
+    assert response.json()["code"] == code
+    assert (BUCKET, ticket["path"]) not in storage.objects
+    assert (await client.get("/v1/me/profile", headers=auth_headers(me))).json()["images"] == []
+
+
 async def test_cannot_register_a_file_that_was_not_uploaded(client: AsyncClient, me: uuid.UUID) -> None:
     response = await client.post("/v1/me/images", headers=auth_headers(me), json={"path": f"{me}/missing.jpg"})
     assert response.status_code == 422
@@ -190,6 +241,51 @@ async def test_first_photo_becomes_avatar_and_limit_is_enforced(
         "/v1/me/images/uploads", headers=auth_headers(me), json={"content_type": "image/jpeg", "size_bytes": 1000}
     )
     assert response.status_code == 409
+
+
+async def avatar_url(app: FastAPI, user: uuid.UUID) -> str | None:
+    async with app.state.db.engine.connect() as conn:
+        return await conn.scalar(text("SELECT avatar_url FROM profiles WHERE id = :id"), {"id": user})  # type: ignore[no-any-return]
+
+
+async def test_avatar_is_the_first_visible_photo(
+    client: AsyncClient, storage: FakeStorage, me: uuid.UUID, app: FastAPI
+) -> None:
+    a = await add_photo(client, storage, me)
+    b = await add_photo(client, storage, me)
+    c = await add_photo(client, storage, me)
+    assert await avatar_url(app, me) == a["url"]
+
+    hide = {"is_visible": False}
+    await client.patch(f"/v1/me/images/{a['id']}", headers=auth_headers(me), json=hide)
+    assert await avatar_url(app, me) == b["url"]
+
+    await client.put("/v1/me/images/order", headers=auth_headers(me), json={"image_ids": [a["id"], c["id"], b["id"]]})
+    assert await avatar_url(app, me) == c["url"]  # a is first but hidden
+
+    await client.delete(f"/v1/me/images/{c['id']}", headers=auth_headers(me))
+    assert await avatar_url(app, me) == b["url"]
+
+    await client.patch(f"/v1/me/images/{b['id']}", headers=auth_headers(me), json=hide)
+    assert await avatar_url(app, me) is None  # every photo hidden: no avatar rather than a hidden one
+
+    await client.patch(f"/v1/me/images/{a['id']}", headers=auth_headers(me), json={"is_visible": True})
+    assert await avatar_url(app, me) == a["url"]
+
+
+async def test_hidden_avatar_never_reaches_matches(
+    client: AsyncClient, storage: FakeStorage, me: uuid.UUID, app: FastAPI
+) -> None:
+    other = uuid.uuid4()
+    await onboard(client, storage, me)
+    await onboard(client, storage, other, gender="male", gender_preference="female")
+    first, second = (await client.get("/v1/me/profile", headers=auth_headers(other))).json()["images"][:2]
+    await client.patch(f"/v1/me/images/{first['id']}", headers=auth_headers(other), json={"is_visible": False})
+    for a, b in ((me, other), (other, me)):
+        swipe = {"target_id": str(b), "direction": "right"}
+        assert (await client.post("/v1/swipes", headers=auth_headers(a), json=swipe)).status_code == 201
+    [match] = (await client.get("/v1/matches", headers=auth_headers(me))).json()["matches"]
+    assert match["partner"]["photo_url"] == second["url"]
 
 
 async def test_reorder(client: AsyncClient, storage: FakeStorage, me: uuid.UUID) -> None:

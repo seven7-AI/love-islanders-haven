@@ -20,10 +20,21 @@ class SignedUpload:
     url: str
 
 
+@dataclass(frozen=True)
+class StoredObject:
+    """What Storage holds at a path: its size, the content type it was uploaded with, and its first bytes."""
+
+    size: int
+    content_type: str
+    head: bytes
+
+
 class StorageProvider(Protocol):
     async def create_signed_upload(self, bucket: str, path: str) -> SignedUpload: ...
 
-    async def exists(self, bucket: str, path: str) -> bool: ...
+    async def inspect(self, bucket: str, path: str) -> StoredObject | None:
+        """The stored object at `path`, or None if there is none."""
+        ...
 
     async def delete(self, bucket: str, paths: list[str]) -> None: ...
 
@@ -40,7 +51,7 @@ class UnconfiguredStorage:
     async def create_signed_upload(self, bucket: str, path: str) -> SignedUpload:
         raise StorageNotConfigured("Image storage is not configured")
 
-    async def exists(self, bucket: str, path: str) -> bool:
+    async def inspect(self, bucket: str, path: str) -> StoredObject | None:
         raise StorageNotConfigured("Image storage is not configured")
 
     async def delete(self, bucket: str, paths: list[str]) -> None:

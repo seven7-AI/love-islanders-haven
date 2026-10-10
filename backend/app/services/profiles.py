@@ -8,13 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import AppError
 from app.db.models import Profile, ProfileImage, ProfileOnboarding
-from app.integrations.storage import SignedUpload, StorageError, StorageNotConfigured, StorageProvider
+from app.integrations.storage import SignedUpload, StorageError, StorageProvider
 from app.schemas.profile import ImageOut, OwnProfile, ProfileUpdate, PublicProfile
+from app.services.uploads import IMAGE_EXTENSIONS, MAX_IMAGE_BYTES, storage_unavailable, verify_upload
 
 MINIMUM_AGE = 18
 MAX_IMAGES = 6
 MIN_PHOTOS_TO_COMPLETE = 4
-EXTENSIONS = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
 
 
 def age_on(dob: date, today: date) -> int:
@@ -31,18 +31,21 @@ class NotFound(AppError):
         super().__init__(404, f"{what} not found", code="not_found")
 
 
-def _storage_unavailable(exc: StorageError) -> AppError:
-    if isinstance(exc, StorageNotConfigured):
-        return AppError(503, "Image storage is not configured", code="storage_not_configured")
-    return AppError(502, "The image storage service failed; please try again", code="storage_failed")
-
-
 async def _images(session: AsyncSession, profile_id: uuid.UUID, *, visible_only: bool) -> list[ProfileImage]:
     query = select(ProfileImage).where(ProfileImage.profile_id == profile_id)
     if visible_only:
         query = query.where(ProfileImage.is_visible.is_not(False))
     query = query.order_by(ProfileImage.position, ProfileImage.created_at)
     return list((await session.scalars(query)).all())
+
+
+async def _sync_avatar(session: AsyncSession, user_id: uuid.UUID) -> None:
+    """The avatar is the first visible photo, so a hidden photo never shows next to the user's name."""
+    await session.flush()
+    first = await _images(session, user_id, visible_only=True)
+    await session.execute(
+        update(Profile).where(Profile.id == user_id).values(avatar_url=first[0].url if first else None)
+    )
 
 
 async def get_own_profile(session: AsyncSession, user_id: uuid.UUID) -> OwnProfile:
@@ -125,7 +128,9 @@ async def set_onboarding_step(session: AsyncSession, user_id: uuid.UUID, step: s
             missing.append(f"at least {MIN_PHOTOS_TO_COMPLETE} photos")
         if missing:
             raise AppError(422, "Onboarding is incomplete: " + ", ".join(missing), code="onboarding_incomplete")
-        await session.execute(update(Profile).where(Profile.id == user_id).values(onboarding_completed=True))
+    # Both flags move together: going back to an earlier step takes the profile out of discovery until it is
+    # completed again.
+    await session.execute(update(Profile).where(Profile.id == user_id).values(onboarding_completed=step == "completed"))
     await session.execute(
         text(
             "INSERT INTO profile_onboarding (profile_id, current_step, completed) VALUES (:id, :step, :done) "
@@ -177,11 +182,11 @@ async def create_image_upload(
     )
     if (count or 0) >= MAX_IMAGES:
         raise AppError(409, f"You can have at most {MAX_IMAGES} photos", code="too_many_images")
-    path = f"{user_id}/{uuid.uuid4()}.{EXTENSIONS[content_type]}"
+    path = f"{user_id}/{uuid.uuid4()}.{IMAGE_EXTENSIONS[content_type]}"
     try:
         return await storage.create_signed_upload(bucket, path)
     except StorageError as exc:
-        raise _storage_unavailable(exc) from exc
+        raise storage_unavailable(exc) from exc
 
 
 async def register_image(
@@ -190,12 +195,11 @@ async def register_image(
     owner, _, name = path.partition("/")
     if owner != str(user_id) or not name or "/" in name or ".." in path:
         raise AppError(403, "You can only add photos you uploaded", code="forbidden_path")
+    await verify_upload(storage, bucket, path, allowed=IMAGE_EXTENSIONS, max_bytes=MAX_IMAGE_BYTES)
     try:
-        if not await storage.exists(bucket, path):
-            raise AppError(422, "The uploaded file was not found; upload it again", code="upload_missing")
         url = storage.public_url(bucket, path)
     except StorageError as exc:
-        raise _storage_unavailable(exc) from exc
+        raise storage_unavailable(exc) from exc
 
     # Serialise concurrent registrations for the same user so the photo limit holds.
     await session.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"), {"k": f"images:{user_id}"})
@@ -209,8 +213,7 @@ async def register_image(
     )
     image = ProfileImage(profile_id=user_id, url=url, position=position, is_visible=True)
     session.add(image)
-    if position == 0:
-        await session.execute(update(Profile).where(Profile.id == user_id).values(avatar_url=url))
+    await _sync_avatar(session, user_id)
     await session.commit()
     await session.refresh(image)
     return ImageOut(id=image.id, url=image.url, position=image.position or 0, is_visible=True)
@@ -228,6 +231,7 @@ async def set_image_visibility(
 ) -> ImageOut:
     image = await _own_image(session, user_id, image_id)
     image.is_visible = is_visible
+    await _sync_avatar(session, user_id)
     await session.commit()
     return ImageOut(id=image.id, url=image.url, position=image.position or 0, is_visible=is_visible)
 
@@ -239,8 +243,7 @@ async def reorder_images(session: AsyncSession, user_id: uuid.UUID, image_ids: l
     by_id = {i.id: i for i in current}
     for position, image_id in enumerate(image_ids):
         by_id[image_id].position = position
-    first = by_id[image_ids[0]]
-    await session.execute(update(Profile).where(Profile.id == user_id).values(avatar_url=first.url))
+    await _sync_avatar(session, user_id)
     await session.commit()
     return [
         ImageOut(id=i, url=by_id[i].url, position=n, is_visible=by_id[i].is_visible is not False)
@@ -258,15 +261,13 @@ async def delete_image(
         try:
             await storage.delete(bucket, [path])
         except StorageError as exc:
-            raise _storage_unavailable(exc) from exc
+            raise storage_unavailable(exc) from exc
     await session.delete(image)
     await session.flush()
     remaining = await _images(session, user_id, visible_only=False)
     for position, img in enumerate(remaining):
         img.position = position
-    await session.execute(
-        update(Profile).where(Profile.id == user_id).values(avatar_url=remaining[0].url if remaining else None)
-    )
+    await _sync_avatar(session, user_id)
     await session.commit()
 
 

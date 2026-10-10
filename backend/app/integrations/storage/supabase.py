@@ -4,7 +4,9 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 
 import httpx
 
-from app.integrations.storage.provider import SignedUpload, StorageError
+from app.integrations.storage.provider import SignedUpload, StorageError, StoredObject
+
+HEAD_BYTES = 16  # enough to recognise every accepted file type
 
 
 class SupabaseStorage:
@@ -29,15 +31,24 @@ class SupabaseStorage:
             raise StorageError("Storage did not return an upload token")
         return SignedUpload(bucket=bucket, path=path, token=token, url=f"{self._base}{relative}")
 
-    async def exists(self, bucket: str, path: str) -> bool:
-        response = await self._client.get(
-            f"{self._base}/object/info/{self._object(bucket, path)}", headers=self._headers
+    async def inspect(self, bucket: str, path: str) -> StoredObject | None:
+        info = await self._client.get(f"{self._base}/object/info/{self._object(bucket, path)}", headers=self._headers)
+        if info.status_code in (400, 404):
+            return None
+        if info.status_code != 200:
+            raise StorageError(f"Storage lookup failed ({info.status_code})")
+        body = info.json()
+        head = await self._client.get(
+            f"{self._base}/object/authenticated/{self._object(bucket, path)}",
+            headers={**self._headers, "Range": f"bytes=0-{HEAD_BYTES - 1}"},
         )
-        if response.status_code == 200:
-            return True
-        if response.status_code in (400, 404):
-            return False
-        raise StorageError(f"Storage lookup failed ({response.status_code})")
+        if head.status_code not in (200, 206):
+            raise StorageError(f"Storage read failed ({head.status_code})")
+        return StoredObject(
+            size=int(body.get("size") or 0),
+            content_type=str(body.get("content_type") or ""),
+            head=head.content[:HEAD_BYTES],
+        )
 
     async def delete(self, bucket: str, paths: list[str]) -> None:
         response = await self._client.request(

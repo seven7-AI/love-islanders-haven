@@ -44,6 +44,8 @@ export DATABASE_URL="postgresql+asyncpg://postgres:postgres@127.0.0.1:$DB_PORT/l
 (cd backend && uv run alembic upgrade head)
 
 $SUPABASE start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,supavisor,postgres-meta >/dev/null
+# Applies the bucket limits in supabase/config.toml, also to a stack started before they were added.
+$SUPABASE seed buckets --local >/dev/null
 eval "$($SUPABASE status -o env | sed 's/^/export SB_/')"
 
 export E2E_SUPABASE_URL="$SB_API_URL" E2E_SUPABASE_ANON_KEY="$SB_ANON_KEY" E2E_SUPABASE_SERVICE_ROLE_KEY="$SB_SERVICE_ROLE_KEY"

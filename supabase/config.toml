@@ -14,3 +14,24 @@ additional_redirect_urls = [
 
 [auth.email]
 enable_confirmations = true
+
+# Bucket limits, matching what the API accepts (backend/app/services/uploads.py). Storage enforces them on upload;
+# the API also checks each stored file before using it. Production buckets need the same limits set by hand: see
+# docs/operations/production-actions.md.
+[storage.buckets.profile-images]
+public = true
+file_size_limit = "5MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "image/webp"]
+
+[storage.buckets.chat-media]
+public = false
+file_size_limit = "10MiB"
+allowed_mime_types = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "audio/webm",
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/ogg",
+]

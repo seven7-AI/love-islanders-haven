@@ -35,6 +35,11 @@ committed document is out of date, so CI catches a forgotten regeneration.
 - **Pagination:** list endpoints take `limit` and return an opaque `next_cursor`, which is passed back as `cursor` to
   get the next page. Chat history is different: it returns `older_cursor`, which is passed back as `before` for older
   messages, and `after=<timestamp>` polls for new ones. A `null` cursor means there are no more pages.
+- **Uploads:** files go straight from the browser to Storage with a signed upload ticket. When a file is then attached
+  (a profile photo, a streak post or a chat message), the API reads the stored file and rejects it with `422` if it
+  is missing (`upload_missing`), too large (`upload_too_large`: 5 MB for photos, 10 MB for chat media) or not the
+  type its name and declared content type say, judged by its first bytes (`upload_invalid_type`). Rejected files are
+  deleted.
 - **Rate limits:** write endpoints are limited per user. Exceeding a limit gives `429` with `code: rate_limited` and a
   `Retry-After` header.
 - **Request ids:** every response carries `X-Request-ID`. Send your own to correlate client and server logs.
