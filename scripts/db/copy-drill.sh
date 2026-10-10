@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Drill for copy-data.sh: a database built from supabase/migrations (with the Supabase stubs) is seeded and its data
-# copied into a fresh Alembic database, then validated. Proves the two schemas are data-compatible.
+# copied into a fresh Alembic database at the cutover revision, validated, and upgraded to head.
 # Usage: scripts/db/copy-drill.sh <postgres-url-of-server>   (superuser; e.g. .../postgres)
 set -euo pipefail
 admin="${1:?usage: copy-drill.sh <postgres-url>}"
@@ -31,6 +31,8 @@ for f in "$root"/supabase/migrations/*.sql; do psql "$src" -qX -v ON_ERROR_STOP=
 } | psql "$src" -qX -v ON_ERROR_STOP=1 >/dev/null
 unset PGOPTIONS
 
-(cd "$root/backend" && DATABASE_URL="${dst/postgresql:/postgresql+asyncpg:}" uv run alembic upgrade head >/dev/null)
+# Load at the cutover revision, then apply every later revision to the copied data.
+(cd "$root/backend" && DATABASE_URL="${dst/postgresql:/postgresql+asyncpg:}" uv run alembic upgrade 0005 >/dev/null)
 "$here/copy-data.sh" "$src" "$dst"
+(cd "$root/backend" && DATABASE_URL="${dst/postgresql:/postgresql+asyncpg:}" uv run alembic upgrade head >/dev/null)
 echo "Copy drill passed"

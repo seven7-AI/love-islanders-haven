@@ -1,9 +1,7 @@
 # Schema reconciliation (#8)
 
 The Lovable-generated code referenced tables, columns and buckets that no migration creates. Each one is listed below with
-the decision taken. "Repository" means checked against `supabase/migrations` and the application code; confirming the
-live Supabase project has no further out-of-band objects is tracked separately because it needs project access
-(see "Live verification" below).
+the decision taken. "Repository" means checked against `supabase/migrations` and the application code.
 
 | Object | Referenced by | Decision |
 |---|---|---|
@@ -18,14 +16,10 @@ live Supabase project has no further out-of-band objects is tracked separately b
 | `public.users` | `google-calendar-callback` | Should have been `auth.users`; the flow is rebuilt in #20. |
 | Per-function `config.toml` with `project_id = "hojcrgvdvvrfdnyccgej"` | `supabase/functions/*/config.toml` | Not read by the Supabase CLI and named a different project from `.env`. Replaced by `supabase/config.toml` (local stack settings, `verify_jwt = false` for the Google callback). |
 
-## Live verification
-Tracked in #36. Requires the owner to run, with access to the production project:
-
-```bash
-supabase link --project-ref <project-ref>
-supabase db diff --linked --schema public,storage   # differences between migrations and the live database
-supabase db dump --schema public,storage -f live-schema.sql
-```
-
-Any table, column, function, policy or bucket that exists live but not in `supabase/migrations` must be added as a
-migration (or dropped) before the Alembic baseline (#10) is used against production data.
+## Live verification (superseded)
+#36 planned a `supabase db diff --linked` against the live project before adopting Alembic on that database. The
+owner's Supabase account has no access to the project, and the application database is now a separate Postgres
+managed by Alembic (#59), so the live schema no longer needs to equal the repository. Drift is caught mechanically
+during the cutover instead: applying `supabase/migrations` to the legacy database fails on unexpected objects, and
+`scripts/db/copy-data.sh` fails as a whole if the legacy data has any table or column that Alembic revision `0005`
+lacks (`docs/deployment.md`).
