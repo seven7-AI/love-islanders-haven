@@ -7,6 +7,32 @@ Google Calendar date planning, and safety tools (blocking, reporting, safety con
 - **API:** FastAPI + SQLAlchemy + Alembic on Python 3.12 (`backend/`)
 - **Platform:** Postgres 16 (schema by Alembic), Supabase Auth and Storage (`supabase/`)
 
+## Screenshots
+Captured from the running app (local stack with the [seed accounts](docs/development/seed-data.md)): real API data
+through the real UI, at phone size. The people and conversations are fictional; photos are from Pexels
+([credits](docs/development/seed-data.md#photo-credits)).
+
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="docs/images/screenshots/discover.jpg" alt="Discover: Swipe through people who match your preferences" width="240"><br><sub><b>Discover</b><br>Swipe through people who match your preferences</sub></td>
+    <td align="center" width="33%"><img src="docs/images/screenshots/discover-details.jpg" alt="Profile details: Bio, interests, what they're looking for" width="240"><br><sub><b>Profile details</b><br>Bio, interests, what they're looking for</sub></td>
+    <td align="center" width="33%"><img src="docs/images/screenshots/matches.jpg" alt="Matches: Mutual likes, last message and unread count" width="240"><br><sub><b>Matches</b><br>Mutual likes, last message and unread count</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><img src="docs/images/screenshots/chat.jpg" alt="Chat: Messages and photo sharing" width="240"><br><sub><b>Chat</b><br>Messages and photo sharing</sub></td>
+    <td align="center" width="33%"><img src="docs/images/screenshots/profile.jpg" alt="Your profile: Photos, details and insights" width="240"><br><sub><b>Your profile</b><br>Photos, details and insights</sub></td>
+    <td align="center" width="33%"><img src="docs/images/screenshots/streaks.jpg" alt="Streaks: Daily photo posts and the leaderboard" width="240"><br><sub><b>Streaks</b><br>Daily photo posts and the leaderboard</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><img src="docs/images/screenshots/safety.jpg" alt="Safety centre: Trusted contacts, date plans, emergency alert" width="240"><br><sub><b>Safety centre</b><br>Trusted contacts, date plans, emergency alert</sub></td>
+    <td align="center" width="33%"><img src="docs/images/screenshots/onboarding.jpg" alt="Onboarding: Six guided steps, at least four photos" width="240"><br><sub><b>Onboarding</b><br>Six guided steps, at least four photos</sub></td>
+    <td align="center" width="33%"><img src="docs/images/screenshots/login.jpg" alt="Sign in: Email and password with Supabase Auth" width="240"><br><sub><b>Sign in</b><br>Email and password with Supabase Auth</sub></td>
+  </tr>
+</table>
+
+To refresh them after UI changes: `SEED=1 npm run test:e2e -- --config=playwright.screenshots.config.ts` (writes
+`docs/images/screenshots/`).
+
 ## Repository layout
 | Path | Contents |
 |---|---|
