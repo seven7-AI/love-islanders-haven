@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { ReactNode } from 'react';
 import App from './App';
@@ -144,6 +144,20 @@ describe('App routes', () => {
     });
     expect(await screen.findByText('Posted!')).toBeInTheDocument();
     expect(screen.getByText('Your streak is now 3 days.')).toBeInTheDocument();
+  });
+
+  it('keeps a private page mounted when the app re-renders', async () => {
+    renderAt('/settings');
+    await screen.findByRole('button', { name: 'Save All Changes' });
+    // The onboarding guard inside the private route loads the profile when it mounts.
+    await waitFor(() => expect(getMyProfile).toHaveBeenCalled());
+    const loads = getMyProfile.mock.calls.length;
+    act(() => {
+      toast({ title: 'Something happened' }); // App subscribes to useToast, so this re-renders it
+    });
+    await screen.findByText('Something happened');
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(getMyProfile.mock.calls.length).toBe(loads);
   });
 
   it('shows the not-found page for unknown paths', async () => {
