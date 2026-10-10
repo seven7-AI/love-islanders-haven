@@ -13,11 +13,11 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 5 | 2 Security | Harden profile write paths and read policies | ✅ (production action pending) |
 | 6 | 2 Security | Move verification and auth state checks server-side | ✅ (production action pending) |
 | 7 | 2 Security | Enforce matching, blocking, read-receipt rules in the database | ✅ (production action pending) |
-| 8 | 3 Database | Reconcile schema references with migrations | ✅ (live check split into #36) |
-| 36 | 3 Database | Verify migrations against the live Supabase project | ⛔ needs Supabase project access |
+| 8 | 3 Database | Reconcile schema references with migrations | ✅ |
+| 36 | 3 Database | Verify migrations against the live Supabase project | Superseded by #59 (closed, not planned) |
 | 9 | 3 Database | Scaffold FastAPI backend, config, logging, health, local Postgres | ✅ |
 | 10 | 3 Database | Alembic baseline migration with indexes | ✅ |
-| 11 | 3 Database | Data migration, backup and restore runbooks | ✅ (production run needs credentials, #36) |
+| 11 | 3 Database | Data migration, backup and restore runbooks | ✅ (production run happens at cutover) |
 | 12 | 4 Features | Backend authentication (Supabase JWT verification) | ✅ |
 | 13 | 4 Features | Profiles, images, onboarding via API | ✅ (deployment pending) |
 | 14 | 4 Features | Discover, swipes, matches via API | ✅ |
@@ -35,9 +35,11 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 26 | 6 Testing | Complete CI pipeline | ✅ |
 | 27 | 7 Docs | Documentation and deployment artifacts | ✅ |
 | 28 | 7 Docs | Clean-clone verification and upstream PR | ✅ |
+| 58 | 3 Database | Run the API on its own Alembic-managed Postgres | ✅ |
+| 59 | 3 Database | Make Alembic the only schema authority and retire live-Supabase reconciliation | ✅ |
 
 ## External blockers
-- Supabase project access (schema dump, JWT verification key, function deployment/undeployment)
+- Supabase project access for the cutover (legacy database connection string, Auth settings, function undeployment)
 - OpenAI API key, Resend API key + verified sender domain, Google OAuth client
 - Production hosting target, Android signing keystore, final Capacitor `appId` (currently the Lovable-generated id)
 

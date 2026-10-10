@@ -15,11 +15,9 @@ Love Islander API (FastAPI, Python 3.12)  ── backend/
    app/core/           config, logging, errors, middleware (request ids, security headers, body limit),
                        rate limits, metrics, crypto
    ▼
-Postgres (Supabase-hosted today)          Supabase Auth             Supabase Storage
-  schema: supabase/migrations (Supabase     users, sessions,          profile-images (public),
-  objects + RLS) and backend/alembic        confirmation emails       chat-media (private, signed URLs)
-  (portable schema), kept identical by a
-  parity test
+Postgres 16 (application database)      Supabase Auth             Supabase Storage
+  schema: backend/alembic only            users, sessions,          profile-images (public),
+  (docker-compose locally)                confirmation emails       chat-media (private, signed URLs)
 ```
 
 ## Responsibilities
@@ -27,7 +25,7 @@ Postgres (Supabase-hosted today)          Supabase Auth             Supabase Sto
 |---|---|---|
 | Presentation | `src/` | No business rules or direct table access (lint rule enforces it) |
 | Business logic | `backend/app/services` | Every rule enforced server-side: 18+, photo limits, mutual matching under a lock, blocks, read receipts, streak arithmetic, rate limits |
-| Persistence | Postgres via SQLAlchemy | Supabase migrations own RLS/auth triggers/storage; Alembic owns the portable schema (`docs/database/migrations.md`) |
+| Persistence | Postgres via SQLAlchemy | Alembic is the only schema authority; `supabase/migrations` is frozen legacy (`docs/database/migrations.md`) |
 | Authentication | Supabase Auth → API `TokenVerifier` | API trusts only the verified token's `sub` |
 | Files | Supabase Storage behind `StorageProvider` | API issues signed upload URLs after validating type, size, ownership |
 | Integrations | `backend/app/integrations/*` behind interfaces | Missing credentials produce explicit 503 errors, never simulated success |
@@ -35,7 +33,8 @@ Postgres (Supabase-hosted today)          Supabase Auth             Supabase Sto
 | Observability | structured logs, `/metrics`, `/healthz`, `/readyz`, optional Sentry | `docs/operations/observability.md` |
 
 ## Key flows
-- **Sign-up:** Supabase Auth creates `auth.users` → trigger creates `profiles` + `profile_onboarding` → user confirms email →
+- **Sign-up:** Supabase Auth creates the user → user confirms email → the first authenticated API request creates
+  `profiles` + `profile_onboarding` (`ensure_profile`) →
   `/auth/callback` → onboarding (API: profile fields, photos, step; completion requires name, DOB 18+, gender,
   preference and 4 photos).
 - **Discover/match:** `GET /v1/discover` applies both users' preferences, blocks, swipes and distance; `POST /v1/swipes`
@@ -45,6 +44,7 @@ Postgres (Supabase-hosted today)          Supabase Auth             Supabase Sto
   delivery provider (not yet integrated, reported honestly to the user).
 
 ## Supabase dependency
-Supabase remains the auth provider, file store and database host. The app's data layer does not depend on Supabase
-APIs: the API talks to Postgres directly and the schema is portable (Alembic). Replacing Auth or Storage means
-implementing `TokenVerifier` / `StorageProvider`; moving the database is covered by `docs/operations/database.md`.
+Supabase is the auth provider and file store only. The application database is a plain Postgres the API talks to
+directly; nothing in it depends on Supabase. Replacing Auth or Storage means implementing `TokenVerifier` /
+`StorageProvider`. Moving the existing data off the legacy Supabase database is a one-time step
+(`docs/deployment.md`, `docs/operations/database.md`).

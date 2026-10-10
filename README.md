@@ -5,7 +5,7 @@ Google Calendar date planning, and safety tools (blocking, reporting, safety con
 
 - **Web/mobile client:** React 18 + TypeScript + Vite, Tailwind/shadcn, Capacitor shell (`src/`)
 - **API:** FastAPI + SQLAlchemy + Alembic on Python 3.12 (`backend/`)
-- **Platform:** Supabase Auth, Storage and Postgres (`supabase/`)
+- **Platform:** Postgres 16 (schema by Alembic), Supabase Auth and Storage (`supabase/`)
 
 ## Quick start
 ```bash

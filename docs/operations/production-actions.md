@@ -12,7 +12,8 @@ Changes merged to the repository that only take effect once someone with access 
 | #6 | Delete the `send-verification-email` and `ai-companion-proactive` edge functions | `supabase functions delete send-verification-email --project-ref <project-ref>` and the same for `ai-companion-proactive` | Pending |
 | #6 | Require email confirmation and allow the callback URL | Supabase dashboard → Authentication → Providers → Email: enable "Confirm email"; URL Configuration → Redirect URLs: add `https://<app-domain>/auth/callback` | Pending |
 | #7 | Apply migration `20261009130000_enforce_matching_rules.sql` (merges any duplicate reversed matches, keeping messages) | `supabase db push` | Pending |
-| #13 | Deploy the API with `DATABASE_URL` (Supabase direct connection), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CORS_ORIGINS`; run `alembic stamp 0001` (after #36); build the web app with `VITE_API_URL` | see `backend/README.md`, `docs/database/migrations.md` | Pending |
+| #13, #59 | Provision the application Postgres, deploy the API with `DATABASE_URL` (that database), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CORS_ORIGINS`; build the web app with `VITE_API_URL` | `docs/deployment.md` steps 2–4 | Pending |
+| #59 | Copy the legacy data into the application database during the maintenance window | `docs/deployment.md` steps 5–7 (`scripts/db/copy-data.sh`) | Pending |
 | #15 | Apply migration `20261009140000_chat_media_bucket.sql` (private `chat-media` bucket) | `supabase db push` | Pending |
 | #16 | Schedule `python -m app.jobs.expire_streaks` hourly with the API's environment | hosting platform scheduler / cron | Pending |
 | #17 | Apply migration `20261009150000_settings_preferences_and_reports.sql`; decide who reviews `reports` (service-role access, e.g. Supabase dashboard) | `supabase db push` | Pending |

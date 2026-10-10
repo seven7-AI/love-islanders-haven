@@ -10,15 +10,16 @@ npm ci
 ```
 
 ## Option A — everything local (recommended)
-Runs a local Supabase (Auth, Storage, Postgres with this repository's migrations), the API and the web app:
+Runs a local Postgres (schema from Alembic), a local Supabase (Auth, Storage), the API and the web app:
 ```bash
 KEEP_STACK=1 npm run test:e2e      # first run downloads images; leaves the stack running
 npx supabase@2.120.0 status -o env # shows the local URLs and keys
 ```
-Then start the API and web app against it (values from `status`):
+Then start the application database, the API and the web app (values from `status`):
 ```bash
+make migrate       # Postgres 16 on localhost:5433, schema via alembic upgrade head
 cd backend
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@127.0.0.1:54322/postgres \
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@127.0.0.1:5433/love_islander \
 SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY> \
 CORS_ORIGINS='["http://localhost:8080"]' LOG_JSON=false \
 uv run uvicorn app.main:create_app --factory --reload --port 8001

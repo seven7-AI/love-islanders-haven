@@ -17,6 +17,9 @@ SUPABASE_DIR = BACKEND_DIR.parent / "supabase"
 
 # Supabase-only objects that the portable schema intentionally leaves out.
 SUPABASE_ONLY_CONSTRAINTS = {"profiles_id_fkey"}  # profiles.id -> auth.users.id
+# The Alembic revision whose schema equals the frozen supabase/migrations track: the data copied off the legacy
+# Supabase database is loaded at this revision, then later revisions are applied (docs/database/migrations.md).
+CUTOVER_REVISION = "0005"
 
 
 def _dsn(database: str) -> str:
@@ -145,11 +148,11 @@ async def _schema(database: str) -> dict[str, set[tuple[object, ...]]]:
         await conn.close()
 
 
-async def test_alembic_schema_matches_supabase_migrations(make_database) -> None:  # type: ignore[no-untyped-def]
-    """Columns, types, nullability, defaults, constraints and indexes are identical.
+async def test_cutover_revision_matches_supabase_migrations(make_database) -> None:  # type: ignore[no-untyped-def]
+    """At the cutover revision, columns, types, nullability, defaults, constraints and indexes are identical.
 
-    The only exception is the Supabase-only FK to auth.users, so data can be moved between the two
-    with a plain dump/restore.
+    The only exception is the Supabase-only FK to auth.users, so the legacy Supabase data can be moved into
+    the application database with a plain data-only dump/restore.
     """
     supabase_db = await make_database()
     conn = await asyncpg.connect(_dsn(supabase_db))
@@ -162,7 +165,7 @@ async def test_alembic_schema_matches_supabase_migrations(make_database) -> None
         await conn.close()
 
     alembic_db = await make_database()
-    await _alembic(alembic_db, "upgrade", "head")
+    await _alembic(alembic_db, "upgrade", CUTOVER_REVISION)
 
     supabase_schema = await _schema(supabase_db)
     alembic_schema = await _schema(alembic_db)
