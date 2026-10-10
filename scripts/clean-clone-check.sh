@@ -11,6 +11,12 @@ trap 'cd /; (cd "$work/app" 2>/dev/null && docker compose down -v >/dev/null 2>&
 
 step() { printf '\n==> %s\n' "$*"; }
 
+# The E2E step must start its own local Supabase stack and database; a running one would be reused with old data.
+if docker ps --format '{{.Names}}' | grep -qE '^(supabase_.*_love-islander|love-islander-e2e-db)$'; then
+  echo "A local Supabase stack or E2E database is running; stop it first (npx supabase stop; docker rm -f love-islander-e2e-db)"
+  exit 1
+fi
+
 step "clone $repo@$ref"
 git clone --quiet --depth 1 --branch "$ref" "$repo" "$work/app"
 cd "$work/app"
@@ -52,7 +58,15 @@ echo "web and API images built"
 step "database policy tests"
 npm run -s test:db 2>&1 | grep -cE '^PASS' | sed 's/$/ policy suites passed/'
 
-step "end-to-end (local Supabase + API + web)"
-npm run -s test:e2e 2>&1 | grep -E "✓|✘|passed|failed"
+step "seed accounts, then end-to-end at three viewports (local Supabase + API + web)"
+# A fresh clone has no Pexels key or photo cache, so the seed uses its labelled placeholder photos, as CI does.
+# The full output is kept outside the clone (which is deleted on exit) so a failure can be investigated.
+e2e_log="${TMPDIR:-/tmp}/clean-clone-e2e.log"
+if ! SEED=1 SEED_PLACEHOLDER_PHOTOS=true npm run -s test:e2e > "$e2e_log" 2>&1; then
+  grep -E "placeholders|seed verified|passed|failed|flaky|skipped" "$e2e_log"
+  echo "end-to-end failed; full output: $e2e_log"
+  exit 1
+fi
+grep -E "placeholders|seed verified|passed|failed|flaky|skipped" "$e2e_log"
 
 step "clean-clone check passed"

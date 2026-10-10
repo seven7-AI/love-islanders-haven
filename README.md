@@ -1,7 +1,8 @@
 # Love Islander
 
 A dating app: profiles and photos, discovery with mutual matching, chat, daily photo streaks, an AI dating companion,
-Google Calendar date planning, and safety tools (blocking, reporting, safety contacts, date plans, emergency alerts).
+Google Calendar date planning, safety tools (blocking, reporting, safety contacts, date plans, emergency alerts), and
+a moderation queue where moderators review reports.
 
 - **Web/mobile client:** React 18 + TypeScript + Vite, Tailwind/shadcn, Capacitor shell (`web/`)
 - **API:** FastAPI + SQLAlchemy + Alembic on Python 3.12 (`backend/`)
@@ -51,3 +52,16 @@ other scripts run from the root. Details: [docs/development/repository-layout.md
 Set up from a fresh clone with [docs/development/setup.md](docs/development/setup.md); the test suites and the
 `make check` / `make ci` shortcuts are described in [docs/development/testing.md](docs/development/testing.md).
 All documentation is listed in [docs/README.md](docs/README.md).
+
+To try the app with realistic data, seed the local stack: `SEED=1 npm run test:e2e` (or `uv run python -m seed run` in
+`backend/` against a running stack) creates fictional accounts in every state, including a moderator, all with the
+password `LoveIsland-Seed-2026!`; see [seed accounts](docs/development/seed-data.md). Moderator roles are granted
+only with the operator CLI ([moderation](docs/operations/moderation.md)).
+
+## Status
+Every feature has a passing test or a documented limitation in the
+[test coverage matrix](docs/development/test-matrix.md): API tests on real Postgres, web component tests, database
+policy tests, and end-to-end tests of every page at phone, tablet and desktop sizes on the real local stack, which fail
+on any console error or server error. What still needs the owner (credentials, providers, legal text, production
+steps) is listed in [docs/STATUS.md](docs/STATUS.md#before-launch) and
+[docs/operations/production-actions.md](docs/operations/production-actions.md).
