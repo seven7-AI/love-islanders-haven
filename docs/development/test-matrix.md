@@ -14,7 +14,7 @@ Roles:
 - **mod:** a moderator
 - **anon:** signed out
 
-Last updated: 2026-10-10 (#86).
+Last updated: 2026-10-10 (#87).
 
 ## Authentication
 | Feature | Roles | Tests | Result | Issue |
@@ -77,5 +77,5 @@ Last updated: 2026-10-10 (#86).
 | No console errors or 5xx responses during journeys | none | – | #88 |
 | Image loading and fallbacks | none | – | #83 |
 | Security headers, CORS, rate limits, body size | A `test_hardening.py` | pass | – |
-| Seed accounts: run, verify, reset | none | – | #87 |
+| Seed accounts: run, verify, reset | A `test_seed.py` (persona rules, production/remote refusal); `SEED=1 scripts/e2e.sh` (run twice, verify, E2E on top); reset checked on a kept stack (0 seed profiles, files, auth users left) | pass (#87) | #88 runs it in CI |
 | Pexels key stays on the server | A `test_pexels.py` (key only in the API header, never in errors or settings repr); build and repository grep | pass (#86) | – |

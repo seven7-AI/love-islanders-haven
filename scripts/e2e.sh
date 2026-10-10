@@ -2,7 +2,8 @@
 # Runs the Playwright end-to-end tests against a real local stack:
 #   Postgres (schema from Alembic) → Love Islander API → web dev server, with the Supabase CLI providing only Auth
 #   (with Mailpit) and Storage.
-# Usage: scripts/e2e.sh [playwright args]     KEEP_STACK=1 leaves everything running afterwards.
+# Usage: scripts/e2e.sh [playwright args]     KEEP_STACK=1 leaves everything running afterwards;
+#        SEED=1 also creates the seed accounts (needs PEXELS_API_KEY or a filled backend/.seed-cache).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 SUPABASE="npx --yes supabase@2.120.0"
@@ -68,5 +69,15 @@ for url in "http://127.0.0.1:$API_PORT/readyz" "http://localhost:$WEB_PORT/"; do
   curl -fsS "$url" >/dev/null || {
     echo "Not ready: $url"; tail -30 /tmp/love-islander-e2e-api.log /tmp/love-islander-e2e-web.log; exit 1; }
 done
+
+if [[ "${SEED:-0}" == "1" ]]; then
+  # Seed accounts (docs/development/seed-data.md) through the running stack; twice to prove re-runs are safe.
+  (
+    cd backend
+    export SEED_API_URL="http://127.0.0.1:$API_PORT" SUPABASE_URL="$SB_API_URL" SUPABASE_ANON_KEY="$SB_ANON_KEY" \
+      SUPABASE_SERVICE_ROLE_KEY="$SB_SERVICE_ROLE_KEY"
+    uv run python -m seed run && uv run python -m seed run >/dev/null && uv run python -m seed verify
+  )
+fi
 
 npm test -w e2e -- "$@"
