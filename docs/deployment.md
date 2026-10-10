@@ -72,7 +72,7 @@ The same checklist with status columns is kept in `docs/operations/production-ac
   redeploy the old web app. `copy-data.sh` never modifies the source.
 
 ## Mobile (Capacitor)
-`npm run build && npx cap sync android`, then follow `docs/mobile/android-checklist.md`. Before the first store release
-set the final `appId` in `capacitor.config.ts` (still the Lovable-generated id) and create the signing keystore. The
+`npm run build && (cd web && npx cap sync android)`, then follow `docs/mobile/android-checklist.md`. Before the first store release
+set the final `appId` in `web/capacitor.config.ts` (still the Lovable-generated id) and create the signing keystore. The
 native app must be built with the production `VITE_*` values, and the API's `CORS_ORIGINS` must include the app's
 origin (`https://localhost` / `capacitor://localhost`).

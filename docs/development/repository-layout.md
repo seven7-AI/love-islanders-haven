@@ -92,10 +92,11 @@ Makefile  README.md  docker-compose.yml  package.json (npm workspaces root)  pac
 - **Files are moved with `git mv`**, so history follows them (`git log --follow`).
 
 ## Order of work
-1. #62: this inventory and the target layout.
+1. #62: this inventory and the target layout. Done.
 2. #63: remove stale configuration and tracked CLI state, and make the policy tests independent of the working
-   directory. Nothing moves in this step.
-3. #64: move the web app into `web/` and turn the root into an npm-workspaces root.
+   directory. Nothing moves in this step. Done.
+3. #64: move the web app into `web/` and turn the root into an npm-workspaces root. Done. `.prettierrc.json` became
+   the `prettier` key of the root `package.json`, and `.dockerignore` became `deploy/web/Dockerfile.dockerignore`.
 4. #65: make `e2e/` its own workspace, with its own config and type checking.
 5. #66: add a docs index and regroup the docs under `docs/development/`, stating each fact once.
 6. #67: add a generated API reference (`docs/api/`).

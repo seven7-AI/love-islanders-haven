@@ -6,5 +6,5 @@ supabase
 playwright-report
 test-results
 package-lock.json
-src/integrations/supabase/types.ts
+web/src/integrations/supabase/types.ts
 *.md

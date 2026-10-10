@@ -3,5 +3,5 @@
   add_header Referrer-Policy "strict-origin-when-cross-origin" always;
   add_header Permissions-Policy "camera=(), microphone=(), geolocation=(self)" always;
   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-  # Google AdSense is loaded by index.html; remove its hosts here if ads are removed.
+  # Google AdSense is loaded by web/index.html; remove its hosts here if ads are removed.
   add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.adtrafficquality.google https://www.googletagservices.com; img-src 'self' data: blob: ${SUPABASE_ORIGIN} https:; connect-src 'self' ${API_ORIGIN} ${SUPABASE_ORIGIN} https://*.googlesyndication.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline'; frame-src https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://www.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;

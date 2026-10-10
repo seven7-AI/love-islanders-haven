@@ -1,9 +1,9 @@
 # Architecture
 
 ```
-Browser / Capacitor app (React 18, Vite, Tailwind/shadcn)  ── src/
+Browser / Capacitor app (React 18, Vite, Tailwind/shadcn)  ── web/
    │  supabase-js: sign-in, sessions, signed file uploads only
-   │  src/lib/api/*: everything else (Bearer = Supabase access token)
+   │  web/src/lib/api/*: everything else (Bearer = Supabase access token)
    ▼
 Love Islander API (FastAPI, Python 3.12)  ── backend/
    app/api/            HTTP routes (validation with pydantic; problem+json errors)
@@ -23,7 +23,7 @@ Postgres 16 (application database)      Supabase Auth             Supabase Stora
 ## Responsibilities
 | Concern | Where | Notes |
 |---|---|---|
-| Presentation | `src/` | No business rules or direct table access (lint rule enforces it) |
+| Presentation | `web/src/` | No business rules or direct table access (lint rule enforces it) |
 | Business logic | `backend/app/services` | Every rule enforced server-side: 18+, photo limits, mutual matching under a lock, blocks, read receipts, streak arithmetic, rate limits |
 | Persistence | Postgres via SQLAlchemy | Alembic is the only schema authority; `supabase/migrations` is frozen legacy (`docs/database/migrations.md`) |
 | Authentication | Supabase Auth → API `TokenVerifier` | API trusts only the verified token's `sub` |

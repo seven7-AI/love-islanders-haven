@@ -33,5 +33,5 @@ Web container (runtime): `API_ORIGIN`, `SUPABASE_ORIGIN` — origins allowed by 
 | `LOG_LEVEL` / `LOG_JSON` | no | `INFO` / `true` | |
 | `DB_POOL_SIZE` / `DB_POOL_TIMEOUT_SECONDS` | no | `5` / `5` | |
 
-Templates: `.env.example` (web) and `backend/.env.example` (API). Real values live in the hosting platform's secret
+Templates: `web/.env.example` (web; Vite reads `web/.env`) and `backend/.env.example` (API). Real values live in the hosting platform's secret
 store; `.env` files are git-ignored.

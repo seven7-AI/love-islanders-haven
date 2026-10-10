@@ -1,5 +1,6 @@
-
 # App Icon Requirements
+
+> Run the `npx cap …` and `npx @capacitor/…` commands below from `web/` (the Capacitor project root).
 
 This document outlines the requirements for your dating app icon.
 
@@ -39,7 +40,7 @@ This will create all necessary icon sizes for both Android and iOS platforms.
 
 Place your 512x512px master icon at:
 ```
-public/app-icon.png
+web/public/app-icon.png
 ```
 
 After generating the various sizes, they will be placed in the appropriate platform-specific directories.
