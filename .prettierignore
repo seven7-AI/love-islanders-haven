@@ -8,3 +8,4 @@ test-results
 package-lock.json
 web/src/integrations/supabase/types.ts
 *.md
+docs/api/openapi.json

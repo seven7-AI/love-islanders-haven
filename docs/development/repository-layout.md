@@ -112,5 +112,5 @@ Not tracked, and kept out of git by `.gitignore` or `.git/info/exclude`: `node_m
    type-checked (strict) by `npm run typecheck`, and Playwright output goes to `e2e/playwright-report/` and
    `e2e/test-results/`.
 5. #66: add a docs index and regroup the docs under `docs/development/`, stating each fact once. Done.
-6. #67: add a generated API reference under docs/api.
+6. #67: add a generated API reference (`docs/api/`, regenerated with `make api-docs`). Done.
 7. #68: verify the documented workflow from a clean clone.

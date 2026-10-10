@@ -8,6 +8,7 @@
 ## Development
 - [Testing](development/testing.md): every suite, what it covers and how to run it; CI
 - [Environment variables](development/environment.md): web and API settings (the single reference)
+- [API reference](api/README.md): endpoint groups and conventions; full OpenAPI document in `docs/api/openapi.json`
 - [Database migrations](database/migrations.md): Alembic as the only schema authority, revision rules
 - [Schema reconciliation](database/schema-reconciliation.md): how the Lovable-era schema references were resolved
 

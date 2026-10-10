@@ -3,7 +3,7 @@
 # Local compose database unless overridden (e.g. DATABASE_URL=... make migrate).
 DATABASE_URL ?= postgresql+asyncpg://postgres:postgres@localhost:$(or $(DB_PORT),5433)/love_islander
 export DATABASE_URL
-.PHONY: help up down db api-test api-lint api-typecheck api-check web-check check migrate migration db-backup db-restore-drill security-check ci
+.PHONY: help up down db api-docs api-test api-lint api-typecheck api-check web-check check migrate migration db-backup db-restore-drill security-check ci
 
 help:
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -39,6 +39,9 @@ migrate: db ## Apply Alembic migrations to the local database
 
 migration: ## Autogenerate an Alembic revision: make migration m="description"
 	cd backend && uv run alembic revision --autogenerate -m "$(m)"
+
+api-docs: ## Regenerate docs/api/openapi.json from the API code
+	cd backend && uv run python -m app.openapi_export > ../docs/api/openapi.json
 
 db-backup: ## Back up the local database to backups/
 	scripts/db/backup.sh postgresql://postgres:postgres@localhost:$(or $(DB_PORT),5433)/love_islander backups
