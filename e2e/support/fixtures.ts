@@ -32,3 +32,4 @@ export const test = base.extend<{ guard: Guard }>({
 });
 
 export { expect };
+export type { Page } from '@playwright/test';
