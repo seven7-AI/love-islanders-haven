@@ -78,3 +78,10 @@ test('unknown pages show the not-found page', async ({ page }) => {
   await page.goto('/no-such-page');
   await expect(page.getByText('404')).toBeVisible();
 });
+
+test('legal pages say plainly that they are not published yet', async ({ page }) => {
+  await page.goto('/terms');
+  await expect(page.getByRole('status')).toContainText('The terms of service have not been published yet.');
+  await page.goto('/privacy');
+  await expect(page.getByRole('status')).toContainText('The privacy policy has not been published yet.');
+});
