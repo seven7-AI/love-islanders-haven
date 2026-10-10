@@ -7,6 +7,7 @@
 
 ## Development
 - [Testing](development/testing.md): every suite, what it covers and how to run it; CI
+- [Test coverage matrix](development/test-matrix.md): page, feature and role → test → result
 - [Environment variables](development/environment.md): web and API settings (the single reference)
 - [API reference](api/README.md): endpoint groups and conventions; full OpenAPI document in `docs/api/openapi.json`
 - [Database migrations](database/migrations.md): Alembic as the only schema authority, revision rules
@@ -24,3 +25,4 @@
 ## Project history
 - [Status](STATUS.md): issues and their state
 - [Audit (2026-10)](audit/2026-10-audit.md): the original technical audit, kept as written
+- [Functional audit (2026-10-10)](audit/2026-10-functional-audit.md): routes, elements and endpoints by status
