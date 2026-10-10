@@ -25,6 +25,9 @@ package-lock.json          The only lockfile
 .gitignore  .gitleaksignore  .git-blame-ignore-revs  .prettierignore
 ```
 
+`scripts/clean-clone-check.sh` fails if the tracked root entries differ from this list or a second lockfile appears;
+update both together.
+
 ### Where to put new things
 | Kind | Location |
 |---|---|

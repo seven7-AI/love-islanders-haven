@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fails if documentation points at files that do not exist.
 
-Checks every Markdown file outside docs/audit/ (a dated historical record), node_modules and virtualenvs:
+Checks every tracked (or new, not ignored) Markdown file outside docs/audit/ (a dated historical record):
 - relative links `[text](path)` resolve from the file's directory (anchors are ignored);
 - backticked repository paths such as `scripts/db/backup.sh` or `web/src/lib/api/` exist. A token counts as a
   repository path when it starts with a top-level directory of this repository; tokens with wildcards, placeholders
@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TOP_LEVEL = ("web/", "backend/", "e2e/", "supabase/", "deploy/", "scripts/", "docs/", ".github/")
-SKIP_DIRS = {"node_modules", ".venv", ".git", "audit", ".codegraph", ".security", "playwright-report", "test-results"}
+SKIP_DIRS = {"audit"}  # dated historical record
 # Paths the docs mention on purpose although they do not exist in the repository.
 KNOWN_MISSING = {
     "supabase/migration.sql": "deleted stale file, described in the schema reconciliation",
@@ -33,11 +33,14 @@ CODE = re.compile(r"`([^`\n]+)`")
 
 
 def markdown_files() -> list[Path]:
-    return sorted(
-        p
-        for p in ROOT.rglob("*.md")
-        if not SKIP_DIRS.intersection(p.relative_to(ROOT).parts) and p.name != "CLAUDE.local.md"
-    )
+    """Tracked and new (not ignored) Markdown files, so local caches and excluded notes are never scanned."""
+    listed = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files", "-co", "--exclude-standard", "*.md"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.split()
+    return sorted(ROOT / f for f in listed if not SKIP_DIRS.intersection(Path(f).parts))
 
 
 def ignored_by_git(rel: str) -> bool:

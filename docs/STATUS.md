@@ -37,6 +37,13 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 | 28 | 7 Docs | Clean-clone verification and upstream PR | ✅ |
 | 58 | 3 Database | Run the API on its own Alembic-managed Postgres | ✅ |
 | 59 | 3 Database | Make Alembic the only schema authority and retire live-Supabase reconciliation | ✅ |
+| 62 | 8 Structure | Repository structure audit and target layout | ✅ |
+| 63 | 8 Structure | Remove stale and accidentally tracked items | ✅ |
+| 64 | 8 Structure | Move the frontend into `web/` with an npm-workspaces root | ✅ |
+| 65 | 8 Structure | Make `e2e/` a self-contained workspace | ✅ |
+| 66 | 8 Structure | Docs index and regrouping without duplication | ✅ |
+| 67 | 8 Structure | Generated API reference | ✅ |
+| 68 | 8 Structure | Clean-clone verification of the new layout | ✅ |
 
 ## External blockers
 - Supabase project access for the cutover (legacy database connection string, Auth settings, function undeployment)
@@ -44,8 +51,24 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 - Production hosting target, Android signing keystore, final Capacitor `appId` (currently the Lovable-generated id)
 
 ## Clean-clone verification
-`scripts/clean-clone-check.sh` (2026-10-09, fork `main` at `e380da3`): fresh `git clone` → no Lovable tooling
-referenced → `npm ci`, `uv sync` → Postgres via compose, `alembic upgrade head` (0005) → `make check`: Prettier, ESLint
-(0 errors), typecheck, 23 test files / 88 web tests, build, ruff, mypy, 169 API tests → 12 database policy suites →
-3/3 end-to-end tests against a local Supabase (real Auth, Storage, Postgres), the API and the web app.
-(Since #58 the end-to-end API runs on its own Alembic-managed Postgres; Supabase provides only Auth and Storage.)
+`scripts/clean-clone-check.sh` (2026-10-10, fork `main` at `0aed16d`, after the reorganization):
+- fresh `git clone`, no Lovable tooling referenced
+- tracked root entries equal the documented layout, with one lockfile
+- `npm ci` (workspaces `web`, `e2e`) and `uv sync`
+- Postgres via compose, `alembic upgrade head` (0005)
+- `make check`:
+  - Prettier
+  - ESLint (0 errors)
+  - typecheck (web and e2e)
+  - 23 test files / 88 web tests
+  - build
+  - 22 Markdown files with 0 broken references
+  - ruff, mypy
+  - 170 API tests
+- restore and copy drills
+- web and API images built
+- 12 database policy suites
+- 3/3 end-to-end tests: the API on its own Alembic Postgres, local Supabase Auth and Storage, and the web app served
+  from `web/`
+
+Previous run: 2026-10-09 at `e380da3`, before the reorganization.
