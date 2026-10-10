@@ -9,5 +9,6 @@
 | OpenAI-compatible LLM | AI companion | `LLM_API_KEY` | **Not verified live** (no key); client tested against a mocked API | companion answers 503 `ai_not_configured` |
 | Google OAuth + Calendar | calendar sync | `GOOGLE_*`, `TOKEN_ENCRYPTION_KEY` | **Not verified live** (no OAuth client); flow tested against a mocked Google | connect button hidden; endpoints 503 |
 | Emergency alert delivery (SMS/email) | safety alerts to contacts | implement `AlertSender` | **Not integrated** (no provider chosen) | alerts answer 503 and the app tells users to call emergency services |
+| Pexels | stock photos for local seed data | `PEXELS_API_KEY` | Client verified against the live API (search); used only by the seed tool, never at runtime | seeding without photos is not possible; the app itself is unaffected |
 | Google AdSense | ads (`web/index.html`) | publisher id in `web/index.html` | Pre-existing; unchanged | – |
 | Sentry (optional) | error tracking | `SENTRY_DSN` | Optional | errors only in logs |

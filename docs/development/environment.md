@@ -33,6 +33,7 @@ Read by `backend/app/core/config.py`; missing required values stop the API at st
 | `GOOGLE_REDIRECT_URI` | for Google Calendar | – | `https://<web-app>/calendar/callback`; must be registered on the OAuth client |
 | `TOKEN_ENCRYPTION_KEY` | for Google Calendar | – | Fernet key for stored refresh tokens: `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`. Rotating it disconnects existing calendars |
 | `OAUTH_STATE_SECRET` | no | token key | Signs OAuth state values (10-minute lifetime, bound to the user) |
+| `PEXELS_API_KEY` (or `PEXEL_API_KEY`) | for the seed tool | – | Pexels API key used only by the local seed tool to fetch stock photos (secret; never used by the running API or sent to browsers) |
 | `METRICS_TOKEN` | recommended in production | – | Protects `/metrics` (Bearer token) |
 | `SENTRY_DSN` / `SENTRY_TRACES_SAMPLE_RATE` | no | – / `0` | Error tracking; see [observability](../operations/observability.md) |
 | `RATE_LIMIT_ENABLED` | no | `true` | Per-user limits on write endpoints |

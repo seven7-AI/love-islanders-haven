@@ -14,7 +14,7 @@ Roles:
 - **mod:** a moderator
 - **anon:** signed out
 
-Last updated: 2026-10-10 (#80).
+Last updated: 2026-10-10 (#86).
 
 ## Authentication
 | Feature | Roles | Tests | Result | Issue |
@@ -78,4 +78,4 @@ Last updated: 2026-10-10 (#80).
 | Image loading and fallbacks | none | – | #83 |
 | Security headers, CORS, rate limits, body size | A `test_hardening.py` | pass | – |
 | Seed accounts: run, verify, reset | none | – | #87 |
-| Pexels key stays on the server | none | – | #86 |
+| Pexels key stays on the server | A `test_pexels.py` (key only in the API header, never in errors or settings repr); build and repository grep | pass (#86) | – |
