@@ -3,7 +3,7 @@
 A dating app: profiles and photos, discovery with mutual matching, chat, daily photo streaks, an AI dating companion,
 Google Calendar date planning, and safety tools (blocking, reporting, safety contacts, date plans, emergency alerts).
 
-- **Web/mobile client:** React 18 + TypeScript + Vite, Tailwind/shadcn, Capacitor shell (`src/`)
+- **Web/mobile client:** React 18 + TypeScript + Vite, Tailwind/shadcn, Capacitor shell (`web/`)
 - **API:** FastAPI + SQLAlchemy + Alembic on Python 3.12 (`backend/`)
 - **Platform:** Postgres 16 (schema by Alembic), Supabase Auth and Storage (`supabase/`)
 

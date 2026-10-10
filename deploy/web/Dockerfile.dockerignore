@@ -1,0 +1,18 @@
+# Ignore rules for deploy/web/Dockerfile (build context = repository root). Only the npm manifests, web/ and
+# deploy/web/ are needed.
+**/node_modules
+**/dist
+**/coverage
+backend
+supabase
+e2e
+docs
+scripts
+.github
+**/test-results
+**/playwright-report
+.git
+**/.env
+**/.env.*
+.codegraph
+.security

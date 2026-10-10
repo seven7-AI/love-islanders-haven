@@ -1,11 +1,12 @@
-
 # Android App Icon Setup Guide
+
+> Run the `npx cap …` and `npx @capacitor/…` commands below from `web/` (the Capacitor project root).
 
 This guide will help you set up the provided silhouette image as your Android app icon.
 
 ## Step 1: Prepare Your Icon Images
 
-The image you've provided (source app icon (a 1024×1024 PNG; `public/app-icon.png` is referenced by `capacitor.config.ts` but is not yet in the repository)) needs to be:
+The image you've provided (source app icon (a 1024×1024 PNG; `web/public/app-icon.png` is referenced by `web/capacitor.config.ts` but is not yet in the repository)) needs to be:
 
 1. Cropped to a square format
 2. Resized to the following dimensions:
