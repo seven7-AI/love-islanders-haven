@@ -68,6 +68,10 @@ jobs:
         run: |
           uv export --frozen --format requirements-txt --no-hashes > /tmp/requirements.txt
           uvx pip-audit -r /tmp/requirements.txt --progress-spinner off
+      - name: no tracked files that .gitignore excludes (local caches, CLI state, downloaded photos)
+        run: |
+          tracked="$(git ls-files -ci --exclude-standard)"
+          if [ -n "$tracked" ]; then echo "Tracked files matching .gitignore:"; echo "$tracked"; exit 1; fi
       - name: gitleaks (secrets in history; known findings baselined in .gitleaksignore)
         run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.21.2 git /repo --no-banner --redact
 
