@@ -69,7 +69,7 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
   return (
     <div
       ref={cardRef}
-      className="relative w-full max-w-md mx-auto h-[70vh] overflow-hidden rounded-xl shadow-xl bg-black/10"
+      className="relative w-full max-w-md mx-auto h-[62dvh] max-h-[640px] overflow-hidden rounded-xl shadow-xl bg-black/10"
       style={cardStyle}
       onMouseDown={handleTouchStart}
       onMouseMove={handleTouchMove}

@@ -25,7 +25,7 @@ const ProfileViewContent = ({ profile, onEdit }: ProfileViewContentProps) => {
 
       <ProfileDetails profile={profile} />
 
-      <ProfileActionBar onEdit={onEdit} />
+      <ProfileActionBar />
     </div>
   );
 };

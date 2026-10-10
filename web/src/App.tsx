@@ -19,7 +19,7 @@ import AuthCallback from '@/pages/AuthCallback';
 import CalendarCallback from '@/pages/CalendarCallback';
 import NotFound from '@/pages/NotFound';
 import { Toaster as ToastContainer } from 'sonner';
-import MobileNavigation from '@/components/MobileNavigation';
+import AppNavigation from '@/components/AppNavigation';
 import useOnline from '@/hooks/useOnline';
 import OfflinePlaceholder from '@/components/OfflinePlaceholder';
 import { useToast } from '@/hooks/use-toast';
@@ -187,7 +187,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
 
-          {/* Hide MobileNavigation on auth/onboarding routes */}
+          {/* No navigation on auth and onboarding routes */}
           {isAuthenticated &&
             user &&
             ![
@@ -198,7 +198,7 @@ function App() {
               '/forgot-password',
               '/reset-password',
               '/auth/callback',
-            ].includes(location.pathname) && <MobileNavigation />}
+            ].includes(location.pathname) && <AppNavigation />}
 
           <ToastContainer />
         </>

@@ -5,11 +5,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { sendFeedback } from '@/lib/api/insights';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const FeedbackSupport = () => {
+  const navigate = useNavigate();
   const [feedback, setFeedback] = useState('');
   const [category, setCategory] = useState('general');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,7 +44,7 @@ const FeedbackSupport = () => {
   };
 
   const handleViewFeedback = () => {
-    window.location.href = '/feedback';
+    navigate('/feedback');
   };
 
   const handleContactSupport = () => {

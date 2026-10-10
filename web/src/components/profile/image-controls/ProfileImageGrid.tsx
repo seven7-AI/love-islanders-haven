@@ -64,12 +64,13 @@ const ProfileImageGrid = ({
       {images.map((image, index) => (
         <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-island-light/20 group">
           <img src={image} alt={`Profile image ${index + 1}`} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
             <div className="flex flex-col gap-2">
               <Button
                 size="sm"
                 variant="destructive"
                 onClick={() => onRemoveImage(index)}
+                aria-label={`Remove photo ${index + 1}`}
                 className="flex items-center gap-1"
               >
                 <Trash2 size={14} />
@@ -82,6 +83,7 @@ const ProfileImageGrid = ({
                   variant="outline"
                   onClick={() => onMoveImageUp(index)}
                   disabled={index === 0}
+                  aria-label={`Move photo ${index + 1} earlier`}
                   className="h-8 w-8 bg-island-light/30"
                 >
                   <ChevronUp size={14} />
@@ -91,6 +93,7 @@ const ProfileImageGrid = ({
                   variant="outline"
                   onClick={() => onMoveImageDown(index)}
                   disabled={index === images.length - 1}
+                  aria-label={`Move photo ${index + 1} later`}
                   className="h-8 w-8 bg-island-light/30"
                 >
                   <ChevronDown size={14} />
@@ -99,6 +102,7 @@ const ProfileImageGrid = ({
                   size="icon"
                   variant="outline"
                   onClick={() => onToggleVisibility(index)}
+                  aria-label={visibleImages.includes(index) ? `Hide photo ${index + 1}` : `Show photo ${index + 1}`}
                   className="h-8 w-8 bg-island-light/30"
                 >
                   {visibleImages.includes(index) ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -114,7 +118,7 @@ const ProfileImageGrid = ({
           <input
             id="image-upload"
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
+            accept="image/jpeg,image/png,image/webp"
             onChange={handleFileChange}
             className="sr-only"
             disabled={isUploading}

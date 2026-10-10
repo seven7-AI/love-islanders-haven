@@ -54,7 +54,7 @@ const Discover: React.FC = () => {
     (filters.gender ? 1 : 0);
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950">
+    <div className="flex flex-col h-dvh bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950">
       <ScrollArea className="h-full w-full overflow-auto">
         <div className="container mx-auto px-4 py-8 pb-24">
           <h1 className="text-3xl font-bold text-center text-white mb-6">Discover People</h1>

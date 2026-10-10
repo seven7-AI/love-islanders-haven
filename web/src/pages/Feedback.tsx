@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth';
 import { fetchMyFeedback } from '@/lib/api/insights';
@@ -131,7 +130,6 @@ const FeedbackPage = () => {
           )}
         </main>
       </div>
-      <Navbar />
     </div>
   );
 };

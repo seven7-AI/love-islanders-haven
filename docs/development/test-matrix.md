@@ -14,7 +14,7 @@ Roles:
 - **mod:** a moderator
 - **anon:** signed out
 
-Last updated: 2026-10-10 (#79).
+Last updated: 2026-10-10 (#80).
 
 ## Authentication
 | Feature | Roles | Tests | Result | Issue |
@@ -31,7 +31,7 @@ Last updated: 2026-10-10 (#79).
 | Feature | Roles | Tests | Result | Issue |
 |---|---|---|---|---|
 | Onboarding steps, 18+, completion rules | new | A `test_profiles.py`; U `OnboardingPersonality.test.tsx`; E `signup.spec.ts` (start only) | pass (relationship goal values fixed in #78) | #89 adds a full E2E walk-through |
-| Photo upload, remove, reorder, visibility | user | A `test_profiles.py`; E `photos.spec.ts` | pass | #80 makes controls touch-usable; #89 adds E2E |
+| Photo upload, remove, reorder, visibility | user | A `test_profiles.py`; E `photos.spec.ts` | pass (controls usable by touch and labelled since #80) | #89 adds E2E |
 | Profile details display | user | U `profile-view.test.ts`, `ProfileDetails.test.tsx` | pass (fixed in #78) | #89 adds E2E |
 | Display preferences (name, show age) | user | U `profile-view.test.ts` | pass (hidden-age reset fixed in #78) | #89 adds E2E |
 | Profile load failure | user | U `Profile.test.tsx` | pass (error with retry instead of a placeholder profile, #79) | – |
@@ -72,7 +72,7 @@ Last updated: 2026-10-10 (#79).
 ## Cross-cutting
 | Feature | Tests | Result | Issue |
 |---|---|---|---|
-| Navigation, one bar per viewport | none | **broken** (two bars overlap) | #80 |
+| Navigation, one bar on every viewport | U `AppNavigation.test.tsx` | pass (fixed in #80) | #88 checks it visually at 3 viewports |
 | Responsive layout at mobile, tablet and desktop | E (mobile only) | partial | #88 |
 | No console errors or 5xx responses during journeys | none | – | #88 |
 | Image loading and fallbacks | none | – | #83 |

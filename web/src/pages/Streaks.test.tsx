@@ -11,7 +11,6 @@ vi.mock('@/lib/api/streaks', async (importOriginal) => ({
   getLeaderboard: () => Promise.resolve([]),
 }));
 vi.mock('@/context/auth', () => ({ useAuth: () => ({ user: { id: 'me' }, isAuthenticated: true, signOut: vi.fn() }) }));
-vi.mock('@/components/Navbar', () => ({ default: () => null }));
 
 const renderPage = () =>
   render(
