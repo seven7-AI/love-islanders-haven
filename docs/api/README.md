@@ -14,7 +14,7 @@ committed document is out of date, so CI catches a forgotten regeneration.
 | health | `/healthz`, `/readyz` | Liveness and database readiness (no auth). `/metrics` (Prometheus) is not part of the document |
 | me, profiles | `/v1/me…`, `/v1/profiles/{id}` | Account bootstrap, own profile, onboarding, photos (signed uploads), location, public profiles |
 | discovery | `/v1/discover`, `/v1/swipes`, `/v1/matches…` | Candidate feed, swipes, mutual matches |
-| messages | `/v1/matches/{id}/messages`, `…/media/uploads`, `…/read` | Chat, chat media, read receipts |
+| messages | `/v1/matches/{id}/messages`, `…/messages/{message_id}`, `…/media/uploads`, `…/read` | Chat, chat media (a single message re-signs its expired media URL), read receipts |
 | streaks | `/v1/streaks…` | Daily photo posts, likes, own status, leaderboard |
 | settings & safety | `/v1/me/settings`, `/v1/blocks…`, `/v1/reports`, `/v1/safety-contacts…`, `/v1/date-plans…`, `/v1/safety/alerts` | Preferences, blocking, reporting, safety tools |
 | notifications | `/v1/notifications…` | In-app notifications and read state |

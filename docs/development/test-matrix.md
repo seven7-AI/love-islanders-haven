@@ -31,14 +31,14 @@ Last updated: 2026-10-10 (#87).
 | Feature | Roles | Tests | Result | Issue |
 |---|---|---|---|---|
 | Onboarding steps, 18+, completion rules | new | A `test_profiles.py`; U `OnboardingPersonality.test.tsx`; E `signup.spec.ts` (start only) | pass (relationship goal values fixed in #78) | #89 adds a full E2E walk-through |
-| Photo upload, remove, reorder, visibility | user | A `test_profiles.py`; E `photos.spec.ts` | pass (controls usable by touch and labelled since #80) | #89 adds E2E |
+| Photo upload, remove, reorder, visibility; stored file checked (size, type) | user | A `test_profiles.py`, `test_uploads.py`; E `photos.spec.ts` | pass (controls usable by touch and labelled since #80) | #89 adds E2E |
 | Profile details display | user | U `profile-view.test.ts`, `ProfileDetails.test.tsx` | pass (fixed in #78) | #89 adds E2E |
 | Display preferences (name, show age) | user | U `profile-view.test.ts` | pass (hidden-age reset fixed in #78) | #89 adds E2E |
 | Profile load failure | user | U `Profile.test.tsx` | pass (error with retry instead of a placeholder profile, #79) | – |
 | Discovery preferences (age, distance, gender) | user | A `test_discovery.py`; U `ProfileFilterPreferences.test.tsx`, `useDiscoverProfiles.test.ts` | pass (gender reset fixed in #78) | #89 adds E2E |
 | Insights (week, month, year) | user | A `test_insights.py`; U `ProfileInsights.test.tsx` | pass (tabs and hardcoded figures fixed in #79) | #89 adds E2E |
 | Calendar: date plans, Google connect and disconnect | user | A `test_calendar.py`, `test_safety.py`; U `CalendarCallback.test.tsx`, `ProfileCalendar.test.tsx` | pass (error state and disconnect added in #79) | #89 adds E2E (unconfigured state) |
-| Avatar respects photo visibility | user | none | – | #81 |
+| Avatar respects photo visibility | user | A `test_profiles.py` (hide, reorder, delete, matches list), `test_migrations.py` (0006 backfill) | pass (#81) | – |
 
 ## Discovery, matches and chat
 | Feature | Roles | Tests | Result | Issue |
@@ -47,7 +47,7 @@ Last updated: 2026-10-10 (#87).
 | Swipe and mutual match (including concurrency) | user | A `test_discovery.py`; E `match-and-chat.spec.ts`; DB `supabase/test` | pass | – |
 | Info panel fields | user | U `profile-view.test.ts` | pass (fixed in #78) | #89 adds E2E |
 | Matches list, unmatch | user | A `test_discovery.py`; U `InlineChatHeader.test.tsx`; E `match-and-chat.spec.ts` | pass (unmatch UI added in #82) | #89 adds the matches list states |
-| Chat send, receive, paging, media, read receipts | user | A `test_messages.py`; U `useInlineChat.test.ts`, `MessageItem.test.tsx`; E `match-and-chat.spec.ts` | pass (read receipts added in #82) | #83 (media URL refresh), #89 |
+| Chat send, receive, paging, media, read receipts | user | A `test_messages.py`; U `useInlineChat.test.ts`, `MessageItem.test.tsx`; E `match-and-chat.spec.ts` | pass (read receipts added in #82; expired media URLs refreshed in #83, `GET …/messages/{id}`) | #89 |
 | Block and report from chat | user | A `test_safety.py`; U `ReportUserDialog.test.tsx` | pass | #89 adds E2E |
 | Notifications | user | A `test_notifications.py`; U `NotificationBell.test.tsx` | pass | #89 adds E2E |
 
@@ -75,7 +75,7 @@ Last updated: 2026-10-10 (#87).
 | Navigation, one bar on every viewport | U `AppNavigation.test.tsx` | pass (fixed in #80) | #88 checks it visually at 3 viewports |
 | Responsive layout at mobile, tablet and desktop | E (mobile only) | partial | #88 |
 | No console errors or 5xx responses during journeys | none | – | #88 |
-| Image loading and fallbacks | none | – | #83 |
+| Image loading and fallbacks; ads only when configured | U `SafeImage.test.tsx`, `MessageItem.test.tsx`, `AdSense.test.tsx`; built `index.html` and bundle checked for AdSense code with it unset (none) | pass (#83, #100) | – |
 | Security headers, CORS, rate limits, body size | A `test_hardening.py` | pass | – |
 | Seed accounts: run, verify, reset | A `test_seed.py` (persona rules, production/remote refusal); `SEED=1 scripts/e2e.sh` (run twice, verify, E2E on top); reset checked on a kept stack (0 seed profiles, files, auth users left) | pass (#87) | #88 runs it in CI |
 | Pexels key stays on the server | A `test_pexels.py` (key only in the API header, never in errors or settings repr); build and repository grep | pass (#86) | – |

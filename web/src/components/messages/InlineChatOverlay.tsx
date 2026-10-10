@@ -24,7 +24,8 @@ const InlineChatOverlay: React.FC<InlineChatOverlayProps> = ({
   onBlocked,
   onUnmatched,
 }) => {
-  const { messages, isLoading, error, currentUserId, handleSendMessage, loadOlder, hasOlder } = useInlineChat(matchId);
+  const { messages, isLoading, error, currentUserId, handleSendMessage, loadOlder, hasOlder, refreshMedia } =
+    useInlineChat(matchId);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
@@ -48,6 +49,7 @@ const InlineChatOverlay: React.FC<InlineChatOverlayProps> = ({
             hasOlder={hasOlder}
             onLoadOlder={loadOlder}
             onSendMessage={handleSendMessage}
+            onMediaExpired={refreshMedia}
           />
         </div>
       </AudioPlayerProvider>

@@ -1,7 +1,8 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 
 type AudioPlayerContextType = {
-  playAudio: (id: string, src: string) => void;
+  /** Resolves to whether playback started. */
+  playAudio: (id: string, src: string) => Promise<boolean>;
   pauseAudio: () => void;
   isPlaying: boolean;
   currentAudioId: string | null;
@@ -10,7 +11,7 @@ type AudioPlayerContextType = {
 };
 
 const AudioPlayerContext = createContext<AudioPlayerContextType>({
-  playAudio: () => {},
+  playAudio: async () => false,
   pauseAudio: () => {},
   isPlaying: false,
   currentAudioId: null,
@@ -56,32 +57,27 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
   }, []);
 
-  const playAudio = (id: string, src: string) => {
-    if (!audioRef.current) return;
+  const playAudio = async (id: string, src: string): Promise<boolean> => {
+    if (!audioRef.current) return false;
 
     // If a different audio is playing, stop it first
     if (isPlaying) {
       audioRef.current.pause();
     }
 
-    // Play the new audio
     try {
       audioRef.current.src = src;
       setCurrentSrc(src);
-      audioRef.current
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-          setCurrentAudioId(id);
-        })
-        .catch((error) => {
-          console.error('Failed to play audio:', error);
-          setIsPlaying(false);
-          setCurrentAudioId(null);
-          setCurrentSrc(null);
-        });
+      await audioRef.current.play();
+      setIsPlaying(true);
+      setCurrentAudioId(id);
+      return true;
     } catch (error) {
-      console.error('Error setting up audio playback:', error);
+      console.error('Failed to play audio:', error);
+      setIsPlaying(false);
+      setCurrentAudioId(null);
+      setCurrentSrc(null);
+      return false;
     }
   };
 

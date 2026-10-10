@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Plus, Trash2, Loader2, Image, AlertCircle } from 'lucide-react';
 import { deletePhoto, getMyProfile, ProfileImage, uploadProfilePhoto } from '@/lib/api/profile';
 import { useToast } from '@/hooks/use-toast';
+import SafeImage from '@/components/SafeImage';
 
 interface OnboardingPhotosProps {
   profileId: string;
@@ -102,7 +103,7 @@ export const OnboardingPhotos = ({ onNext, onBack, isSubmitting }: OnboardingPho
       <div className="grid grid-cols-3 gap-3 mb-6">
         {photos.map((photo, index) => (
           <div key={photo.id} className="relative aspect-square bg-island-light/10 rounded-lg overflow-hidden group">
-            <img src={photo.url} alt={`Profile ${index + 1}`} className="w-full h-full object-cover" />
+            <SafeImage src={photo.url} alt={`Profile ${index + 1}`} className="w-full h-full object-cover" />
             <button
               onClick={() => handleDelete(photo)}
               className="absolute bottom-2 right-2 bg-red-500/80 hover:bg-red-600 p-1.5 rounded-full transition-opacity md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"

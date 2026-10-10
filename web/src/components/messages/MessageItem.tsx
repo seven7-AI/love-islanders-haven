@@ -1,15 +1,29 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Check, CheckCheck, Music } from 'lucide-react';
 import { Message } from '@/services/messages';
 import { useAudioPlayer } from '@/hooks/use-audio-player';
+import SafeImage from '@/components/SafeImage';
 
 interface MessageItemProps {
   message: Message;
   isCurrentUser: boolean;
+  /** Fetches a fresh signed URL when the media URL has expired. */
+  onMediaExpired?: (messageId: string) => Promise<string | null>;
 }
 
-const MessageItem = ({ message, isCurrentUser }: MessageItemProps) => {
+const MessageItem = ({ message, isCurrentUser, onMediaExpired }: MessageItemProps) => {
   const { playAudio, isPlaying, currentAudioId } = useAudioPlayer();
+  const [audioUnavailable, setAudioUnavailable] = useState(false);
+
+  const refresh = onMediaExpired ? () => onMediaExpired(message.id) : undefined;
+
+  const handlePlay = async () => {
+    if (message.media_url && (await playAudio(message.id, message.media_url))) return;
+    // The signed URL may have expired: try once more with a fresh one.
+    const fresh = refresh ? await refresh() : null;
+    const played = fresh ? await playAudio(message.id, fresh) : false;
+    setAudioUnavailable(!played);
+  };
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -22,11 +36,12 @@ const MessageItem = ({ message, isCurrentUser }: MessageItemProps) => {
       case 'image':
         return (
           <div className="mb-2">
-            <img
+            <SafeImage
               src={message.media_url}
-              alt="Message image"
-              className="rounded-md max-w-full max-h-60 object-contain"
-              onClick={() => window.open(message.media_url, '_blank')}
+              alt="Photo"
+              onExpired={refresh}
+              className="rounded-md max-w-full max-h-60 min-h-24 min-w-24 object-contain cursor-pointer"
+              onClick={(e) => window.open(e.currentTarget.currentSrc, '_blank', 'noopener')}
             />
           </div>
         );
@@ -34,11 +49,15 @@ const MessageItem = ({ message, isCurrentUser }: MessageItemProps) => {
         return (
           <div
             className="flex items-center space-x-2 cursor-pointer hover:opacity-90 p-2 bg-black/20 rounded-md mb-2"
-            onClick={() => playAudio(message.id, message.media_url || '')}
+            onClick={handlePlay}
           >
             <Music size={20} />
             <span className="text-sm">
-              {isPlaying && currentAudioId === message.id ? 'Playing...' : 'Audio message'}
+              {isPlaying && currentAudioId === message.id
+                ? 'Playing...'
+                : audioUnavailable
+                  ? 'Voice note unavailable'
+                  : 'Audio message'}
             </span>
             {isPlaying && currentAudioId === message.id && (
               <div className="flex space-x-1">

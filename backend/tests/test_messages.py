@@ -197,3 +197,33 @@ async def test_after_must_be_a_timestamp(client: AsyncClient, chat: tuple[uuid.U
         params={"after": (datetime.now().astimezone() - timedelta(days=1)).isoformat()},
     )
     assert ok.status_code == 200
+
+
+async def test_single_message_gets_a_fresh_media_url(
+    client: AsyncClient, app: FastAPI, storage: FakeStorage, chat: tuple[uuid.UUID, uuid.UUID, uuid.UUID]
+) -> None:
+    a, b, match_id = chat
+    ticket = (
+        await client.post(
+            url(match_id, "media/uploads"),
+            headers=auth_headers(a),
+            json={"content_type": "image/jpeg", "size_bytes": 10},
+        )
+    ).json()
+    storage.put(BUCKET, ticket["path"])
+    sent = await client.post(
+        url(match_id), headers=auth_headers(a), json={"content_type": "image", "media_path": ticket["path"]}
+    )
+    message_id = sent.json()["id"]
+
+    response = await client.get(url(match_id, f"messages/{message_id}"), headers=auth_headers(b))
+    assert response.status_code == 200
+    assert response.json()["media_url"].startswith(f"https://storage.test/signed/{BUCKET}/{ticket['path']}")
+
+    other_match = uuid.uuid4()
+    outsider = await person(app)
+    assert (
+        await client.get(url(match_id, f"messages/{message_id}"), headers=auth_headers(outsider))
+    ).status_code == 404
+    assert (await client.get(url(match_id, f"messages/{uuid.uuid4()}"), headers=auth_headers(b))).status_code == 404
+    assert (await client.get(url(other_match, f"messages/{message_id}"), headers=auth_headers(b))).status_code == 404

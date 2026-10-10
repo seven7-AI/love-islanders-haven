@@ -34,6 +34,10 @@ export function listMessages(
   return apiFetch<MessagePage>(`${base(matchId)}/messages${query ? `?${query}` : ''}`);
 }
 
+/** One message with a newly signed media URL, for when the one from the list has expired. */
+export const getChatMessage = (matchId: string, messageId: string) =>
+  apiFetch<ChatMessage>(`${base(matchId)}/messages/${encodeURIComponent(messageId)}`);
+
 export const sendChatMessage = (
   matchId: string,
   body: { content: string; content_type: MessageContentType; media_path?: string },

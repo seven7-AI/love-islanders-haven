@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import SafeImage from '@/components/SafeImage';
 
 interface ProfileImageGridProps {
   images: string[];
@@ -63,7 +64,7 @@ const ProfileImageGrid = ({
     <div className="grid grid-cols-3 gap-2">
       {images.map((image, index) => (
         <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-island-light/20 group">
-          <img src={image} alt={`Profile image ${index + 1}`} className="w-full h-full object-cover" />
+          <SafeImage src={image} alt={`Profile image ${index + 1}`} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
             <div className="flex flex-col gap-2">
               <Button

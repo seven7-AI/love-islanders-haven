@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import SafeImage from '@/components/SafeImage';
 
 interface ProfileImageCarouselProps {
   images: string[];
@@ -41,7 +42,12 @@ const ProfileImageCarousel = ({
 
   return (
     <div className="relative w-full h-full">
-      <img src={displayImages[currentIndex]} alt={`${name}'s profile`} className="w-full h-full object-cover" />
+      <SafeImage
+        src={displayImages[currentIndex]}
+        alt={`${name}'s profile`}
+        loading="eager"
+        className="w-full h-full object-cover"
+      />
 
       {displayImages.length > 1 && (
         <>

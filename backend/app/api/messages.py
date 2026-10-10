@@ -37,6 +37,19 @@ async def list_messages(
     )
 
 
+@router.get("/messages/{message_id}")
+async def get_message(
+    match_id: uuid.UUID,
+    message_id: uuid.UUID,
+    user: CurrentUser,
+    session: SessionDep,
+    storage: StorageDep,
+    bucket: ChatBucket,
+) -> MessageOut:
+    """One message, with a new signed `media_url`; used when a previously signed URL has expired."""
+    return await messaging.get_message(session, storage, bucket, user.id, match_id, message_id)
+
+
 @router.post("/messages", status_code=201, dependencies=limited("messages", 60))
 async def send_message(
     match_id: uuid.UUID,

@@ -6,11 +6,13 @@ import type { ChatMessage } from '@/lib/api/messages';
 const listMessages = vi.fn();
 const sendChatMessage = vi.fn();
 const markConversationRead = vi.fn();
+const getChatMessage = vi.fn();
 
 vi.mock('@/lib/api/messages', () => ({
   listMessages: (...a: unknown[]) => listMessages(...a),
   sendChatMessage: (...a: unknown[]) => sendChatMessage(...a),
   markConversationRead: (...a: unknown[]) => markConversationRead(...a),
+  getChatMessage: (...a: unknown[]) => getChatMessage(...a),
 }));
 vi.mock('@/context/auth', () => ({ useAuth: () => ({ user: { id: 'me' } }) }));
 
@@ -108,6 +110,21 @@ describe('useInlineChat', () => {
     // Polls from just before my unread message, so the answer includes it.
     expect(listMessages).toHaveBeenLastCalledWith('m1', { after: '2026-01-01T10:00:00Z', limit: 100 });
     await waitFor(() => expect(result.current.messages[1].is_read).toBe(true));
+  });
+
+  it('replaces an expired media URL with a fresh one', async () => {
+    const photo = { ...msg('p', 'them', '2026-01-01T10:00:00Z', true), content_type: 'image' as const };
+    listMessages.mockResolvedValue({ messages: [{ ...photo, media_url: 'old' }], older_cursor: null });
+    getChatMessage.mockResolvedValue({ ...photo, media_url: 'fresh' });
+    const { result } = renderHook(() => useInlineChat('m1'));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    let url: string | null = null;
+    await act(async () => {
+      url = await result.current.refreshMedia('p');
+    });
+    expect(url).toBe('fresh');
+    expect(getChatMessage).toHaveBeenCalledWith('m1', 'p');
+    expect(result.current.messages[0].media_url).toBe('fresh');
   });
 
   it('keeps polling an empty conversation', async () => {
