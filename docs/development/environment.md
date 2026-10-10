@@ -6,6 +6,7 @@
 | `VITE_SUPABASE_URL` | yes | `https://<ref>.supabase.co` | Supabase project (auth, signed uploads) |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | yes | `sb_publishable_…` or anon key | Public client key |
 | `VITE_API_URL` | yes | `https://api.example.com` | Love Islander API base URL |
+| `VITE_ADSENSE_CLIENT` / `VITE_ADSENSE_SLOT` | no | `ca-pub-…` / ad unit id | Google AdSense in the Streaks feed. Ads (and the AdSense script) are off unless both are set |
 
 Web container (runtime): `API_ORIGIN`, `SUPABASE_ORIGIN` — origins allowed by the Content-Security-Policy.
 

@@ -107,7 +107,7 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
         {showMoreInfo && <ProfileInfoPanel profile={profile} onClose={toggleMoreInfo} />}
 
         {/* Profile info at bottom */}
-        <ProfileBottomInfo profile={profile} />
+        {!showMoreInfo && <ProfileBottomInfo profile={profile} />}
       </div>
     </div>
   );
