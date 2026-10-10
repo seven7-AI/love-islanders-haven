@@ -17,7 +17,9 @@ const UserStreakCard = ({ streakCount, hasPostedToday }: UserStreakCardProps) =>
           <div className="flex items-center gap-2">
             <Flame className="text-love h-8 w-8" />
             <div>
-              <p className="text-xl font-bold">{streakCount} days</p>
+              <p className="text-xl font-bold">
+                {streakCount} {streakCount === 1 ? 'day' : 'days'}
+              </p>
               <p className="text-sm text-muted-foreground">Current streak</p>
             </div>
           </div>

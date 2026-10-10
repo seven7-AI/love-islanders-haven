@@ -14,6 +14,9 @@ COPY web/ web/
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_PUBLISHABLE_KEY
 ARG VITE_API_URL
+# Optional: Google AdSense publisher id and ad unit; ads are off when either is empty.
+ARG VITE_ADSENSE_CLIENT=""
+ARG VITE_ADSENSE_SLOT=""
 RUN test -n "$VITE_SUPABASE_URL" && test -n "$VITE_SUPABASE_PUBLISHABLE_KEY" && test -n "$VITE_API_URL" \
   || (echo "VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY and VITE_API_URL build args are required" && exit 1)
 RUN npm run build -w web

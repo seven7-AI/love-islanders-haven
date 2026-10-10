@@ -61,7 +61,15 @@ export const OnboardingProgress = ({ currentStep, steps, stepLabels = {} }: Onbo
               </div>
 
               {/* Step label */}
-              <span className={cn('mt-2 text-xs', isCurrent ? 'text-love font-medium' : 'text-gray-400')}>{label}</span>
+              {/* On phones only the current step is labelled; the labels do not fit side by side. */}
+              <span
+                className={cn(
+                  'mt-2 text-xs text-center',
+                  isCurrent ? 'text-love font-medium' : 'hidden sm:block text-gray-400',
+                )}
+              >
+                {label}
+              </span>
             </div>
           );
         })}
