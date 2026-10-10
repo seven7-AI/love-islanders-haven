@@ -2,7 +2,7 @@
 
 > Run the `npx cap …` and `npx @capacitor/…` commands below from `web/` (the Capacitor project root).
 
-This checklist helps you prepare and deploy your Love Islanders Haven app to the Google Play Store.
+This checklist helps you prepare and deploy your Love Islander app to the Google Play Store.
 
 ## Pre-deployment Requirements
 
@@ -55,13 +55,12 @@ This checklist helps you prepare and deploy your Love Islanders Haven app to the
 ## Helpful Commands
 
 ```bash
-# Build production version
+# From the repository root: interactive helper (build, sync, version bump, open Android Studio)
+npm run android:deploy
+
+# Or step by step, from web/
 npm run build
-
-# Sync changes to Android platform
 npx cap sync android
-
-# Open Android Studio
 npx cap open android
 ```
 

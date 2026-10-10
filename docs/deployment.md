@@ -6,7 +6,7 @@ Three deployables, a Postgres database, and the existing Supabase project for Au
 |---|---|---|
 | API | `backend/Dockerfile` (non-root, `uvicorn app.main:create_app --factory`, port 8000) | `GET /readyz` (DB), `GET /healthz` (process) |
 | Web | `deploy/web/Dockerfile` (static build + nginx, port 8080, SPA routing, CSP and security headers) or any static host | `GET /healthz` |
-| Jobs | the API image running `python -m app.jobs.expire_streaks` (hourly) and `python -m app.jobs.companion_checkins` (every few hours) | exit code |
+| Jobs | the API image running the scheduled commands listed in [backend/README.md](../backend/README.md#scheduled-jobs) | exit code |
 | Database | Postgres 16 (managed service or self-hosted), schema from `alembic upgrade head` | `GET /readyz` |
 | Supabase | Auth and Storage (existing project) | Supabase status page |
 
@@ -23,7 +23,7 @@ docker build -f deploy/web/Dockerfile -t love-islander-web \
   --build-arg VITE_API_URL=https://api.<domain> .
 docker run -e API_ORIGIN=https://api.<domain> -e SUPABASE_ORIGIN=https://<ref>.supabase.co -p 8080:8080 love-islander-web
 ```
-Configuration: `docs/environment.md`.
+Configuration: [development/environment.md](development/environment.md).
 
 ## First production rollout (from the Lovable-era deployment)
 The data moves from the legacy Supabase database into the new application database. The order matters: the old web

@@ -19,6 +19,10 @@ Some external services are replaced in tests; these tests check our code's handl
 - Language model, Google OAuth/Calendar, emergency-alert delivery: scripted fakes / mocked transports. No live test
   exists until credentials are provided (see docs/operations/production-actions.md).
 
+## Documentation references
+`scripts/check-doc-references.py` (part of `make check` and the CI web job) fails when a Markdown file links to a
+missing file or names a repository path that does not exist.
+
 ## From a fresh clone
 `scripts/clean-clone-check.sh [repo-url] [ref]` clones into a temporary directory and runs the documented setup and
 all suites there, proving nothing depends on a developer's machine state or on Lovable tooling.

@@ -7,31 +7,21 @@ Google Calendar date planning, and safety tools (blocking, reporting, safety con
 - **API:** FastAPI + SQLAlchemy + Alembic on Python 3.12 (`backend/`)
 - **Platform:** Postgres 16 (schema by Alembic), Supabase Auth and Storage (`supabase/`)
 
-## Quick start
-```bash
-npm ci && (cd backend && uv sync)
-KEEP_STACK=1 npm run test:e2e   # starts a local Supabase + API + web and runs the end-to-end tests
-```
-Full instructions: [docs/setup.md](docs/setup.md).
-
-## Checks
-```bash
-make check   # web: format, lint, typecheck, tests, build; API: ruff, mypy, tests
-make ci      # everything CI runs, incl. database policy tests, security scans and end-to-end tests
-```
-
-## Documentation
-| Topic | Document |
+## Repository layout
+| Path | Contents |
 |---|---|
-| Architecture | [docs/architecture.md](docs/architecture.md) |
-| Local setup | [docs/setup.md](docs/setup.md) |
-| Environment variables | [docs/environment.md](docs/environment.md) |
-| Database & migrations | [docs/database/migrations.md](docs/database/migrations.md), [schema reconciliation](docs/database/schema-reconciliation.md) |
-| Testing | [docs/testing.md](docs/testing.md) |
-| External services | [docs/external-services.md](docs/external-services.md) |
-| Deployment | [docs/deployment.md](docs/deployment.md) |
-| Security | [docs/security.md](docs/security.md) |
-| Operations | [backups & restore](docs/operations/database.md), [observability](docs/operations/observability.md), [pending production actions](docs/operations/production-actions.md) |
-| API reference | `GET /docs` on a non-production API (OpenAPI) and [backend/README.md](backend/README.md) |
-| Project status & audit | [docs/STATUS.md](docs/STATUS.md), [docs/audit/2026-10-audit.md](docs/audit/2026-10-audit.md) |
-| Mobile | [docs/mobile/](docs/mobile/) |
+| `web/` | React + Vite web app and Capacitor shell |
+| `backend/` | FastAPI API, Alembic migrations, API tests |
+| `e2e/` | Playwright end-to-end tests for the whole stack |
+| `supabase/` | Supabase CLI project: local Auth/Storage config, frozen legacy migrations, policy tests |
+| `deploy/` | Web image (Dockerfile, nginx) |
+| `scripts/` | End-to-end runner, clean-clone check, database operations (`scripts/db/`) |
+| `docs/` | Documentation ([index](docs/README.md)) |
+
+The root `package.json` is an npm-workspaces root (`web`, `e2e`); `npm run build`, `npm test`, `npm run lint` and the
+other scripts run from the root. Details: [docs/development/repository-layout.md](docs/development/repository-layout.md).
+
+## Getting started
+Set up from a fresh clone with [docs/development/setup.md](docs/development/setup.md); the test suites and the
+`make check` / `make ci` shortcuts are described in [docs/development/testing.md](docs/development/testing.md).
+All documentation is listed in [docs/README.md](docs/README.md).

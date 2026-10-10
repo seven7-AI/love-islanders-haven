@@ -1,10 +1,71 @@
 # Repository layout
 
-This document records how the repository is organised, what references what, and the rules any future move has to
-respect. It was written before the root-directory reorganization (issues #62–#68), and each of those issues updates
-it as files move.
+How the repository is organised, what references what, and the rules any future move has to respect. The layout
+below is the result of the root-directory reorganization (issues #62–#68); the inventory it started from is kept
+at the end.
 
-## Root inventory before the reorganization
+## Current layout
+```
+.github/workflows/ci.yml   CI: web, security, database, backend, e2e
+backend/                   FastAPI API: app/, alembic/, tests/, Dockerfile (context backend/), .env.example
+web/                       React + Vite web app and Capacitor shell: src/, public/, index.html, package.json,
+                           vite/vitest/tsconfig/tailwind/postcss/eslint/components/capacitor configs, .env.example,
+                           scripts/android-deploy.cjs
+e2e/                       Playwright workspace: package.json, playwright.config.ts, tsconfig.json, specs, support/
+supabase/                  Supabase CLI project: config.toml, frozen migrations/, policy tests (test/)
+deploy/web/                Web Dockerfile (context = repository root), Dockerfile.dockerignore, nginx templates
+scripts/                   e2e.sh (whole-stack runner), clean-clone-check.sh, db/ (backup, restore, validate,
+                           data copy, drills, sample seed)
+docs/                      Documentation; index in docs/README.md
+Makefile                   Task runner (make help)
+README.md
+docker-compose.yml         Local Postgres and API
+package.json               npm workspaces root (web, e2e): delegating scripts, Prettier and its config
+package-lock.json          The only lockfile
+.gitignore  .gitleaksignore  .git-blame-ignore-revs  .prettierignore
+```
+
+### Where to put new things
+| Kind | Location |
+|---|---|
+| Web code, assets, web-only config or scripts | `web/` |
+| API code, Alembic revisions, API tests | `backend/` |
+| Whole-stack browser tests | `e2e/` |
+| Schema changes | `backend/alembic/versions/` only (`supabase/migrations/` is frozen) |
+| Scripts that span several parts (database operations, stack runners, verification) | `scripts/` |
+| Container and hosting artifacts | `deploy/<component>/` (the API's Dockerfile stays in `backend/`) |
+| Documentation | `docs/`, linked from `docs/README.md` |
+
+## Constraints any move must respect
+- **CI check names are fixed.** Branch protection requires these five checks by name:
+  - `Web (lint, typecheck, test, build)`
+  - `Security (dependencies, secrets)`
+  - `Database (migrations + policy tests)`
+  - `Backend (ruff, mypy, pytest)`
+  - `End-to-end (Playwright on local Supabase + API + web)`
+
+  Steps can change; names cannot.
+- **`supabase/` stays at the root.** The Supabase CLI looks for `supabase/config.toml` in its working directory
+  (`scripts/e2e.sh` runs it from the root). `supabase start` applies `supabase/migrations`, which create the
+  `profile-images` and `chat-media` buckets the E2E photo and chat tests use.
+- **Some scripts locate files by fixed relative paths:**
+  - `scripts/e2e.sh` runs `cd "$(dirname "$0")/.."`.
+  - `scripts/db/restore-drill.sh` and `copy-drill.sh` use `root="$here/../.."`.
+  - `supabase/test/run.sh` uses `$here/../migrations`.
+  - `backend/tests/test_migrations.py` uses `BACKEND_DIR.parent / "supabase"`.
+- **Some tools are sensitive to the working directory:**
+  - Tailwind 3 resolves `content` globs against the current working directory.
+  - Vite reads `.env*` from its project root.
+  - Capacitor resolves `webDir` and native folders next to its config.
+  - So web commands must run with the web app's directory as the working directory.
+- **`.gitleaksignore` entries are commit-bound fingerprints** (`<commit>:<path>:<rule>:<line>`). They refer to the
+  paths as they were in those commits and must not be rewritten after a move.
+- **Prettier's scope covers more than the web app:** it also checks `.github/workflows/ci.yml`,
+  `docker-compose.yml` and `e2e/`. Its config has to stay where it can reach those.
+- **The web image build uses the repository root as context.** Its ignore file has to follow the build when the
+  manifests move.
+
+## Root inventory before the reorganization (history)
 These are the tracked files and directories at the root as of `557f50d`.
 
 | Entry | Purpose | Consumed by |
@@ -41,56 +102,6 @@ That is 24 files and 8 directories. Fourteen of the files belong only to the web
 Not tracked, and kept out of git by `.gitignore` or `.git/info/exclude`: `node_modules/`, `dist/`, `test-results/`,
 `playwright-report/`, `.env*`, `backend/.venv`, and local tool state.
 
-## Constraints any move must respect
-- **CI check names are fixed.** Branch protection requires these five checks by name:
-  - `Web (lint, typecheck, test, build)`
-  - `Security (dependencies, secrets)`
-  - `Database (migrations + policy tests)`
-  - `Backend (ruff, mypy, pytest)`
-  - `End-to-end (Playwright on local Supabase + API + web)`
-
-  Steps can change; names cannot.
-- **`supabase/` stays at the root.** The Supabase CLI looks for `supabase/config.toml` in its working directory
-  (`scripts/e2e.sh` runs it from the root). `supabase start` applies `supabase/migrations`, which create the
-  `profile-images` and `chat-media` buckets the E2E photo and chat tests use.
-- **Some scripts locate files by fixed relative paths:**
-  - `scripts/e2e.sh` runs `cd "$(dirname "$0")/.."`.
-  - `scripts/db/restore-drill.sh` and `copy-drill.sh` use `root="$here/../.."`.
-  - `supabase/test/run.sh` uses `$here/../migrations`.
-  - `backend/tests/test_migrations.py` uses `BACKEND_DIR.parent / "supabase"`.
-- **Some tools are sensitive to the working directory:**
-  - Tailwind 3 resolves `content` globs against the current working directory.
-  - Vite reads `.env*` from its project root.
-  - Capacitor resolves `webDir` and native folders next to its config.
-  - So web commands must run with the web app's directory as the working directory.
-- **`.gitleaksignore` entries are commit-bound fingerprints** (`<commit>:<path>:<rule>:<line>`). They refer to the
-  paths as they were in those commits and must not be rewritten after a move.
-- **Prettier's scope covers more than the web app:** it also checks `.github/workflows/ci.yml`,
-  `docker-compose.yml` and `e2e/`. Its config has to stay where it can reach those.
-- **The web image build uses the repository root as context.** Its ignore file has to follow the build when the
-  manifests move.
-
-## Target layout
-```
-.github/workflows/ci.yml
-backend/        FastAPI API (unchanged)
-web/            React + Vite + Capacitor app with its own package.json and configs, .env.example, scripts/android-deploy.cjs
-e2e/            Playwright workspace: package.json, playwright.config.ts, tsconfig.json, specs, support/
-supabase/       Supabase CLI project: config.toml, frozen migrations/, policy tests (test/)
-deploy/web/     Web Dockerfile, Dockerfile.dockerignore, nginx templates
-scripts/        Repository tooling: e2e.sh, clean-clone-check.sh, db/
-docs/           Index, architecture, deployment, security, development/, api/, database/, operations/, mobile/, audit/
-Makefile  README.md  docker-compose.yml  package.json (npm workspaces root)  package-lock.json
-.gitignore  .gitleaksignore  .git-blame-ignore-revs  .prettierignore
-```
-- **The root `package.json`** is a private npm-workspaces root (`web`, `e2e`) with one lockfile. It holds Prettier
-  (with its config in the `prettier` key) and scripts that delegate to the workspaces, so `npm run build`,
-  `npm test`, `npm run test:e2e` and the other commands keep working from the root.
-- **Web commands** run inside `web/` (`npm run <script> -w web`), which satisfies the Tailwind, Vite and Capacitor
-  working-directory rules.
-- **The web image** keeps the root as its build context, with a Dockerfile-specific ignore file next to the Dockerfile.
-- **Files are moved with `git mv`**, so history follows them (`git log --follow`).
-
 ## Order of work
 1. #62: this inventory and the target layout. Done.
 2. #63: remove stale configuration and tracked CLI state, and make the policy tests independent of the working
@@ -100,6 +111,6 @@ Makefile  README.md  docker-compose.yml  package.json (npm workspaces root)  pac
 4. #65: make `e2e/` its own workspace, with its own config and type checking. Done; the E2E code is now
    type-checked (strict) by `npm run typecheck`, and Playwright output goes to `e2e/playwright-report/` and
    `e2e/test-results/`.
-5. #66: add a docs index and regroup the docs under `docs/development/`, stating each fact once.
-6. #67: add a generated API reference (`docs/api/`).
+5. #66: add a docs index and regroup the docs under `docs/development/`, stating each fact once. Done.
+6. #67: add a generated API reference under docs/api.
 7. #68: verify the documented workflow from a clean clone.

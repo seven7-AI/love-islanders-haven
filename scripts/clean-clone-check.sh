@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Proves the project builds, tests and runs from a fresh clone without Lovable tooling, following docs/setup.md.
+# Proves the project builds, tests and runs from a fresh clone without Lovable tooling, following docs/development/setup.md.
 # Usage: scripts/clean-clone-check.sh [repo-url] [ref]     (default: this repository's origin, main)
 # Needs: git, Node 22 + npm, uv, Docker, psql. Uses DB port 5434 so it does not touch a running dev database.
 set -euo pipefail
@@ -24,7 +24,7 @@ step "install"
 npm ci --no-audit --no-fund >/dev/null
 (cd backend && uv sync --frozen >/dev/null 2>&1)
 
-step "local database (docs/setup.md option B)"
+step "local database (docs/development/setup.md option B)"
 export TEST_DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5434/love_islander_test
 docker compose up -d --wait db >/dev/null 2>&1
 make --no-print-directory migrate >/dev/null 2>&1

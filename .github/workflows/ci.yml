@@ -24,6 +24,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run format:check
+      - name: Documentation references resolve
+        run: scripts/check-doc-references.py
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
