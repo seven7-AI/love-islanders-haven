@@ -24,6 +24,8 @@ class Persona:
     profile: dict[str, object] = field(default_factory=dict)
     photos: tuple[int, ...] = ()
     location: tuple[float, float] | None = None
+    # Granted with the operator code (app.services.moderation), as `python -m app.admin roles grant` would.
+    roles: tuple[str, ...] = ()
 
     @property
     def email(self) -> str:
@@ -264,6 +266,8 @@ PERSONAS: tuple[Persona, ...] = (
     ),
     # Signed up and signed in once; nothing else.
     Persona("newcomer", "signed_up", "Newcomer"),
+    # Staff account: reviews reports; has no dating profile and does not appear in Discover.
+    Persona("mercy", "signed_up", "Mercy", {"name": "Mercy"}, roles=("moderator",)),
 )
 
 BY_KEY = {p.key: p for p in PERSONAS}
@@ -306,6 +310,7 @@ BLOCKS: tuple[tuple[str, str], ...] = (("amani", "eric"),)
 # (reporter, reported, reason, details); the reporter also blocks the reported user.
 REPORTS: tuple[tuple[str, str, str, str], ...] = (
     ("lydia", "eric", "harassment", "Kept sending messages after I asked him to stop."),
+    ("grace", "juma", "spam", "Sent me the same investment link three times."),
 )
 
 SAFETY_CONTACTS: dict[str, tuple[dict[str, object], ...]] = {

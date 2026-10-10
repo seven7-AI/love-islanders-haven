@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.errors import AppError
 from app.db.session import Database
 from app.integrations.auth import AuthenticatedUser, AuthError, TokenVerifier
+from app.services.moderation import MODERATOR, roles_of
 from app.services.users import ensure_profile
 
 _bearer = HTTPBearer(auto_error=False)
@@ -57,3 +58,12 @@ async def get_current_user(
 
 
 CurrentUser = Annotated[AuthenticatedUser, Depends(get_current_user)]
+
+
+async def get_moderator(user: CurrentUser, session: SessionDep) -> AuthenticatedUser:
+    if MODERATOR not in await roles_of(session, user.id):
+        raise AppError(403, "Moderator access required", code="forbidden")
+    return user
+
+
+ModeratorUser = Annotated[AuthenticatedUser, Depends(get_moderator)]

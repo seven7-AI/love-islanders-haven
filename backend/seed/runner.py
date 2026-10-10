@@ -1,11 +1,14 @@
 """Creates, verifies and removes the seed data through Supabase Auth and the Love Islander API."""
 
+import uuid
 from collections.abc import Callable
 from datetime import UTC, datetime, time, timedelta
 from typing import Any
 
 import asyncpg
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from app.services.moderation import grant_role
 from seed import personas as P
 from seed.photos import PhotoSource
 from seed.stack import SeedError, Session, Stack
@@ -14,8 +17,11 @@ Log = Callable[[str], None]
 
 
 class Seeder:
-    def __init__(self, stack: Stack, photos: PhotoSource, password: str, log: Log = print) -> None:
+    def __init__(
+        self, stack: Stack, photos: PhotoSource, password: str, log: Log = print, database_url: str | None = None
+    ) -> None:
         self.stack = stack
+        self.database_url = database_url
         self.photos = photos
         self.password = password
         self.log = log
@@ -37,11 +43,14 @@ class Seeder:
         for persona in P.PERSONAS:
             await self._persona(persona)
         await self._relationships()
+        await self._roles()
         self.log("seed complete")
 
     async def _persona(self, persona: P.Persona) -> None:
         await self.call(persona.key, "GET", "/v1/me")  # creates the profile, as the first sign-in does in the app
         if persona.state == "signed_up":
+            if persona.profile:
+                await self.call(persona.key, "PATCH", "/v1/me/profile", persona.profile)
             self.log(f"{persona.key}: signed up")
             return
         await self.call(persona.key, "PATCH", "/v1/me/profile", persona.profile)
@@ -181,6 +190,23 @@ class Seeder:
             if not await self.call(owner, "GET", "/v1/feedback"):
                 await self.call(owner, "POST", "/v1/feedback", {"category": category, "content": content})
 
+    async def _roles(self) -> None:
+        """Roles have no API (by design); they are granted in the database with the operator CLI's code."""
+        staff = [p for p in P.PERSONAS if p.roles]
+        if not staff:
+            return
+        if not self.database_url:
+            raise SeedError("DATABASE_URL (the API's database) is needed to grant the moderator role")
+        engine = create_async_engine(self.database_url)
+        try:
+            async with async_sessionmaker(engine)() as session:
+                for persona in staff:
+                    for role in persona.roles:
+                        await grant_role(session, uuid.UUID(await self._user_id(persona.key)), role, "seed")
+                    self.log(f"{persona.key}: {', '.join(persona.roles)}")
+        finally:
+            await engine.dispose()
+
     # Verification -------------------------------------------------------------------------------------------------
 
     async def verify(self) -> list[str]:
@@ -215,6 +241,13 @@ class Seeder:
         expect(any(b["user_id"] == eric_id for b in await self.call("lydia", "GET", "/v1/blocks")), "lydia: report")
         board = await self.call("amani", "GET", "/v1/streaks/leaderboard?limit=10")
         expect(len(board) >= 1, "leaderboard is empty")
+        for persona in (p for p in P.PERSONAS if p.roles):
+            me = await self.call(persona.key, "GET", "/v1/me")
+            expect(set(persona.roles) <= set(me["roles"]), f"{persona.key}: roles {me['roles']}")
+        queue = await self.call("mercy", "GET", "/v1/moderation/reports?status=open")
+        expect(len(queue["reports"]) >= len(P.REPORTS), "mercy: open reports missing from the moderation queue")
+        denied = await self.call("amani", "GET", "/v1/moderation/reports", ok=(200, 403))
+        expect(denied.get("code") == "forbidden", "amani: a regular user can read the moderation queue")
         return problems
 
 

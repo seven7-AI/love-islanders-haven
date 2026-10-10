@@ -65,8 +65,8 @@ Last updated: 2026-10-10 (#87).
 ## Moderation and permissions
 | Feature | Roles | Tests | Result | Issue |
 |---|---|---|---|---|
-| Report review queue and status changes | mod | none (feature missing) | – | #84, #85 |
-| Non-moderators cannot moderate | user | none | – | #84, #89 |
+| Report review queue and status changes (reviewer, time, note; no self-review) | mod | A `test_moderation.py`; seed `verify` (queue has the seeded reports) | pass (API, #84) | #85 adds the page |
+| Non-moderators cannot moderate; roles only via the operator CLI | user | A `test_moderation.py` (403, revoked role, CLI grant/revoke/list, email lookup); seed `verify` | pass (API, #84) | #89 adds E2E |
 | Cross-user access (other users' photos, chats, contacts) | user | A `test_profiles.py`, `test_messages.py`, `test_safety.py` | pass | #89 adds E2E |
 
 ## Cross-cutting

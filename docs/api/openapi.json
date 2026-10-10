@@ -2537,6 +2537,154 @@
           }
         ]
       }
+    },
+    "/v1/moderation/reports": {
+      "get": {
+        "tags": [
+          "moderation"
+        ],
+        "summary": "List Reports",
+        "description": "Reports, oldest first, optionally only those with one status. Moderators only.",
+        "operationId": "list_reports_v1_moderation_reports_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "open",
+                    "reviewing",
+                    "resolved",
+                    "dismissed"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 30,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModerationReportPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/moderation/reports/{report_id}": {
+      "patch": {
+        "tags": [
+          "moderation"
+        ],
+        "summary": "Review Report",
+        "description": "Sets the status (and optionally a note); records the moderator and the time. Moderators only, and not on\nreports they filed or that are about them.",
+        "operationId": "review_report_v1_moderation_reports__report_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportReview"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModerationReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4111,6 +4259,13 @@
           "email_verified": {
             "type": "boolean",
             "title": "Email Verified"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Roles"
           }
         },
         "type": "object",
@@ -4119,7 +4274,8 @@
           "email",
           "name",
           "onboarding_completed",
-          "email_verified"
+          "email_verified",
+          "roles"
         ],
         "title": "MeResponse"
       },
@@ -4280,6 +4436,134 @@
         ],
         "title": "MessagePage",
         "description": "Messages in chronological order. `older_cursor` fetches the page before the first message."
+      },
+      "ModerationReport": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "harassment",
+              "spam",
+              "fake_profile",
+              "inappropriate_content",
+              "underage",
+              "other"
+            ],
+            "title": "Reason"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "reviewing",
+              "resolved",
+              "dismissed"
+            ],
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "reporter": {
+            "$ref": "#/components/schemas/ReportPerson"
+          },
+          "reported": {
+            "$ref": "#/components/schemas/ReportedPerson"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportPerson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "resolution_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reason",
+          "details",
+          "status",
+          "created_at",
+          "reporter",
+          "reported",
+          "reviewed_by",
+          "reviewed_at",
+          "resolution_note"
+        ],
+        "title": "ModerationReport"
+      },
+      "ModerationReportPage": {
+        "properties": {
+          "reports": {
+            "items": {
+              "$ref": "#/components/schemas/ModerationReport"
+            },
+            "type": "array",
+            "title": "Reports"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reports",
+          "next_cursor"
+        ],
+        "title": "ModerationReportPage"
       },
       "NotificationOut": {
         "properties": {
@@ -5459,6 +5743,118 @@
           "id"
         ],
         "title": "ReportCreated"
+      },
+      "ReportPerson": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "photo_url"
+        ],
+        "title": "ReportPerson"
+      },
+      "ReportReview": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "reviewing",
+              "resolved",
+              "dismissed"
+            ],
+            "title": "Status"
+          },
+          "resolution_note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "ReportReview"
+      },
+      "ReportedPerson": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "reports_against": {
+            "type": "integer",
+            "title": "Reports Against"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "photo_url",
+          "reports_against"
+        ],
+        "title": "ReportedPerson"
       },
       "SettingsOut": {
         "properties": {

@@ -52,3 +52,11 @@ def test_relationships_reference_onboarded_personas() -> None:
         assert pair in P.MATCHES
         assert all(sender in pair for sender, _ in lines)
     assert all(a in onboarded for a, _, _ in P.STREAKS)
+
+
+def test_moderator_persona_can_review_every_seeded_report() -> None:
+    staff = [p for p in P.PERSONAS if p.roles]
+    assert [(p.key, p.roles) for p in staff] == [("mercy", ("moderator",))]
+    involved = {key for reporter, reported, _, _ in P.REPORTS for key in (reporter, reported)}
+    assert not involved & {p.key for p in staff}  # moderators cannot review reports that involve them
+    assert involved <= set(P.BY_KEY)

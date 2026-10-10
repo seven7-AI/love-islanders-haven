@@ -35,6 +35,7 @@ async def test_returns_the_token_user_and_creates_their_profile(client: AsyncCli
         "name": "Ava",
         "onboarding_completed": False,
         "email_verified": False,
+        "roles": [],
     }
     engine: AsyncEngine = app.state.db.engine
     async with engine.connect() as conn:

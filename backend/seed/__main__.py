@@ -71,7 +71,7 @@ async def main(argv: list[str]) -> int:
                 return 2
             await reset(stack, settings.database_url)
             return 0
-        seeder = Seeder(stack, photos, settings.seed_password)
+        seeder = Seeder(stack, photos, settings.seed_password, database_url=settings.database_url)
         if args.command == "run":
             await seeder.run()
             return 0
