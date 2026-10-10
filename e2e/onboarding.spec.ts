@@ -16,11 +16,14 @@ test('complete onboarding through every step; progress and answers persist', asy
   // Basics
   await expect(page.getByRole('heading', { name: "Let's get to know you" })).toBeVisible();
   await page.getByLabel("What's your name?").fill('Zara');
-  await pick(page, 'Month', 'March');
-  await pick(page, 'Day', '14');
-  await pick(page, 'Year', '1996');
-  await page.getByRole('radio', { name: 'Female' }).check();
-  await page.getByRole('radio', { name: 'Men' }).check();
+  await pick(page, 'Birth month', 'March');
+  await pick(page, 'Birth day', '14');
+  await pick(page, 'Birth year', '1996');
+  // The radios are visually hidden behind their labels, which is what people click.
+  for (const choice of ['Female', 'Men']) {
+    await page.getByText(choice, { exact: true }).click();
+    await expect(page.getByRole('radio', { name: choice, exact: true })).toBeChecked();
+  }
   await page.getByRole('button', { name: 'Continue' }).click();
 
   // Photos; then a reload resumes at this step with the photos kept.
@@ -43,16 +46,21 @@ test('complete onboarding through every step; progress and answers persist', asy
   // Lifestyle
   await expect(page.getByRole('heading', { name: 'Lifestyle' })).toBeVisible();
   await page.getByLabel('What do you do?').fill('Architect');
-  await page.getByRole('button', { name: 'Active', exact: true }).click();
-  await page.getByRole('button', { name: 'Frequently', exact: true }).click();
-  await page.getByRole('button', { name: 'Regularly', exact: true }).click();
+  for (const option of ['Active', 'Frequently', 'Regularly']) {
+    const button = page.getByRole('button', { name: option, exact: true });
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+  }
   await page.getByRole('button', { name: 'Continue' }).click();
 
   // Personality
   await expect(page.getByRole('heading', { name: 'About You' })).toBeVisible();
   await page.getByLabel('About me').fill('I design homes by day and dance salsa by night.');
-  await page.getByRole('button', { name: /Long-term/ }).click();
-  await page.getByRole('button', { name: /Texting/ }).click();
+  for (const option of [/Long-term/, /Texting/]) {
+    const button = page.getByRole('button', { name: option });
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+  }
   await page.getByRole('button', { name: 'Continue' }).click();
 
   // Preferences and completion
