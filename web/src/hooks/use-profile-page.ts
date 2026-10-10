@@ -1,30 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth';
-import { fetchUserProfile } from '@/services/profiles/core';
+import { getMyProfile } from '@/lib/api/profile';
+import { fromOwnProfile, type ProfileView } from '@/lib/profile-view';
 import { supabase } from '@/integrations/supabase/client';
 
-const createDefaultProfile = (email?: string | null, id?: string) => ({
+const createDefaultProfile = (email?: string | null, id?: string): ProfileView => ({
   id: id || 'local-profile',
   name: email?.split('@')[0] || 'New User',
-  age: 0,
-  bio: '',
-  distance: 0,
-  occupation: '',
-  education: '',
-  images: [],
-  interests: [],
-  relationshipGoal: 'both' as const,
-  height: '',
-  lastActive: new Date().toISOString(),
-  verified: false,
-  location: '',
-  genderPreference: 'both' as const,
+  age: null,
   showAge: true,
+  bio: '',
+  verified: false,
+  occupation: null,
+  education: null,
+  location: null,
+  relationshipGoal: null,
+  heightCm: null,
+  pronouns: null,
+  interests: [],
+  images: [],
 });
 
 export function useProfilePage() {
-  const [profile, setProfile] = useState<any>(() => createDefaultProfile(null));
+  const [profile, setProfile] = useState<ProfileView>(() => createDefaultProfile(null));
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,9 +74,7 @@ export function useProfilePage() {
     }
 
     if (user?.id) {
-      setProfile((current: any) =>
-        current?.id === 'local-profile' ? createDefaultProfile(user.email, user.id) : current,
-      );
+      setProfile((current) => (current?.id === 'local-profile' ? createDefaultProfile(user.email, user.id) : current));
       void loadUserProfile();
     } else {
       toast({
@@ -94,28 +91,11 @@ export function useProfilePage() {
     setError(null);
 
     try {
-      console.log('Loading user profile...');
-
       if (!user?.id) {
-        console.log('No authentication detected');
         throw new Error('Authentication required');
       }
 
-      console.log('Authentication status: Supabase =', isAuthenticated);
-      const userData = await fetchUserProfile();
-
-      if (userData) {
-        console.log('Profile loaded successfully');
-        setProfile(userData);
-      } else {
-        console.log('No profile found, creating default');
-        setProfile(createDefaultProfile(user?.email, user?.id));
-
-        toast({
-          title: 'Complete your profile',
-          description: 'Please add your profile details to get started.',
-        });
-      }
+      setProfile(fromOwnProfile(await getMyProfile()));
     } catch (error: any) {
       console.error('Error loading profile:', error);
       setError(error?.message || 'Failed to load profile data');

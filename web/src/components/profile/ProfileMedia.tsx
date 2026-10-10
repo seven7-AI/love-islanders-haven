@@ -1,8 +1,8 @@
 import ProfileMediaSection from './ProfileMediaSection';
-import { Profile } from '@/utils/dummyData';
+import type { ProfileView } from '@/lib/profile-view';
 
 interface ProfileMediaProps {
-  profile: Profile;
+  profile: ProfileView;
   visibleImagesIndices?: number[];
   isMyProfile?: boolean;
 }

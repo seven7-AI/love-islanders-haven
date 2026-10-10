@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Profile } from '../utils/dummyData';
+import type { ProfileView } from '@/lib/profile-view';
 import { Info, MessageCircle } from 'lucide-react';
 import ProfileImageCarousel from './profile/ProfileImageCarousel';
 import ProfileInfoPanel from './profile/ProfileInfoPanel';
@@ -8,7 +8,7 @@ import ProfileBottomInfo from './profile/ProfileBottomInfo';
 import SwipeIndicator from './profile/SwipeIndicator';
 
 interface ProfileCardProps {
-  profile: Profile;
+  profile: ProfileView;
   onSwipe: (direction: 'left' | 'right') => void;
 }
 
@@ -20,14 +20,8 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
   const [showCommentInput, setShowCommentInput] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // If profile has no images, use placeholder images
-  const images =
-    profile.images && profile.images.length > 0
-      ? profile.images
-      : [
-          'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1964&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop',
-        ];
+  // Never show someone else's photo in place of a missing one.
+  const images = profile.images.length > 0 ? profile.images : ['/placeholder.svg'];
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -111,15 +105,6 @@ const ProfileCard = ({ profile, onSwipe }: ProfileCardProps) => {
 
         {/* More info panel */}
         {showMoreInfo && <ProfileInfoPanel profile={profile} onClose={toggleMoreInfo} />}
-
-        {/* Activity status */}
-        {profile.activityStatus && (
-          <div className="absolute top-6 left-4">
-            <div className="bg-black/20 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full">
-              {profile.activityStatus}
-            </div>
-          </div>
-        )}
 
         {/* Profile info at bottom */}
         <ProfileBottomInfo profile={profile} />

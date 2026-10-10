@@ -13,7 +13,8 @@ const formSchema = z.object({
     .string()
     .min(20, { message: 'Bio must be at least 20 characters' })
     .max(500, { message: 'Bio must be 500 characters or less' }),
-  relationship_goal: z.enum(['long_term', 'short_term', 'friends', 'figuring_out'], {
+  // Values accepted by the API (backend/app/schemas/profile.py RelationshipGoal).
+  relationship_goal: z.enum(['long-term', 'casual', 'friendship', 'not-sure'], {
     required_error: "Please select what you're looking for",
   }),
   communication_style: z
@@ -116,10 +117,10 @@ export const OnboardingPersonality = ({ initialData, onNext, onBack, isSubmittin
                 <FormLabel>I'm looking for</FormLabel>
                 <div className="flex flex-wrap gap-2 pt-1">
                   {[
-                    { value: 'long_term', label: 'Long-term', emoji: '💍' },
-                    { value: 'short_term', label: 'Short-term', emoji: '🎉' },
-                    { value: 'friends', label: 'New friends', emoji: '👋' },
-                    { value: 'figuring_out', label: 'Still figuring out', emoji: '🤔' },
+                    { value: 'long-term', label: 'Long-term', emoji: '💍' },
+                    { value: 'casual', label: 'Something casual', emoji: '🎉' },
+                    { value: 'friendship', label: 'New friends', emoji: '👋' },
+                    { value: 'not-sure', label: 'Still figuring out', emoji: '🤔' },
                   ].map((option) => (
                     <OptionButton
                       key={option.value}
