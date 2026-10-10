@@ -52,7 +52,7 @@ const ProfileErrorState = ({ onRetry, errorMessage }: ProfileErrorStateProps) =>
 
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Connection Error</AlertTitle>
+          <AlertTitle>Could not load your profile</AlertTitle>
           <AlertDescription>
             {errorMessage || 'Unable to load profile data. Please try again when you have better connectivity.'}
           </AlertDescription>
@@ -72,8 +72,6 @@ const ProfileErrorState = ({ onRetry, errorMessage }: ProfileErrorStateProps) =>
               You appear to be offline. Please connect to the internet and try again.
             </p>
           )}
-
-          <p className="text-xs text-love mt-2">For development purposes, data will be loaded from default values.</p>
         </div>
 
         <Button
