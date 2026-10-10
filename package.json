@@ -5,13 +5,14 @@
   "type": "module",
   "description": "Love Islander: web app (web/), API (backend/), end-to-end tests (e2e/). See README.md.",
   "workspaces": [
-    "web"
+    "web",
+    "e2e"
   ],
   "scripts": {
     "dev": "npm run dev -w web",
     "build": "npm run build -w web",
     "lint": "npm run lint -w web",
-    "typecheck": "npm run typecheck -w web",
+    "typecheck": "npm run typecheck --workspaces",
     "test": "npm test -w web",
     "android:deploy": "npm run android:deploy -w web",
     "format": "prettier --write .",
@@ -20,7 +21,6 @@
     "test:e2e": "scripts/e2e.sh"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.0",
     "prettier": "^3.9.9"
   },
   "prettier": {

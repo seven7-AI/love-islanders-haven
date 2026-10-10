@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
  * Auth and Storage, and the web app. Start everything with `scripts/e2e.sh` (CI does the same); see docs/testing.md.
  */
 export default defineConfig({
-  testDir: 'e2e',
+  testDir: '.',
   timeout: 60_000,
   expect: { timeout: 15_000 },
   fullyParallel: false,
