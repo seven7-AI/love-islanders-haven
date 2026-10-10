@@ -11,6 +11,15 @@ export interface BlockedUser {
 
 export type ReportReason = 'harassment' | 'spam' | 'fake_profile' | 'inappropriate_content' | 'underage' | 'other';
 
+export const REPORT_REASONS: { value: ReportReason; label: string }[] = [
+  { value: 'harassment', label: 'Harassment or threats' },
+  { value: 'spam', label: 'Spam or scam' },
+  { value: 'fake_profile', label: 'Fake profile' },
+  { value: 'inappropriate_content', label: 'Inappropriate content' },
+  { value: 'underage', label: 'Under 18' },
+  { value: 'other', label: 'Something else' },
+];
+
 export interface ReportInput {
   user_id: string;
   reason: ReportReason;

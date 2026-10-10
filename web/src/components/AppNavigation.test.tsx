@@ -5,6 +5,8 @@ import AppNavigation from './AppNavigation';
 
 const signOut = vi.fn().mockResolvedValue(undefined);
 vi.mock('@/context/auth', () => ({ useAuth: () => ({ signOut }) }));
+const roles = vi.hoisted(() => ({ isModerator: false }));
+vi.mock('@/hooks/use-roles', () => ({ useRoles: () => roles }));
 
 const renderAt = (path: string) =>
   render(
@@ -29,6 +31,17 @@ describe('AppNavigation', () => {
     renderAt('/discover');
     expect(screen.getByRole('link', { name: 'Settings' })).toHaveClass('hidden', 'md:flex');
     expect(screen.getByRole('link', { name: 'Safety' })).toHaveClass('hidden', 'md:flex');
+  });
+
+  it('shows Moderation only to moderators', () => {
+    roles.isModerator = false;
+    const { unmount } = renderAt('/discover');
+    expect(screen.queryByRole('link', { name: 'Moderation' })).not.toBeInTheDocument();
+    unmount();
+    roles.isModerator = true;
+    renderAt('/moderation');
+    expect(screen.getByRole('link', { name: 'Moderation' })).toHaveAttribute('aria-current', 'page');
+    roles.isModerator = false;
   });
 
   it('logs out and goes to the login page', async () => {

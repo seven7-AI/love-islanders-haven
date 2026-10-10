@@ -13,16 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { ReportReason, reportUser } from '@/lib/api/safety';
-
-const REASONS: { value: ReportReason; label: string }[] = [
-  { value: 'harassment', label: 'Harassment or threats' },
-  { value: 'spam', label: 'Spam or scam' },
-  { value: 'fake_profile', label: 'Fake profile' },
-  { value: 'inappropriate_content', label: 'Inappropriate content' },
-  { value: 'underage', label: 'Under 18' },
-  { value: 'other', label: 'Something else' },
-];
+import { REPORT_REASONS as REASONS, ReportReason, reportUser } from '@/lib/api/safety';
 
 const MAX_DETAILS = 1000;
 

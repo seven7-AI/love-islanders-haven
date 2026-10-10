@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { getMyProfile } from '@/lib/api/profile';
+import { getMe } from '@/lib/api/moderation';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -34,9 +34,14 @@ const Login = () => {
       }
       if (data.session) {
         toast.success('Welcome back!');
-        // Decide destination based on onboarding status
-        const profile = await getMyProfile().catch(() => null);
-        navigate(profile?.onboarding_completed ? '/discover' : '/onboarding', { replace: true });
+        // Onboarded users go to Discover; staff without a dating profile to their queue; everyone else to onboarding.
+        const me = await getMe().catch(() => null);
+        const destination = me?.onboarding_completed
+          ? '/discover'
+          : me?.roles.includes('moderator')
+            ? '/moderation'
+            : '/onboarding';
+        navigate(destination, { replace: true });
       }
     } catch (err: any) {
       toast.error(err?.message || 'Failed to log in.');

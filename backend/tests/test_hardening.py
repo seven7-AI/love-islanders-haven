@@ -73,3 +73,15 @@ def test_production_settings_accept_https_origins() -> None:
     origins = ["https://app.example", "https://localhost", "capacitor://localhost"]
     settings: Settings = make_settings(environment="production", cors_origins=origins)
     assert settings.cors_origins == origins
+
+
+def test_configuration_errors_do_not_echo_values() -> None:
+    """A startup failure is logged; it must not carry secrets such as the database password or API keys."""
+    with pytest.raises(ValidationError) as error:
+        make_settings(
+            environment="production",
+            cors_origins=["*"],
+            llm_api_key="sk-do-not-print",
+            supabase_jwt_secret="jwt-do-not-print",
+        )
+    assert "do-not-print" not in str(error.value)

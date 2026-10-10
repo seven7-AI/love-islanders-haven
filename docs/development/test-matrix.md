@@ -65,8 +65,8 @@ Last updated: 2026-10-10 (#87).
 ## Moderation and permissions
 | Feature | Roles | Tests | Result | Issue |
 |---|---|---|---|---|
-| Report review queue and status changes (reviewer, time, note; no self-review) | mod | A `test_moderation.py`; seed `verify` (queue has the seeded reports) | pass (API, #84) | #85 adds the page |
-| Non-moderators cannot moderate; roles only via the operator CLI | user | A `test_moderation.py` (403, revoked role, CLI grant/revoke/list, email lookup); seed `verify` | pass (API, #84) | #89 adds E2E |
+| Report review queue and status changes (reviewer, time, note; no self-review) | mod | A `test_moderation.py`; seed `verify` (queue has the seeded reports); U `Moderation.test.tsx`; E `moderation.spec.ts` (moderator granted with the operator CLI reviews a report in the browser) | pass (#84 API, #85 page) | – |
+| Non-moderators cannot moderate; roles only via the operator CLI | user | A `test_moderation.py` (403, revoked role, CLI grant/revoke/list, email lookup); seed `verify`; U `App.test.tsx`, `AppNavigation.test.tsx`, `use-roles.test.ts`; E `moderation.spec.ts` (no link, "Moderators only", API 403) | pass (#84, #85) | – |
 | Cross-user access (other users' photos, chats, contacts) | user | A `test_profiles.py`, `test_messages.py`, `test_safety.py` | pass | #89 adds E2E |
 
 ## Cross-cutting
@@ -76,6 +76,6 @@ Last updated: 2026-10-10 (#87).
 | Responsive layout at mobile, tablet and desktop | E (mobile only) | partial | #88 |
 | No console errors or 5xx responses during journeys | none | – | #88 |
 | Image loading and fallbacks; ads only when configured | U `SafeImage.test.tsx`, `MessageItem.test.tsx`, `AdSense.test.tsx`; built `index.html` and bundle checked for AdSense code with it unset (none) | pass (#83, #100) | – |
-| Security headers, CORS, rate limits, body size | A `test_hardening.py` | pass | – |
+| Security headers, CORS, rate limits, body size; configuration errors never echo values | A `test_hardening.py` | pass | – |
 | Seed accounts: run, verify, reset | A `test_seed.py` (persona rules, production/remote refusal); `SEED=1 scripts/e2e.sh` (run twice, verify, E2E on top); reset checked on a kept stack (0 seed profiles, files, auth users left) | pass (#87) | #88 runs it in CI |
 | Pexels key stays on the server | A `test_pexels.py` (key only in the API header, never in errors or settings repr); build and repository grep | pass (#86) | – |

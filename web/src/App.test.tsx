@@ -5,11 +5,14 @@ import { ReactNode } from 'react';
 import App from './App';
 import AppProviders from './AppProviders';
 import { supabase } from '@/integrations/supabase/client';
+import { resetRolesCache } from '@/hooks/use-roles';
 
 // Renders the real route tree and providers (AppProviders, as in main.tsx); only the auth session and the HTTP API
 // are substituted.
 const auth = vi.hoisted(() => ({ signedIn: true }));
 const getMyProfile = vi.fn();
+const getMe = vi.fn();
+const listReports = vi.fn();
 
 vi.mock('@/context/auth', () => ({
   AuthProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -38,6 +41,11 @@ vi.mock('@/lib/api/profile', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/api/profile')>()),
   getMyProfile: () => getMyProfile(),
   updateMyProfile: vi.fn(),
+}));
+vi.mock('@/lib/api/moderation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/api/moderation')>()),
+  getMe: () => getMe(),
+  listReports: () => listReports(),
 }));
 vi.mock('@/lib/api/safety', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/api/safety')>()),
@@ -68,6 +76,9 @@ describe('App routes', () => {
     auth.signedIn = true;
     getMyProfile.mockReset();
     getMyProfile.mockResolvedValue(onboardedProfile);
+    resetRolesCache();
+    getMe.mockResolvedValue({ id: 'me', onboarding_completed: true, roles: [] });
+    listReports.mockResolvedValue({ reports: [], next_cursor: null });
     vi.spyOn(supabase.auth, 'getSession').mockResolvedValue({
       data: { session: { access_token: 'token', user: { id: 'me' } } },
       error: null,
@@ -91,6 +102,22 @@ describe('App routes', () => {
     renderAt('/settings');
     expect(await screen.findByRole('heading', { name: "Let's get to know you" })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Settings' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the moderation page and its link from regular users', async () => {
+    renderAt('/moderation');
+    expect(await screen.findByText('Moderators only')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Moderation' })).not.toBeInTheDocument();
+    expect(listReports).not.toHaveBeenCalled();
+  });
+
+  it('opens the moderation queue for a moderator without a dating profile', async () => {
+    getMyProfile.mockResolvedValue({ ...onboardedProfile, onboarding_completed: false });
+    getMe.mockResolvedValue({ id: 'me', onboarding_completed: false, roles: ['moderator'] });
+    renderAt('/moderation');
+    expect(await screen.findByText('No open reports.')).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Moderation' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.queryByRole('heading', { name: "Let's get to know you" })).not.toBeInTheDocument();
   });
 
   it('shows the not-found page for unknown paths', async () => {
