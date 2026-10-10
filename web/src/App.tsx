@@ -33,6 +33,35 @@ import AICompanion from '@/components/companion/AICompanion';
 import OnboardingGuard from '@/components/OnboardingGuard';
 import SignedInRedirect from '@/components/SignedInRedirect';
 
+/**
+ * Signed-in pages. Declared at module level: a component declared inside App would be a new type on every App render,
+ * and React would remount the whole page each time (losing its state and reloading its data).
+ */
+const PrivateRoute = ({
+  children,
+  guardOnboarding = true,
+}: {
+  children: React.ReactNode;
+  guardOnboarding?: boolean;
+}) => {
+  const { isAuthenticated, loading, user } = useAuth();
+  const hasAuthenticatedUser = !!user?.id || isAuthenticated;
+
+  if (loading && !hasAuthenticatedUser) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-island-dark">
+        <Loader2 className="h-12 w-12 animate-spin text-love" />
+      </div>
+    );
+  }
+
+  if (!hasAuthenticatedUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return guardOnboarding ? <OnboardingGuard>{children}</OnboardingGuard> : <>{children}</>;
+};
+
 function App() {
   const { isAuthenticated, loading, user } = useAuth();
   const online = useOnline();
@@ -48,31 +77,6 @@ function App() {
       });
     }
   }, [online, toast]);
-
-  // Custom PrivateRoute component
-  const PrivateRoute = ({
-    children,
-    guardOnboarding = true,
-  }: {
-    children: React.ReactNode;
-    guardOnboarding?: boolean;
-  }) => {
-    const hasAuthenticatedUser = !!user?.id || isAuthenticated;
-
-    if (loading && !hasAuthenticatedUser) {
-      return (
-        <div className="flex h-screen items-center justify-center bg-island-dark">
-          <Loader2 className="h-12 w-12 animate-spin text-love" />
-        </div>
-      );
-    }
-
-    if (!hasAuthenticatedUser) {
-      return <Navigate to="/login" replace />;
-    }
-
-    return guardOnboarding ? <OnboardingGuard>{children}</OnboardingGuard> : <>{children}</>;
-  };
 
   return (
     <>
