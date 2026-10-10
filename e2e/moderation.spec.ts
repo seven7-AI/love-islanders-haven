@@ -2,7 +2,7 @@ import { expect, test } from './support/fixtures';
 import { api, createConfirmedUser, grantRole, onboardedUser, PASSWORD, signIn, uniqueEmail } from './support/stack';
 
 test('a moderator reviews a report; regular users cannot reach the queue', async ({ page }) => {
-  const suffix = Date.now().toString(36);
+  const suffix = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
   const reporter = await onboardedUser('reporter', {
     name: `Rita${suffix}`,
     dob: '1995-02-02',

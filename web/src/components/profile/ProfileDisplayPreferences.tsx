@@ -47,11 +47,8 @@ const ProfileDisplayPreferences = ({
       // Notify parent component that preferences were updated
       onPreferencesUpdated();
     } catch (error: any) {
-      console.error('Error saving display preferences:', error);
-
-      // Ensure we don't show raw DB errors to the user
-      const errorMessage =
-        import.meta.env.MODE === 'development' ? error.message : 'Failed to save your preferences. Please try again.';
+      // API errors are problem documents with a readable detail; show it rather than a generic message.
+      const errorMessage = error?.message || 'Failed to save your preferences. Please try again.';
 
       toast({
         title: 'Save Failed',

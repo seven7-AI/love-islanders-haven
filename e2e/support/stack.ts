@@ -117,3 +117,24 @@ export async function apiStatus(token: string | null, path: string, init: { meth
   await response.body?.cancel();
   return response.status;
 }
+
+/** Posts a streak with one photo through the API's signed-upload flow. */
+export async function postStreak(token: string, caption: string) {
+  const ticket = await api<{ upload_url: string; path: string }>(token, '/v1/streaks/uploads', {
+    method: 'POST',
+    body: { content_type: 'image/png', size_bytes: PHOTO.length },
+  });
+  await json(await fetch(ticket.upload_url, { method: 'PUT', headers: { 'Content-Type': 'image/png' }, body: PHOTO }));
+  return api<{ id: string }>(token, '/v1/streaks', {
+    method: 'POST',
+    body: { media_paths: [ticket.path], caption, duration_hours: 24 },
+  });
+}
+
+/** Makes two users match (both like each other) and returns the match id. */
+export async function makeMatch(a: { id: string; token: string }, b: { id: string; token: string }) {
+  await api(a.token, '/v1/swipes', { method: 'POST', body: { target_id: b.id, direction: 'right' } });
+  await api(b.token, '/v1/swipes', { method: 'POST', body: { target_id: a.id, direction: 'right' } });
+  const page = await api<{ matches: { id: string; partner: { id: string } }[] }>(a.token, '/v1/matches?limit=50');
+  return page.matches.find((m) => m.partner.id === b.id)!.id;
+}

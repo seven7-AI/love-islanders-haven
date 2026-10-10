@@ -59,7 +59,7 @@ const FeedbackSupport = () => {
           <div className="space-y-3">
             <Label htmlFor="category">Category</Label>
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="bg-island-light/20 border-island-light">
+              <SelectTrigger id="category" className="bg-island-light/20 border-island-light">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>

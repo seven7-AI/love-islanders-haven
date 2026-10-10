@@ -2,7 +2,7 @@ import { expect, test } from './support/fixtures';
 import { api, onboardedUser, PASSWORD } from './support/stack';
 
 test('discover someone, match, exchange messages, see read receipts, and unmatch', async ({ page }) => {
-  const cleoName = `Cleo${Date.now().toString(36)}`;
+  const cleoName = `Cleo${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
   const cleo = await onboardedUser('cleo', {
     name: cleoName,
     dob: '1996-03-10',
