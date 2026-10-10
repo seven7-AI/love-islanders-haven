@@ -14,7 +14,7 @@ Roles:
 - **mod:** a moderator
 - **anon:** signed out
 
-Last updated: 2026-10-10 (#76 baseline).
+Last updated: 2026-10-10 (#77).
 
 ## Authentication
 | Feature | Roles | Tests | Result | Issue |
@@ -25,7 +25,7 @@ Last updated: 2026-10-10 (#76 baseline).
 | Forgot / reset password | anon | U `ForgotPassword.test.tsx`, `ResetPassword.test.tsx` | pass | #89 adds E2E |
 | Auth callback | anon | U `AuthCallback.test.tsx` | pass | – |
 | Token verification (JWKS, HS256, expiry, audience) | – | A `test_auth_verifier.py` | pass | – |
-| Route guards (signed out → login, not onboarded → onboarding) | anon, new | none | – | #77 adds App routing test; #89 adds E2E |
+| Route guards (signed out → login, not onboarded → onboarding), 404 | anon, new | U `App.test.tsx` | pass | #89 adds E2E |
 
 ## Onboarding and profile
 | Feature | Roles | Tests | Result | Issue |
@@ -57,7 +57,7 @@ Last updated: 2026-10-10 (#76 baseline).
 | AI companion | user | A `test_companion.py`; U `AICompanion.test.tsx` | pass (mocked LLM; live provider not verified) | #82 adds older history; #89 adds E2E of the unavailable state |
 | Safety contacts, date plans | user | A `test_safety.py`; U `use-safety-contacts.test.ts` | pass | #89 adds E2E |
 | Emergency alert (no provider) | user | A `test_safety.py`; U `EmergencyButton.test.tsx` | pass (honest 503) | – |
-| Settings page | user | U `Settings.test.tsx` (wraps its own provider) | **broken in app** | #77 |
+| Settings page | user | U `App.test.tsx` (real providers), `Settings.test.tsx` | pass (fixed in #77) | #89 adds E2E |
 | Settings sections (privacy, blocks, location, preferences, AI, feedback) | user | U `SettingsContext.test.tsx`, `mapping.test.ts`; A `test_safety.py` | pass (API) | #89 adds E2E |
 | Feedback | user | A `test_insights.py` | pass | #89 adds E2E |
 
