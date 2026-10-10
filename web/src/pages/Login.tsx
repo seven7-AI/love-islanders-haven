@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getMe } from '@/lib/api/moderation';
+import { destinationFor } from '@/components/SignedInRedirect';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -34,14 +35,9 @@ const Login = () => {
       }
       if (data.session) {
         toast.success('Welcome back!');
-        // Onboarded users go to Discover; staff without a dating profile to their queue; everyone else to onboarding.
+        // The /login route itself may already be redirecting (the auth state changed); both use destinationFor.
         const me = await getMe().catch(() => null);
-        const destination = me?.onboarding_completed
-          ? '/discover'
-          : me?.roles.includes('moderator')
-            ? '/moderation'
-            : '/onboarding';
-        navigate(destination, { replace: true });
+        navigate(destinationFor(me), { replace: true });
       }
     } catch (err: any) {
       toast.error(err?.message || 'Failed to log in.');
