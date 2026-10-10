@@ -8,6 +8,8 @@ set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 migrations="$here/../migrations"
+# SQL tests are piped to psql, so their \i paths resolve against the working directory: run from the repository root.
+cd "$here/../.."
 container=""
 
 cleanup() { [[ -n "$container" ]] && docker rm -f "$container" >/dev/null 2>&1 || true; }

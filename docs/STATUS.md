@@ -48,3 +48,4 @@ Legend: ✅ done · 🚧 in progress · ⏳ not started · ⛔ blocked on extern
 referenced → `npm ci`, `uv sync` → Postgres via compose, `alembic upgrade head` (0005) → `make check`: Prettier, ESLint
 (0 errors), typecheck, 23 test files / 88 web tests, build, ruff, mypy, 169 API tests → 12 database policy suites →
 3/3 end-to-end tests against a local Supabase (real Auth, Storage, Postgres), the API and the web app.
+(Since #58 the end-to-end API runs on its own Alembic-managed Postgres; Supabase provides only Auth and Storage.)
