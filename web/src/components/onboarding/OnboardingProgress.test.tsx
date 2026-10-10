@@ -9,4 +9,9 @@ describe('OnboardingProgress', () => {
     expect(screen.getByText('Basics')).toHaveClass('hidden', 'sm:block');
     expect(screen.getByText('Interests')).toHaveClass('hidden', 'sm:block');
   });
+
+  it('aligns the step columns at the top so the circles stay level', () => {
+    const { container } = render(<OnboardingProgress currentStep="photos" steps={['basics', 'photos']} />);
+    expect(container.querySelector('.flex.justify-between')).toHaveClass('items-start');
+  });
 });
