@@ -120,6 +120,21 @@ describe('App routes', () => {
     expect(screen.queryByRole('heading', { name: "Let's get to know you" })).not.toBeInTheDocument();
   });
 
+  it('sends a signed-in moderator without a dating profile from /login to the queue', async () => {
+    getMyProfile.mockResolvedValue({ ...onboardedProfile, onboarding_completed: false });
+    getMe.mockResolvedValue({ id: 'me', onboarding_completed: false, roles: ['moderator'] });
+    renderAt('/login');
+    expect(await screen.findByText('No open reports.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: "Let's get to know you" })).not.toBeInTheDocument();
+  });
+
+  it('sends a signed-in user who has not finished onboarding from / to onboarding', async () => {
+    getMyProfile.mockResolvedValue({ ...onboardedProfile, onboarding_completed: false });
+    getMe.mockResolvedValue({ id: 'me', onboarding_completed: false, roles: [] });
+    renderAt('/');
+    expect(await screen.findByRole('heading', { name: "Let's get to know you" })).toBeInTheDocument();
+  });
+
   it('shows the not-found page for unknown paths', async () => {
     renderAt('/no-such-page');
     expect(await screen.findByText(/404/)).toBeInTheDocument();

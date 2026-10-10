@@ -30,6 +30,7 @@ import Moderation from '@/pages/Moderation';
 import Onboarding from './pages/Onboarding';
 import AICompanion from '@/components/companion/AICompanion';
 import OnboardingGuard from '@/components/OnboardingGuard';
+import SignedInRedirect from '@/components/SignedInRedirect';
 
 function App() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -77,15 +78,12 @@ function App() {
       {online ? (
         <>
           <Routes>
-            <Route path="/login" element={isAuthenticated && user ? <Navigate to="/discover" replace /> : <Login />} />
-            <Route
-              path="/signup"
-              element={isAuthenticated && user ? <Navigate to="/discover" replace /> : <Signup />}
-            />
+            <Route path="/login" element={isAuthenticated && user ? <SignedInRedirect /> : <Login />} />
+            <Route path="/signup" element={isAuthenticated && user ? <SignedInRedirect /> : <Signup />} />
             <Route path="/verify" element={<Verify />} />
             <Route
               path="/forgot-password"
-              element={isAuthenticated && user ? <Navigate to="/discover" replace /> : <ForgotPassword />}
+              element={isAuthenticated && user ? <SignedInRedirect /> : <ForgotPassword />}
             />
             {/* Not redirected when signed in: the recovery link itself creates the session. */}
             <Route path="/reset-password" element={<ResetPassword />} />
@@ -193,7 +191,10 @@ function App() {
             />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
-            <Route path="/" element={<Navigate to="/discover" replace />} />
+            <Route
+              path="/"
+              element={isAuthenticated && user ? <SignedInRedirect /> : <Navigate to="/login" replace />}
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
 

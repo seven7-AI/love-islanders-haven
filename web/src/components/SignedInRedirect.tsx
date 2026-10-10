@@ -1,0 +1,31 @@
+import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
+import { getMe } from '@/lib/api/moderation';
+import { destinationFor } from '@/lib/start-page';
+
+/** Sends an already signed-in user to their start page; the only place that decides it. */
+const SignedInRedirect = () => {
+  const [to, setTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getMe()
+      .catch(() => null)
+      .then((me) => !cancelled && setTo(destinationFor(me)));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!to) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-island-dark">
+        <Loader2 className="h-12 w-12 animate-spin text-love" aria-label="Loading" />
+      </div>
+    );
+  }
+  return <Navigate to={to} replace />;
+};
+
+export default SignedInRedirect;
