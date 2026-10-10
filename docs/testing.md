@@ -3,7 +3,8 @@
 | Suite | Command | What it exercises | Needs |
 |---|---|---|---|
 | Web unit/component | `npm test` | React hooks/components, API client, mappings (Vitest + Testing Library; API modules mocked per test) | Node |
-| API | `make api-test` (`cd backend && uv run pytest`) | Every endpoint and service against a real Postgres: auth, profiles, photos, discovery, swipes (incl. concurrency), messaging, streaks, notifications, settings, safety, companion, calendar, insights, hardening, observability; Alembic upgrade/downgrade/check and parity of the cutover revision with the frozen `supabase/migrations`; backup/restore and data-copy drills | Docker (`make db`) |
+| API | `make api-test` (`cd backend && uv run pytest`) | Every endpoint and service against a real Postgres: auth, profiles, photos, discovery, swipes (incl. concurrency), messaging, streaks, notifications, settings, safety, companion, calendar, insights, hardening, observability; Alembic upgrade/downgrade/check and parity of the cutover revision with the frozen `supabase/migrations` | Docker (`make db`) |
+| Database drills | `make db-restore-drill` | Shell drills on disposable databases: backup → restore → validate, and the legacy Supabase → Alembic data copy at the cutover revision followed by `alembic upgrade head` | Docker (`make db`), psql/pg_dump |
 | Database policies | `npm run test:db` | `supabase/migrations` on Postgres with Supabase role/auth/storage stubs: RLS, triggers, a two-session concurrency test, and the client lockdown | Docker, psql |
 | End-to-end | `npm run test:e2e` | Browser (Playwright, mobile viewport) against the API on its own Postgres (schema created by `alembic upgrade head`), a **real** local Supabase for Auth (with emailed confirmation links) and Storage, and the web app: sign-up + email confirmation, photo upload, discover → match → chat with a reply | Docker, Node, uv; first run downloads the Supabase images and Chromium (`npx playwright install chromium`) |
 

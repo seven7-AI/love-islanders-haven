@@ -14,7 +14,7 @@ the decision taken. "Repository" means checked against `supabase/migrations` and
 | `profiles.latitude`, `longitude`, `location_updated_at` | `location-services` edge function | Missing, so location updates fail today. Added with the location work in #21. |
 | `storage` bucket `media` | `src/services/messages/fileUpload.ts` | Missing, so chat media uploads fail today. Created as a private bucket with signed URLs in #15. |
 | `public.users` | `google-calendar-callback` | Should have been `auth.users`; the flow is rebuilt in #20. |
-| Per-function `config.toml` with `project_id = "hojcrgvdvvrfdnyccgej"` | `supabase/functions/*/config.toml` | Not read by the Supabase CLI and named a different project from `.env`. Replaced by `supabase/config.toml` (local stack settings, `verify_jwt = false` for the Google callback). |
+| Per-function `config.toml` with `project_id = "hojcrgvdvvrfdnyccgej"` | `supabase/functions/*/config.toml` | Not read by the Supabase CLI and named a different project from `.env`. Replaced by `supabase/config.toml` (local stack settings); the functions themselves were removed in #22. |
 
 ## Live verification (superseded)
 #36 planned a `supabase db diff --linked` against the live project before adopting Alembic on that database. The

@@ -1,6 +1,6 @@
 /**
- * Endpoints of the local stack started by scripts/e2e.sh: Supabase CLI (real Auth, Storage and Postgres with this
- * repository's migrations), the Love Islander API, and the web dev server. The keys are the Supabase CLI's fixed
+ * Endpoints of the local stack started by scripts/e2e.sh: Supabase CLI (real Auth and Storage), the Love Islander API
+ * (on its own Alembic-managed Postgres), and the web dev server. The keys are the Supabase CLI's fixed
  * local-development defaults, not secrets.
  */
 export const SUPABASE_URL = process.env.E2E_SUPABASE_URL ?? 'http://127.0.0.1:54321';
