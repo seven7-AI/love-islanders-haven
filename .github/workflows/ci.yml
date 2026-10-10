@@ -136,6 +136,7 @@ jobs:
         run: npm run test:e2e
         env:
           CI: 'true'
+          POSTGRES_IMAGE: public.ecr.aws/docker/library/postgres:16-alpine
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

@@ -5,9 +5,9 @@
 | Web unit/component | `npm test` | React hooks/components, API client, mappings (Vitest + Testing Library; API modules mocked per test) | Node |
 | API | `make api-test` (`cd backend && uv run pytest`) | Every endpoint and service against a real Postgres: auth, profiles, photos, discovery, swipes (incl. concurrency), messaging, streaks, notifications, settings, safety, companion, calendar, insights, hardening, observability; Alembic upgrade/downgrade/check and parity with `supabase/migrations`; backup/restore and data-copy drills | Docker (`make db`) |
 | Database policies | `npm run test:db` | `supabase/migrations` on Postgres with Supabase role/auth/storage stubs: RLS, triggers, a two-session concurrency test, and the client lockdown | Docker, psql |
-| End-to-end | `npm run test:e2e` | Browser (Playwright, mobile viewport) against a **real** local Supabase (Auth with emailed confirmation links, Storage, Postgres with our migrations), the API and the web app: sign-up + email confirmation, photo upload, discover → match → chat with a reply | Docker, Node, uv; first run downloads the Supabase images and Chromium (`npx playwright install chromium`) |
+| End-to-end | `npm run test:e2e` | Browser (Playwright, mobile viewport) against the API on its own Postgres (schema created by `alembic upgrade head`), a **real** local Supabase for Auth (with emailed confirmation links) and Storage, and the web app: sign-up + email confirmation, photo upload, discover → match → chat with a reply | Docker, Node, uv; first run downloads the Supabase images and Chromium (`npx playwright install chromium`) |
 
-`KEEP_STACK=1 npm run test:e2e` leaves the local Supabase stack running for faster re-runs; `npx supabase stop` stops it.
+`KEEP_STACK=1 npm run test:e2e` leaves the local Supabase stack and the `love-islander-e2e-db` container running for faster re-runs; `npx supabase stop` and `docker rm -f love-islander-e2e-db` stop them.
 
 ## Test substitutes
 Some external services are replaced in tests; these tests check our code's handling, **not** the real services:
