@@ -4,6 +4,7 @@ import { Loader2, TrashIcon } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { BlockedUser, fetchBlockedUsers, unblockUser } from '@/lib/api/safety';
+import SafeImage from '@/components/SafeImage';
 
 const BlockReportSection = () => {
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
@@ -70,7 +71,7 @@ const BlockReportSection = () => {
               <div key={blocked.user_id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
                 <div className="flex items-center gap-2 min-w-0">
                   {blocked.photo_url && (
-                    <img src={blocked.photo_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                    <SafeImage src={blocked.photo_url} alt="" className="h-8 w-8 rounded-full object-cover" />
                   )}
                   <span className="truncate">{blocked.name || 'Unknown User'}</span>
                 </div>

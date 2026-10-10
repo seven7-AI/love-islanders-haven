@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Loader2 } from 'lucide-react';
 import { fetchMatches, MatchSummary } from '@/lib/api/discovery';
+import SafeImage from '@/components/SafeImage';
 
 const Matches = () => {
   const { user } = useAuth();
@@ -85,7 +86,7 @@ const Matches = () => {
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 bg-island-light">
                     {m.partner.photo_url ? (
-                      <img
+                      <SafeImage
                         src={m.partner.photo_url}
                         alt={m.partner.name ?? ''}
                         className="w-full h-full object-cover"

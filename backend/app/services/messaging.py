@@ -97,6 +97,30 @@ async def list_messages(
     )
 
 
+async def get_message(
+    session: AsyncSession,
+    storage: StorageProvider,
+    bucket: str,
+    me: uuid.UUID,
+    match_id: uuid.UUID,
+    message_id: uuid.UUID,
+) -> MessageOut:
+    """One message with a freshly signed media URL (signed URLs expire; the client asks again when one has)."""
+    await _require_active_member(session, me, match_id)
+    row = (
+        await session.execute(
+            text(
+                "SELECT id, match_id, sender_id, content, content_type, media_url, is_read, created_at "
+                "FROM messages WHERE id = :id AND match_id = :m"
+            ),
+            {"id": message_id, "m": match_id},
+        )
+    ).one_or_none()
+    if row is None:
+        raise NotFound("Message")
+    return await _to_out(row, storage, bucket)
+
+
 async def create_media_upload(
     session: AsyncSession, storage: StorageProvider, bucket: str, me: uuid.UUID, match_id: uuid.UUID, content_type: str
 ) -> SignedUpload:

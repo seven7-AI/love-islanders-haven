@@ -5,6 +5,7 @@ import { Heart, Flame, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { StreakPost as StreakPostType } from './types';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import SafeImage from '@/components/SafeImage';
 
 interface StreakPostProps {
   post: StreakPostType;
@@ -43,7 +44,11 @@ const StreakPost = ({ post, onLike }: StreakPostProps) => {
       <CardHeader className="py-3 px-4">
         <div className="flex items-center gap-3">
           {post.user_profile_image ? (
-            <img src={post.user_profile_image} alt={post.user_name} className="h-10 w-10 rounded-full object-cover" />
+            <SafeImage
+              src={post.user_profile_image}
+              alt={post.user_name}
+              className="h-10 w-10 rounded-full object-cover"
+            />
           ) : (
             <div className="h-10 w-10 bg-muted rounded-full flex items-center justify-center">
               <User className="h-6 w-6 text-muted-foreground" />
@@ -69,7 +74,7 @@ const StreakPost = ({ post, onLike }: StreakPostProps) => {
               {contentArray.map((imageUrl, index) => (
                 <CarouselItem key={index}>
                   <div className="relative aspect-square">
-                    <img src={imageUrl} alt={`Streak post ${index + 1}`} className="w-full h-full object-cover" />
+                    <SafeImage src={imageUrl} alt={`Streak post ${index + 1}`} className="w-full h-full object-cover" />
                     {hasMultipleImages && (
                       <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded-full text-xs">
                         {index + 1}/{contentArray.length}

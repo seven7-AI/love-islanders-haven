@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/context/auth';
 import {
   ChatMessage,
+  getChatMessage,
   listMessages,
   markConversationRead,
   MessageContentType,
@@ -101,6 +102,21 @@ export const useInlineChat = (matchId: string) => {
     setOlderCursor(page.older_cursor);
   };
 
+  /** Signed media URLs expire; fetches a fresh one for a message (null if the media is unavailable). */
+  const refreshMedia = useCallback(
+    async (messageId: string): Promise<string | null> => {
+      try {
+        const fresh = await getChatMessage(matchId, messageId);
+        setMessages((prev) => merge(prev, [fresh]));
+        return fresh.media_url;
+      } catch (err) {
+        console.error('Error refreshing message media:', err);
+        return null;
+      }
+    },
+    [matchId],
+  );
+
   /** Returns true once the message is stored; false (with the reason logged) if sending failed. */
   const handleSendMessage = async (content: string, contentType: MessageContentType = 'text', mediaPath?: string) => {
     try {
@@ -113,5 +129,14 @@ export const useInlineChat = (matchId: string) => {
     }
   };
 
-  return { messages, isLoading, error, currentUserId, handleSendMessage, loadOlder, hasOlder: olderCursor !== null };
+  return {
+    messages,
+    isLoading,
+    error,
+    currentUserId,
+    handleSendMessage,
+    loadOlder,
+    hasOlder: olderCursor !== null,
+    refreshMedia,
+  };
 };

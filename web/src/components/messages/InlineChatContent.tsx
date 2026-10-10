@@ -14,6 +14,8 @@ interface InlineChatContentProps {
   hasOlder?: boolean;
   onLoadOlder?: () => Promise<void>;
   onSendMessage: (content: string, contentType: 'text' | 'image' | 'audio', mediaPath?: string) => Promise<boolean>;
+  /** Fetches a fresh signed URL for a message whose media URL expired. */
+  onMediaExpired?: (messageId: string) => Promise<string | null>;
 }
 
 const InlineChatContent: React.FC<InlineChatContentProps> = ({
@@ -25,6 +27,7 @@ const InlineChatContent: React.FC<InlineChatContentProps> = ({
   hasOlder,
   onLoadOlder,
   onSendMessage,
+  onMediaExpired,
 }) => {
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -73,7 +76,12 @@ const InlineChatContent: React.FC<InlineChatContentProps> = ({
               </div>
             )}
             {messages.map((msg) => (
-              <MessageItem key={msg.id} message={msg} isCurrentUser={msg.sender_id === currentUserId} />
+              <MessageItem
+                key={msg.id}
+                message={msg}
+                isCurrentUser={msg.sender_id === currentUserId}
+                onMediaExpired={onMediaExpired}
+              />
             ))}
             <div ref={messagesEndRef} />
           </div>
