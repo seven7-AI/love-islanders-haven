@@ -43,29 +43,5 @@ Tests use a real Postgres (`TEST_DATABASE_URL`, default `postgresql+asyncpg://po
 Run them with the same environment as the API (e.g. a cron job or the hosting platform's scheduler running the API image).
 
 ## Configuration
-| Variable | Required | Default | Purpose |
-|---|---|---|---|
-| `DATABASE_URL` | yes | – | `postgresql+asyncpg://…` |
-| `ENVIRONMENT` | no | `development` | `development`, `test`, `staging`, `production` (production hides `/docs`) |
-| `LOG_LEVEL` | no | `INFO` | |
-| `LOG_JSON` | no | `true` | JSON logs; set `false` for readable local output |
-| `CORS_ORIGINS` | no | `["http://localhost:8080"]` | JSON list of allowed browser origins |
-| `SUPABASE_URL` | one of these two | – | Supabase project URL; access tokens are verified against `<url>/auth/v1/.well-known/jwks.json` (signature, `exp`, `aud`, `iss`) |
-| `SUPABASE_JWT_SECRET` | one of these two | – | Legacy HS256 secret for projects without asymmetric signing keys |
-| `SUPABASE_JWT_AUDIENCE` | no | `authenticated` | |
-| `SUPABASE_SERVICE_ROLE_KEY` | for photos | – | Server-side key for Supabase Storage (signed uploads, existence checks, deletes). Without it photo endpoints return 503 `storage_not_configured` |
-| `PROFILE_IMAGES_BUCKET` | no | `profile-images` | |
-| `CHAT_MEDIA_BUCKET` | no | `chat-media` | Private bucket; media is served through signed URLs valid for one hour |
-| `LLM_API_KEY` | for the AI companion | – | Key for an OpenAI-compatible Chat Completions API. Without it the companion endpoints return 503 `ai_not_configured` |
-| `LLM_MODEL` | no | `gpt-4o-mini` | |
-| `LLM_BASE_URL` | no | `https://api.openai.com/v1` | Any OpenAI-compatible endpoint |
-| `COMPANION_MESSAGES_PER_HOUR` | no | `30` | Per-user limit |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | for Google Calendar | – | OAuth client (Google Cloud console). Without them calendar endpoints return 503 `calendar_not_configured` |
-| `GOOGLE_REDIRECT_URI` | for Google Calendar | – | `https://<web-app>/calendar/callback`; must be registered on the OAuth client |
-| `TOKEN_ENCRYPTION_KEY` | for Google Calendar | – | Fernet key for stored refresh tokens: `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`. Rotating it disconnects existing calendars |
-| `OAUTH_STATE_SECRET` | no | token key | Signs OAuth state values (10-minute lifetime, bound to the user) |
-| `METRICS_TOKEN` | recommended in production | – | Protects `/metrics` (Bearer token) |
-| `SENTRY_DSN` / `SENTRY_TRACES_SAMPLE_RATE` | no | – / `0` | Error tracking; see docs/operations/observability.md |
-| `RATE_LIMIT_ENABLED` | no | `true` | Per-user limits on write endpoints |
-| `DB_POOL_SIZE` | no | `5` | |
-| `DB_POOL_TIMEOUT_SECONDS` | no | `5` | Connection and pool checkout timeout |
+All settings are environment variables (or `backend/.env`, from `backend/.env.example`); the reference is
+[docs/development/environment.md](../docs/development/environment.md).

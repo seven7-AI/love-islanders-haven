@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 /**
  * End-to-end tests against a real local stack: the API on its own Postgres (schema from Alembic), the Supabase CLI for
- * Auth and Storage, and the web app. Start everything with `scripts/e2e.sh` (CI does the same); see docs/testing.md.
+ * Auth and Storage, and the web app. Start everything with `scripts/e2e.sh` (CI does the same); see docs/development/testing.md.
  */
 export default defineConfig({
   testDir: '.',

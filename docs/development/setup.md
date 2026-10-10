@@ -37,8 +37,4 @@ cd backend && uv run uvicorn app.main:create_app --factory --reload
 ```
 
 ## Checks
-```bash
-make check   # web + API checks
-make ci      # everything CI runs, including database policy and end-to-end tests
-```
-See `docs/testing.md`.
+The suites, `make check` and `make ci` are described in [testing.md](testing.md).

@@ -28,8 +28,9 @@ api-test: db ## Backend tests against the compose Postgres
 
 api-check: api-lint api-typecheck api-test ## All backend checks
 
-web-check: ## Frontend format check, lint, typecheck, tests, build
+web-check: ## Frontend format check, lint, typecheck, tests, build; documentation references
 	npm run format:check && npm run lint && npm run typecheck && npm test && npm run build
+	scripts/check-doc-references.py
 
 check: web-check api-check ## Web + API checks (fast local loop)
 
